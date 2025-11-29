@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'welcome_page.dart';
+import 'terms_and_conditions.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (isLogin) {
         await _auth.signInWithEmailAndPassword(email: email, password: password);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Zalogowano!')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logged in!')));
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
@@ -37,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else {
         await _auth.createUserWithEmailAndPassword(email: email, password: password);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Konto utworzone!')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Account created!')));
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
@@ -45,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -53,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isLogin ? 'Logowanie' : 'Rejestracja'),
+        title: Text(isLogin ? 'Login' : 'Register'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -68,20 +69,31 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(height: 10),
             TextField(
               controller: passwordController,
-              decoration: InputDecoration(labelText: 'Hasło'),
+              decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: submit,
-              child: Text(isLogin ? 'Zaloguj' : 'Zarejestruj'),
+              child: Text(isLogin ? 'Login' : 'Register'),
             ),
             TextButton(
               onPressed: toggleForm,
-              child: Text(isLogin ? 'Nie masz konta? Zarejestruj się' : 'Masz konto? Zaloguj się'),
+              child: Text(isLogin ? "Don't have an account? Register" : 'Have an account? Login'),
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Terms & Conditions',
+        mini: true,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => TermsAndConditionsPage()),
+          );
+        },
+        child: Icon(Icons.description),
       ),
     );
   }
