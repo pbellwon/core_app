@@ -59,27 +59,45 @@ class _LoginPageState extends State<LoginPage> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(labelText: 'Email'),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: passwordController,
+                      decoration: InputDecoration(labelText: 'Password'),
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: submit,
+                      child: Text(isLogin ? 'Login' : 'Register'),
+                    ),
+                    TextButton(
+                      onPressed: toggleForm,
+                      child: Text(isLogin ? "Don't have an account? Register" : 'Have an account? Login'),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            SizedBox(height: 10),
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: submit,
-              child: Text(isLogin ? 'Login' : 'Register'),
-            ),
-            TextButton(
-              onPressed: toggleForm,
-              child: Text(isLogin ? "Don't have an account? Register" : 'Have an account? Login'),
+
+            // Small agreement text at the bottom center
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                'By using this page you agree to terms & conditions',
+                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
