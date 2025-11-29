@@ -1,59 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'core_content.dart';
-import 'login_page.dart';
+import 'terms_and_conditions.dart';
 
-class WelcomePage extends StatefulWidget {
-  const WelcomePage({super.key});
-
-  @override
-  _WelcomePageState createState() => _WelcomePageState();
-}
-
-class _WelcomePageState extends State<WelcomePage> {
-  final _auth = FirebaseAuth.instance;
-
-  Future<void> _signOutAndGotoLogin() async {
-    try {
-      await _auth.signOut();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd przy wylogowaniu: $e')),
-        );
-      }
-    }
-
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => LoginPage()),
-    );
-  }
+class CoreContentPage extends StatelessWidget {
+  const CoreContentPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Intro"),
-        actions: [
-          IconButton(
-            tooltip: 'Wyloguj',
-            icon: Icon(Icons.logout),
-            onPressed: _signOutAndGotoLogin,
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text("Welome to Core Content")),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => CoreContentPage()),
-            );
-          },
-          child: Text("Core Content"),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "What kind of expirience would be most helpful for You in this moment ?",
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 24),
+            // BUTTON 1
+            ElevatedButton(
+              onPressed: () {
+                // TODO: przejście do odpowiedniej podstrony
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              ),
+              child: Text("Help me reconnect"),
+            ),
+
+            SizedBox(height: 20),
+
+            // BUTTON 2
+            ElevatedButton(
+              onPressed: () {
+                // TODO: przejście do odpowiedniej podstrony
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              ),
+              child: Text("Show me what's possible"),
+            ),
+
+            SizedBox(height: 20),
+
+            // BUTTON 3
+            ElevatedButton(
+              onPressed: () {
+                // TODO: przejście do odpowiedniej podstrony
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              ),
+              child: Text("Go to my favourites"),
+            ),
+          ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Terms & Conditions',
+        mini: true,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => TermsAndConditionsPage()),
+          );
+        },
+        child: Icon(Icons.description),
       ),
     );
   }

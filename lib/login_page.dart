@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'welcome_page.dart';
+import 'get_started.dart';
 import 'terms_and_conditions.dart';
 
 class LoginPage extends StatefulWidget {
@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => WelcomePage()),
+          MaterialPageRoute(builder: (_) => GetStarted()),
         );
       } else {
         await _auth.createUserWithEmailAndPassword(email: email, password: password);
@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => WelcomePage()),
+          MaterialPageRoute(builder: (_) => GetStarted()),
         );
       }
     } catch (e) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'login_page.dart';
-import 'welcome_page.dart';
+import 'get_started.dart';
 
 
 
@@ -76,7 +76,7 @@ class TitlePage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => WelcomePage()),
+                    MaterialPageRoute(builder: (_) => GetStarted()),
                   );
                 },
                 child: Text(
