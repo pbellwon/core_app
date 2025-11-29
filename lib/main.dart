@@ -60,7 +60,7 @@ class TitlePage extends StatelessWidget {
               ),
             ),
 
-            // DOLNY PRZYCISK "LET'S START"
+            // TESTOWA ZMIANA DOLNY PRZYCISK "LET'S START"
             Positioned(
               bottom: 40,
               left: 20,
