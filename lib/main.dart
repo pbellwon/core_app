@@ -27,6 +27,23 @@ class MyApp extends StatelessWidget {
           backgroundColor: Color(0xFFF7E7F3),
           foregroundColor: Color(0xFF860E66),
         ),
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Color(0xFF860E66)),
+          bodyMedium: TextStyle(color: Color(0xFF860E66)),
+          bodySmall: TextStyle(color: Color(0xFF860E66)),
+          displayLarge: TextStyle(color: Color(0xFF860E66)),
+          displayMedium: TextStyle(color: Color(0xFF860E66)),
+          displaySmall: TextStyle(color: Color(0xFF860E66)),
+          headlineLarge: TextStyle(color: Color(0xFF860E66)),
+          headlineMedium: TextStyle(color: Color(0xFF860E66)),
+          headlineSmall: TextStyle(color: Color(0xFF860E66)),
+          labelLarge: TextStyle(color: Color(0xFF860E66)),
+          labelMedium: TextStyle(color: Color(0xFF860E66)),
+          labelSmall: TextStyle(color: Color(0xFF860E66)),
+          titleLarge: TextStyle(color: Color(0xFF860E66)),
+          titleMedium: TextStyle(color: Color(0xFF860E66)),
+          titleSmall: TextStyle(color: Color(0xFF860E66)),
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.resolveWith(
