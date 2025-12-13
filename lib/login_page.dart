@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'get_started.dart';
 import 'terms_and_conditions.dart';
 
@@ -98,7 +99,15 @@ class _LoginPageState extends State<LoginPage> {
         // Show terms dialog before registering
         final accepted = await _showTermsDialog();
         if (accepted == true) {
-          await _auth.createUserWithEmailAndPassword(email: email, password: password);
+          UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+          // Store acceptance timestamp in Firestore
+          final uid = userCredential.user?.uid;
+          if (uid != null) {
+            await FirebaseFirestore.instance.collection('users').doc(uid).set({
+              'accepted_terms_at': DateTime.now().toIso8601String(),
+              'email': email,
+            }, SetOptions(merge: true));
+          }
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Account created!')));
           if (!mounted) return;
           Navigator.pushReplacement(
