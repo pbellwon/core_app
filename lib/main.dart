@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
             backgroundColor: WidgetStateProperty.resolveWith(
               (Set<WidgetState> states) {
                 if (states.contains(WidgetState.hovered)) {
-                  return Color(0xFFFF854D);
+                  return Color(0xFFCC5500);
                 }
                 return Color(0xFFB31288);
               },
@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: Color(0xFFB31288),
           foregroundColor: Colors.white,
-          hoverColor: Color(0xFFFF854D),
+          hoverColor: Color(0xFFCC5500),
         ),
       ),
       home: LoginPage(),
