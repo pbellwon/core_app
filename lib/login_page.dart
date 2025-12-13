@@ -11,6 +11,64 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+    bool _acceptedTerms = false;
+
+    Future<bool?> _showTermsDialog() async {
+      bool accepted = false;
+      bool declined = false;
+      return showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: Text('Terms and Conditions'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Please read and accept the terms and conditions to register.'),
+                      SizedBox(height: 16),
+                      CheckboxListTile(
+                        title: Text('Accept'),
+                        value: accepted,
+                        onChanged: (val) {
+                          setState(() {
+                            accepted = val ?? false;
+                            if (accepted) declined = false;
+                          });
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: Text('Decline'),
+                        value: declined,
+                        onChanged: (val) {
+                          setState(() {
+                            declined = val ?? false;
+                            if (declined) accepted = false;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: !accepted && !declined
+                        ? null
+                        : () {
+                            Navigator.of(context).pop(accepted ? true : false);
+                          },
+                    child: Text('Continue'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    }
   final _auth = FirebaseAuth.instance;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -37,13 +95,24 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (_) => GetStarted()),
         );
       } else {
-        await _auth.createUserWithEmailAndPassword(email: email, password: password);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Account created!')));
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => GetStarted()),
-        );
+        // Show terms dialog before registering
+        final accepted = await _showTermsDialog();
+        if (accepted == true) {
+          await _auth.createUserWithEmailAndPassword(email: email, password: password);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Account created!')));
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => GetStarted()),
+          );
+        } else if (accepted == false) {
+          // Declined, go back to starting page
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => LoginPage()),
+          );
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
