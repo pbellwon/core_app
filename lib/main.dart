@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
           labelSmall: TextStyle(color: Color(0xFF860E66)),
           titleLarge: TextStyle(color: Color(0xFF860E66)),
           titleMedium: TextStyle(color: Color(0xFF860E66)),
-          titleSmall: TextStyle(color: Color(0xFF860E66)),
+          titleSmall: TextStyle(color: Color(0xFF860E66))
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
