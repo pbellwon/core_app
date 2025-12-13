@@ -22,9 +22,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: Color(0xFFF7E7F3),
+        scaffoldBackgroundColor: Color(0xFFFBF3F9),
         appBarTheme: AppBarTheme(
-          backgroundColor: Color(0xFFF7E7F3),
+          backgroundColor: Color(0xFFFBF3F9),
           foregroundColor: Color(0xFF860E66),
         ),
         textTheme: TextTheme(
