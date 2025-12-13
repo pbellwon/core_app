@@ -54,7 +54,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isLogin ? 'Welcome to the Core App' : 'Welcome to the Core App'),
+        title: Text(
+          isLogin ? 'Welcome to the Core App' : 'Welcome to the Core App',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

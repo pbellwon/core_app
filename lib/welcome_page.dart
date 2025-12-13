@@ -35,7 +35,10 @@ class _CoreContentPageState extends State<CoreContentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Welome to Core Content"),
+        title: Text(
+          "Welome to Core Content",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             tooltip: 'Logout',
