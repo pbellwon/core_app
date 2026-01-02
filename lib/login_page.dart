@@ -17,6 +17,29 @@ class _LoginPageState extends State<LoginPage> {
     Future<bool?> _showTermsDialog() async {
       bool accepted = false;
       bool declined = false;
+      Future<void> _showTermsContentDialog() async {
+        await showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Terms & Conditions'),
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Text('terms & conditions'),
+              ),
+            );
+          },
+        );
+      }
       return showDialog<bool>(
         context: context,
         barrierDismissible: false,
@@ -24,13 +47,28 @@ class _LoginPageState extends State<LoginPage> {
           return StatefulBuilder(
             builder: (context, setState) {
               return AlertDialog(
-                title: Text('Terms and Conditions'),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Terms and Conditions'),
+                    IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
                 content: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text('Please read and accept the terms and conditions to register.'),
-                      SizedBox(height: 16),
+                      SizedBox(height: 8),
+                      IconButton(
+                        icon: Icon(Icons.info_outline, color: Colors.blue),
+                        tooltip: 'View Terms & Conditions',
+                        onPressed: _showTermsContentDialog,
+                      ),
+                      SizedBox(height: 8),
                       CheckboxListTile(
                         title: Text('Accept'),
                         value: accepted,
@@ -108,11 +146,10 @@ class _LoginPageState extends State<LoginPage> {
               'email': email,
             }, SetOptions(merge: true));
           }
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Account created!')));
           if (!mounted) return;
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => GetStarted()),
+            MaterialPageRoute(builder: (_) => GetStarted(justRegistered: true)),
           );
         } else if (accepted == false) {
           // Declined, go back to starting page

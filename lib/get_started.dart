@@ -5,7 +5,8 @@ import 'login_page.dart';
 import 'terms_and_conditions.dart';
 
 class GetStarted extends StatefulWidget {
-  const GetStarted({super.key});
+  final bool justRegistered;
+  const GetStarted({super.key, this.justRegistered = false});
 
   @override
   _GetStartedState createState() => _GetStartedState();
@@ -48,16 +49,42 @@ class _GetStartedState extends State<GetStarted> {
           ),
         ],
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => CoreContentPage()),
-            );
-          },
-          child: Text("Core Content"),
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (widget.justRegistered)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Card(
+                color: Colors.green[50],
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green),
+                      SizedBox(width: 10),
+                      Text(
+                        'Your account has been created!',
+                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => CoreContentPage()),
+                );
+              },
+              child: Text("Core Content"),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Terms & Conditions',
