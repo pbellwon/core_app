@@ -13,6 +13,43 @@ class GetStarted extends StatefulWidget {
 }
 
 class _GetStartedState extends State<GetStarted> {
+    @override
+    void didChangeDependencies() {
+      super.didChangeDependencies();
+      if (widget.justRegistered) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Success'),
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green),
+                  SizedBox(width: 10),
+                  Expanded(child: Text('Your account has been created!')),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('OK'),
+                ),
+              ],
+            ),
+          );
+        });
+      }
+    }
   final _auth = FirebaseAuth.instance;
 
   Future<void> _signOutAndGotoLogin() async {
@@ -49,42 +86,16 @@ class _GetStartedState extends State<GetStarted> {
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (widget.justRegistered)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Card(
-                color: Colors.green[50],
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green),
-                      SizedBox(width: 10),
-                      Text(
-                        'Your account has been created!',
-                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => CoreContentPage()),
-                );
-              },
-              child: Text("Core Content"),
-            ),
-          ),
-        ],
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => CoreContentPage()),
+            );
+          },
+          child: Text("Core Content"),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Terms & Conditions',
