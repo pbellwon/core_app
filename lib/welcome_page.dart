@@ -96,17 +96,6 @@ class _CoreContentPageState extends State<CoreContentPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Terms & Conditions',
-        mini: true,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => TermsAndConditionsPage()),
-          );
-        },
-        child: Icon(Icons.description),
-      ),
     );
   }
 }

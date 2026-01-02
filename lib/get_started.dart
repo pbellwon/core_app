@@ -97,17 +97,6 @@ class _GetStartedState extends State<GetStarted> {
           child: Text("Core Content"),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Terms & Conditions',
-        mini: true,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => TermsAndConditionsPage()),
-          );
-        },
-        child: Icon(Icons.description),
-      ),
     );
   }
 }

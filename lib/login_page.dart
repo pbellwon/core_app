@@ -12,102 +12,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-    bool _acceptedTerms = false;
-
-    Future<bool?> _showTermsDialog() async {
-      bool accepted = false;
-      bool declined = false;
-      Future<void> _showTermsContentDialog() async {
-        await showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder: (context) {
-            return AlertDialog(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Terms & Conditions'),
-                  IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-              content: SingleChildScrollView(
-                child: Text('terms & conditions'),
-              ),
-            );
-          },
-        );
-      }
-      return showDialog<bool>(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return AlertDialog(
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Terms and Conditions'),
-                    IconButton(
-                      icon: Icon(Icons.close),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-                content: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Please read and accept the terms and conditions to register.'),
-                      SizedBox(height: 8),
-                      IconButton(
-                        icon: Icon(Icons.info_outline, color: Colors.blue),
-                        tooltip: 'View Terms & Conditions',
-                        onPressed: _showTermsContentDialog,
-                      ),
-                      SizedBox(height: 8),
-                      CheckboxListTile(
-                        title: Text('Accept'),
-                        value: accepted,
-                        onChanged: (val) {
-                          setState(() {
-                            accepted = val ?? false;
-                            if (accepted) declined = false;
-                          });
-                        },
-                      ),
-                      CheckboxListTile(
-                        title: Text('Decline'),
-                        value: declined,
-                        onChanged: (val) {
-                          setState(() {
-                            declined = val ?? false;
-                            if (declined) accepted = false;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: !accepted && !declined
-                        ? null
-                        : () {
-                            Navigator.of(context).pop(accepted ? true : false);
-                          },
-                    child: Text('Continue'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
-    }
   final _auth = FirebaseAuth.instance;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -120,14 +24,119 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  Future<bool?> _showTermsDialog() async {
+    bool? accepted; // null = nic nie wybrano, true = accept, false = decline
+
+    Future<void> _showTermsContentDialog() async {
+      await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return AlertDialog(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Terms & Conditions'),
+                IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Text('terms & conditions'),
+            ),
+          );
+        },
+      );
+    }
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Terms and Conditions'),
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      print('Dialog closed with X');
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                        'Please read and accept the terms and conditions to register.'),
+                    SizedBox(height: 8),
+                    IconButton(
+                      icon: Icon(Icons.info_outline, color: Colors.blue),
+                      tooltip: 'View Terms & Conditions',
+                      onPressed: _showTermsContentDialog,
+                    ),
+                    SizedBox(height: 16),
+                    // Radio buttons for single selection
+                    RadioListTile<bool>(
+                      title: Text('Accept'),
+                      value: true,
+                      groupValue: accepted,
+                      onChanged: (val) {
+                        setState(() {
+                          accepted = val;
+                        });
+                      },
+                    ),
+                    RadioListTile<bool>(
+                      title: Text('Decline'),
+                      value: false,
+                      groupValue: accepted,
+                      onChanged: (val) {
+                        setState(() {
+                          accepted = val;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: accepted == null
+                      ? null
+                      : () {
+                          print(
+                              'Dialog closed with: ${accepted == true ? 'Accept' : 'Decline'}');
+                          Navigator.of(context).pop(accepted);
+                        },
+                  child: Text('Continue'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> submit() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
     try {
       if (isLogin) {
-        await _auth.signInWithEmailAndPassword(email: email, password: password);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logged in!')));
+        await _auth.signInWithEmailAndPassword(
+            email: email, password: password);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Logged in!')));
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
@@ -136,32 +145,102 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         // Show terms dialog before registering
         final accepted = await _showTermsDialog();
+
         if (accepted == true) {
-          UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-          // Store acceptance timestamp in Firestore
-          final uid = userCredential.user?.uid;
-          if (uid != null) {
-            await FirebaseFirestore.instance.collection('users').doc(uid).set({
-              'accepted_terms_at': DateTime.now().toIso8601String(),
-              'email': email,
-            }, SetOptions(merge: true));
+          try {
+            UserCredential userCredential =
+                await _auth.createUserWithEmailAndPassword(
+                    email: email, password: password);
+
+            // Store acceptance timestamp in Firestore
+            final uid = userCredential.user?.uid;
+            if (uid != null) {
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .set({
+                'accepted_terms_at': DateTime.now().toIso8601String(),
+                'email': email,
+              }, SetOptions(merge: true));
+            }
+
+            // Show success message
+            await showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Success'),
+                content: Text('Account has been created!'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close success dialog
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => GetStarted(justRegistered: true)),
+                      );
+                    },
+                    child: Text('Continue'),
+                  ),
+                ],
+              ),
+            );
+          } catch (e) {
+            print('Registration error: $e');
+            await showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Registration Error'),
+                content: Text(e.toString()),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('OK'),
+                  ),
+                ],
+              ),
+            );
           }
-          if (!mounted) return;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => GetStarted(justRegistered: true)),
-          );
         } else if (accepted == false) {
-          // Declined, go back to starting page
-          if (!mounted) return;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => LoginPage()),
+          // Declined, show message and refresh page
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Registration Declined'),
+              content:
+                  Text('You must accept the terms and conditions to register.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => LoginPage()),
+                    );
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            ),
           );
         }
+        // Jeśli accepted == null (użytkownik zamknął dialog X), nic nie rób
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      print('General error: $e');
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
@@ -201,7 +280,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextButton(
                       onPressed: toggleForm,
-                      child: Text(isLogin ? "Don't have an account? Register" : 'Have an account? Login'),
+                      child: Text(isLogin
+                          ? "Don't have an account? Register"
+                          : 'Have an account? Login'),
                     ),
                   ],
                 ),
@@ -219,17 +300,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Terms & Conditions',
-        mini: true,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => TermsAndConditionsPage()),
-          );
-        },
-        child: Icon(Icons.description),
       ),
     );
   }
