@@ -15,7 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  bool isLogin = true; // true = login, false = register
+  bool isLogin = true; // true = logowanie, false = rejestracja
   bool termsAccepted = false;
 
   void toggleForm() {
@@ -26,8 +26,6 @@ class _LoginPageState extends State<LoginPage> {
       passwordController.clear();
     });
   }
-
-  // ================= TERMS =================
 
   Future<void> _showTermsContentDialog() async {
     await showDialog(
@@ -49,61 +47,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // ================= FORGOT PASSWORD =================
-
-  Future<void> _showForgotPasswordDialog() async {
-    final controller = TextEditingController();
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset password'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Email',
-          ),
-          keyboardType: TextInputType.emailAddress,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              try {
-                await _auth.sendPasswordResetEmail(
-                  email: controller.text.trim(),
-                );
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Password reset email has been sent',
-                    ),
-                  ),
-                );
-              } catch (e) {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Unable to send reset email',
-                    ),
-                  ),
-                );
-              }
-            },
-            child: const Text('Send'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ================= SUBMIT =================
-
   Future<void> submit() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
@@ -111,20 +54,10 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (isLogin) {
         // ===== LOGIN =====
-        UserCredential credential =
-            await _auth.signInWithEmailAndPassword(
+        await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
-
-        final user = credential.user;
-
-        if (user == null || !user.emailVerified) {
-          await _auth.signOut();
-          throw FirebaseAuthException(
-            code: 'email-not-verified',
-          );
-        }
 
         if (!mounted) return;
 
@@ -140,14 +73,11 @@ class _LoginPageState extends State<LoginPage> {
           password: password,
         );
 
-        final user = userCredential.user;
-
-        if (user != null) {
-          await user.sendEmailVerification();
-
+        final uid = userCredential.user?.uid;
+        if (uid != null) {
           await FirebaseFirestore.instance
               .collection('users')
-              .doc(user.uid)
+              .doc(uid)
               .set({
             'email': email,
             'accepted_terms_at': DateTime.now().toIso8601String(),
@@ -156,15 +86,17 @@ class _LoginPageState extends State<LoginPage> {
 
         if (!mounted) return;
 
+        // Po rejestracji → wracamy do LOGIN (czysty ekran)
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const LoginPage()),
         );
 
+        // Opcjonalny feedback UX
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Account created. Please verify your email before logging in.',
+              'Account created successfully. You can now log in.',
             ),
           ),
         );
@@ -172,18 +104,16 @@ class _LoginPageState extends State<LoginPage> {
     } on FirebaseAuthException catch (e) {
       String message = 'Something went wrong. Please try again.';
 
-      // LOGIN
+      // LOGIN errors
       if (isLogin && e.code == 'user-not-found') {
         message = 'This email is not registered as a user';
       } else if (isLogin && e.code == 'wrong-password') {
         message = 'Incorrect password';
       } else if (isLogin && e.code == 'invalid-email') {
         message = 'Please enter a valid email address';
-      } else if (isLogin && e.code == 'email-not-verified') {
-        message = 'Please verify your email before logging in';
       }
 
-      // REGISTER
+      // REGISTER errors
       else if (!isLogin && e.code == 'email-already-in-use') {
         message = 'This email is already registered';
       } else if (!isLogin && e.code == 'weak-password') {
@@ -203,10 +133,22 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
       );
+    } catch (e) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
   }
-
-  // ================= UI =================
 
   @override
   Widget build(BuildContext context) {
@@ -240,19 +182,9 @@ class _LoginPageState extends State<LoginPage> {
                           const InputDecoration(labelText: 'Password'),
                       obscureText: true,
                     ),
+                    const SizedBox(height: 16),
 
-                    if (isLogin)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: _showForgotPasswordDialog,
-                          child: const Text('Forgot password?'),
-                        ),
-                      ),
-
-                    const SizedBox(height: 8),
-
-                    // TERMS (REGISTER ONLY)
+                    // Checkbox tylko przy rejestracji
                     if (!isLogin)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,8 +200,8 @@ class _LoginPageState extends State<LoginPage> {
                           Expanded(
                             child: GestureDetector(
                               onTap: _showTermsContentDialog,
-                              child: const RichText(
-                                text: TextSpan(
+                              child: RichText(
+                                text: const TextSpan(
                                   style: TextStyle(color: Colors.black),
                                   children: [
                                     TextSpan(text: 'I agree to '),
