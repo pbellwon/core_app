@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'welcome_page.dart';
 import 'login_page.dart';
-import 'terms_and_conditions.dart';
 
 class GetStarted extends StatefulWidget {
   final bool justRegistered;
