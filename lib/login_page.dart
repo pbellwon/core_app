@@ -4,19 +4,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'get_started.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key}); // super.key nowoczesny
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _auth = FirebaseAuth.instance;
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  bool isLogin = true; // true = logowanie, false = rejestracja
+  bool isLogin = true; // true = login, false = register
   bool termsAccepted = false;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   void toggleForm() {
     setState(() {
@@ -31,16 +38,16 @@ class _LoginPageState extends State<LoginPage> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Terms & Conditions'),
-        content: const SingleChildScrollView(
-          child: Text(
-            'FULL VERSION OF TERMS & CONDITIONS...',
-          ),
+        title: Text('Terms & Conditions'),
+        content: SingleChildScrollView(
+          child: Text('TU WKLEJ PEŁNĄ TREŚĆ TERMS & CONDITIONS...'),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Close'),
           ),
         ],
       ),
@@ -54,12 +61,20 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (isLogin) {
         // ===== LOGIN =====
-        await _auth.signInWithEmailAndPassword(
+        final credential = await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
 
-        if (!mounted) return;
+        final user = credential.user;
+        if (user == null || !user.emailVerified) {
+          await _auth.signOut();
+          throw FirebaseAuthException(code: 'email-not-verified');
+        }
+
+        if (!mounted) {
+          return;
+        }
 
         Navigator.pushReplacement(
           context,
@@ -67,36 +82,37 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else {
         // ===== REGISTER =====
-        UserCredential userCredential =
-            await _auth.createUserWithEmailAndPassword(
+        final credential = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
 
-        final uid = userCredential.user?.uid;
-        if (uid != null) {
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(uid)
-              .set({
+        final user = credential.user;
+        if (user != null) {
+          await user.sendEmailVerification();
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
             'email': email,
             'accepted_terms_at': DateTime.now().toIso8601String(),
           }, SetOptions(merge: true));
         }
 
-        if (!mounted) return;
+        // Wylogowanie po rejestracji
+        await _auth.signOut();
 
-        // Po rejestracji → wracamy do LOGIN (czysty ekran)
+        if (!mounted) {
+          return;
+        }
+
+        // 🔑 Odświeżenie ekranu: nowy widget LoginPage z UniqueKey()
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const LoginPage()),
+          MaterialPageRoute(builder: (_) => LoginPage(key: UniqueKey())),
         );
 
-        // Opcjonalny feedback UX
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Account created successfully. You can now log in.',
+              'Account created successfully. Please verify your email before logging in.',
             ),
           ),
         );
@@ -104,17 +120,15 @@ class _LoginPageState extends State<LoginPage> {
     } on FirebaseAuthException catch (e) {
       String message = 'Something went wrong. Please try again.';
 
-      // LOGIN errors
       if (isLogin && e.code == 'user-not-found') {
         message = 'This email is not registered as a user';
       } else if (isLogin && e.code == 'wrong-password') {
         message = 'Incorrect password';
       } else if (isLogin && e.code == 'invalid-email') {
         message = 'Please enter a valid email address';
-      }
-
-      // REGISTER errors
-      else if (!isLogin && e.code == 'email-already-in-use') {
+      } else if (isLogin && e.code == 'email-not-verified') {
+        message = 'Please verify your email before logging in';
+      } else if (!isLogin && e.code == 'email-already-in-use') {
         message = 'This email is already registered';
       } else if (!isLogin && e.code == 'weak-password') {
         message = 'Password should be at least 6 characters';
@@ -123,12 +137,14 @@ class _LoginPageState extends State<LoginPage> {
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Error'),
+          title: Text('Error'),
           content: Text(message),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
             ),
           ],
         ),
@@ -137,12 +153,14 @@ class _LoginPageState extends State<LoginPage> {
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Error'),
+          title: Text('Error'),
           content: Text(e.toString()),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
             ),
           ],
         ),
@@ -154,13 +172,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Welcome to the Core App',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         child: Column(
           children: [
             Expanded(
@@ -171,20 +189,18 @@ class _LoginPageState extends State<LoginPage> {
                     TextField(
                       controller: emailController,
                       enabled: isLogin || termsAccepted,
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      decoration: InputDecoration(labelText: 'Email'),
                       keyboardType: TextInputType.emailAddress,
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     TextField(
                       controller: passwordController,
                       enabled: isLogin || termsAccepted,
-                      decoration:
-                          const InputDecoration(labelText: 'Password'),
+                      decoration: InputDecoration(labelText: 'Password'),
                       obscureText: true,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
-                    // Checkbox tylko przy rejestracji
                     if (!isLogin)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +217,7 @@ class _LoginPageState extends State<LoginPage> {
                             child: GestureDetector(
                               onTap: _showTermsContentDialog,
                               child: RichText(
-                                text: const TextSpan(
+                                text: TextSpan(
                                   style: TextStyle(color: Colors.black),
                                   children: [
                                     TextSpan(text: 'I agree to '),
@@ -209,8 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                                       text: 'terms & conditions',
                                       style: TextStyle(
                                         color: Colors.blue,
-                                        decoration:
-                                            TextDecoration.underline,
+                                        decoration: TextDecoration.underline,
                                       ),
                                     ),
                                   ],
@@ -221,18 +236,16 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
 
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     ElevatedButton(
                       onPressed: isLogin || termsAccepted ? submit : null,
                       child: Text(isLogin ? 'Login' : 'Register'),
                     ),
                     TextButton(
                       onPressed: toggleForm,
-                      child: Text(
-                        isLogin
-                            ? "Don't have an account? Register"
-                            : 'Have an account? Login',
-                      ),
+                      child: Text(isLogin
+                          ? "Don't have an account? Register"
+                          : 'Have an account? Login'),
                     ),
                   ],
                 ),
