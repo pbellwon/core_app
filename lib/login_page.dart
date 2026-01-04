@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
         title: const Text('Terms & Conditions'),
         content: const SingleChildScrollView(
           child: Text(
-            'TU WKLEJ PEŁNĄ TREŚĆ TERMS & CONDITIONS...',
+            'FULL VERSION OF TERMS & CONDITIONS...',
           ),
         ),
         actions: [
