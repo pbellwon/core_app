@@ -131,8 +131,10 @@ class GetStartedState extends State<GetStarted> {
           /// =======================
           if (_isMenuOpen)
             Positioned(
-              top: kToolbarHeight + 8,
-              left: 16,
+              // ZMIANA: Ustawiamy menu bezpośrednio pod ikoną hamburgera
+              // Używamy 0 lub minimalnej wartości, aby menu było zaraz pod AppBar
+              top: MediaQuery.of(context).padding.top + 0, // Zmniejszona wartość dla lepszego wyrównania
+              left: 8, // Lekkie przesunięcie w lewo dla lepszego wyrównania z ikoną
               child: Material(
                 elevation: 8,
                 borderRadius: BorderRadius.circular(12),
