@@ -5,96 +5,171 @@ import 'login_page.dart';
 
 class GetStarted extends StatefulWidget {
   final bool justRegistered;
+
   const GetStarted({super.key, this.justRegistered = false});
 
   @override
-  _GetStartedState createState() => _GetStartedState();
+  State<GetStarted> createState() => GetStartedState();
 }
 
-class _GetStartedState extends State<GetStarted> {
-    @override
-    void didChangeDependencies() {
-      super.didChangeDependencies();
-      if (widget.justRegistered) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => AlertDialog(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Success'),
-                  IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
+class GetStartedState extends State<GetStarted> {
+  bool _isMenuOpen = false;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  final List<Map<String, String>> _pages = [
+    {'name': 'Welcome Page', 'route': '/welcome'},
+    {'name': 'Page 2', 'route': '/page2'},
+    {'name': 'Page 3', 'route': '/page3'},
+  ];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (widget.justRegistered) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text('Success'),
+            content: const Text('Your account has been created!'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
               ),
-              content: Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.green),
-                  SizedBox(width: 10),
-                  Expanded(child: Text('Your account has been created!')),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('OK'),
-                ),
-              ],
-            ),
-          );
-        });
-      }
+            ],
+          ),
+        );
+      });
     }
-  final _auth = FirebaseAuth.instance;
+  }
 
   Future<void> _signOutAndGotoLogin() async {
-    try {
-      await _auth.signOut();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error signing out: $e')),
-        );
-      }
-    }
-
+    await _auth.signOut();
     if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => LoginPage()),
+      MaterialPageRoute(builder: (_) => const LoginPage()),
     );
+  }
+
+  void _navigateToPage(String routeName) {
+    setState(() {
+      _isMenuOpen = false;
+    });
+
+    if (routeName == '/welcome') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const WelcomePage()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Get started",
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            setState(() {
+              _isMenuOpen = !_isMenuOpen;
+            });
+          },
+        ),
+        title: const Text(
+          'Get started',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
-            tooltip: 'Logout',
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: _signOutAndGotoLogin,
           ),
         ],
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => CoreContentPage()),
-            );
-          },
-          child: Text("Core Content"),
-        ),
+      body: Stack(
+        children: [
+          /// =======================
+          /// MAIN CONTENT
+          /// =======================
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const WelcomePage()),
+                );
+              },
+              child: const Text('Core Content'),
+            ),
+          ),
+
+          /// =======================
+          /// OVERLAY (zamyka menu)
+          /// =======================
+          if (_isMenuOpen)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isMenuOpen = false;
+                  });
+                },
+                child: Container(
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
+
+          /// =======================
+          /// MENU (NA WIERZCHU!)
+          /// =======================
+          if (_isMenuOpen)
+            Positioned(
+              top: kToolbarHeight + 8,
+              left: 16,
+              child: Material(
+                elevation: 8,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  width: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _pages.map((page) {
+                      return InkWell(
+                        onTap: () => _navigateToPage(page['route']!),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 16,
+                          ),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              page['name']!,
+                              style: const TextStyle(
+                                color: Color(0xFF860E66),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
