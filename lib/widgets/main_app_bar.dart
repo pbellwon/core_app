@@ -1,8 +1,8 @@
 // lib/widgets/main_app_bar.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import '../models/user_model.dart';  // DODAJ TEN IMPORT
+import '../providers/auth_provider.dart';  // Importuje AppAuthProvider
+import '../models/user_model.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -30,7 +30,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             )
           : null,
       actions: [
-        Consumer<AuthProvider>(
+        Consumer<AppAuthProvider>(  // ZMIENIONE
           builder: (context, authProvider, child) {
             if (!authProvider.isLoggedIn || authProvider.currentUser == null) {
               return Container();
@@ -56,7 +56,6 @@ class UserProfileButton extends StatelessWidget {
         if (value == 'logout') {
           _showLogoutDialog(context);
         } else if (value == 'profile') {
-          // Navigate to profile page
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Profile page - to be implemented')),
           );
@@ -138,7 +137,7 @@ class UserProfileButton extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Provider.of<AuthProvider>(context, listen: false).signOut();
+              Provider.of<AppAuthProvider>(context, listen: false).signOut();  // ZMIENIONE
             },
             child: const Text('Logout', style: TextStyle(color: Colors.red)),
           ),
