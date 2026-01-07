@@ -1,7 +1,10 @@
+// lib/login_page.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'get_started.dart';
+import 'providers/auth_provider.dart';  // Import AppAuthProvider
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,6 +20,7 @@ class LoginPageState extends State<LoginPage> {
 
   bool isLogin = true; // true = logowanie, false = rejestracja
   bool termsAccepted = false;
+  bool _isLoading = false;  // Dodane dla stanu ładowania
 
   @override
   void dispose() {
@@ -124,6 +128,10 @@ class LoginPageState extends State<LoginPage> {
       return;
     }
 
+    setState(() {
+      _isLoading = true;
+    });
+
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
@@ -134,13 +142,10 @@ class LoginPageState extends State<LoginPage> {
           email: email,
           password: password,
         );
+        
+        // AuthProvider automatycznie wykryje zmianę i przejdzie do GetStarted
+        // Nie trzeba ręcznie nawigować!
 
-        if (!mounted) return;
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const GetStarted()),
-        );
       } else {
         // ===== REGISTER =====
         UserCredential userCredential =
@@ -151,6 +156,7 @@ class LoginPageState extends State<LoginPage> {
 
         final uid = userCredential.user?.uid;
         if (uid != null) {
+          // Zapisujemy użytkownika w Firestore (AuthProvider też to robi, ale lepiej mieć backup)
           await FirebaseFirestore.instance
               .collection('users')
               .doc(uid)
@@ -160,22 +166,15 @@ class LoginPageState extends State<LoginPage> {
           }, SetOptions(merge: true));
         }
 
-        // 🔑 KLUCZOWA LINIA – WYLOGOWANIE PO REJESTRACJI
-        await _auth.signOut();
-
+        // 🔑 ZMIANA: NIE WYLOGOWUJEMY PO REJESTRACJI
+        // Pozostajemy zalogowani i AuthProvider automatycznie przejdzie do GetStarted
+        
+        // Pokaż komunikat o sukcesie
         if (!mounted) return;
-
-        // Wracamy do LOGIN (czysty ekran)
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginPage()),
-        );
-
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'Account created successfully. You can now log in.',
-            ),
+            content: Text('Account created successfully!'),
           ),
         );
       }
@@ -225,6 +224,12 @@ class LoginPageState extends State<LoginPage> {
           ],
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -239,85 +244,138 @@ class LoginPageState extends State<LoginPage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: emailController,
-                      enabled: isLogin || termsAccepted,
-                      decoration: const InputDecoration(labelText: 'Email'),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: passwordController,
-                      enabled: isLogin || termsAccepted,
-                      decoration: const InputDecoration(labelText: 'Password'),
-                      obscureText: true,
-                    ),
-                    const SizedBox(height: 16),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: emailController,
+                          enabled: (isLogin || termsAccepted) && !_isLoading,
+                          decoration: const InputDecoration(labelText: 'Email'),
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 10),
+                        TextField(
+                          controller: passwordController,
+                          enabled: (isLogin || termsAccepted) && !_isLoading,
+                          decoration:
+                              const InputDecoration(labelText: 'Password'),
+                          obscureText: true,
+                        ),
+                        const SizedBox(height: 16),
 
-                    // Checkbox tylko przy rejestracji
-                    if (!isLogin)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Checkbox(
-                            value: termsAccepted,
-                            onChanged: (val) {
-                              setState(() {
-                                termsAccepted = val ?? false;
-                              });
-                            },
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: _showTermsContentDialog,
-                              child: RichText(
-                                text: const TextSpan(
-                                  style: TextStyle(color: Colors.black),
-                                  children: [
-                                    TextSpan(text: 'I agree to '),
-                                    TextSpan(
-                                      text: 'terms & conditions',
-                                      style: TextStyle(
-                                        color: Colors.blue,
-                                        decoration: TextDecoration.underline,
-                                      ),
+                        // Checkbox tylko przy rejestracji
+                        if (!isLogin)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Checkbox(
+                                value: termsAccepted,
+                                onChanged: _isLoading
+                                    ? null
+                                    : (val) {
+                                        setState(() {
+                                          termsAccepted = val ?? false;
+                                        });
+                                      },
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: _isLoading
+                                      ? null
+                                      : _showTermsContentDialog,
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      style: TextStyle(color: Colors.black),
+                                      children: [
+                                        TextSpan(text: 'I agree to '),
+                                        TextSpan(
+                                          text: 'terms & conditions',
+                                          style: TextStyle(
+                                            color: Colors.blue,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
 
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: isLogin || termsAccepted ? submit : null,
-                      child: Text(isLogin ? 'Login' : 'Register'),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: (_isLoading ||
+                                  (!isLogin && !termsAccepted))
+                              ? null
+                              : submit,
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(isLogin ? 'Login' : 'Register'),
+                        ),
+                        TextButton(
+                          onPressed: _isLoading ? null : toggleForm,
+                          child: Text(
+                            isLogin
+                                ? "Don't have an account? Register"
+                                : 'Have an account? Login',
+                          ),
+                        ),
+                      ],
                     ),
-                    TextButton(
-                      onPressed: toggleForm,
-                      child: Text(
-                        isLogin
-                            ? "Don't have an account? Register"
-                            : 'Have an account? Login',
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+
+          // Pokazuje informację gdy AuthProvider wykryje zalogowanie
+          Consumer<AppAuthProvider>(
+            builder: (context, authProvider, child) {
+              if (authProvider.isLoggedIn) {
+                // To się pokaże na chwilę przed przejściem do GetStarted
+                return Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Logowanie udane! Przenoszę...',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
       ),
     );
   }
