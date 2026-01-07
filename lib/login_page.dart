@@ -7,10 +7,10 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -32,6 +32,48 @@ class _LoginPageState extends State<LoginPage> {
       emailController.clear();
       passwordController.clear();
     });
+  }
+
+  // ================= VALIDACJA =================
+
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  bool _validateInputs() {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    // Walidacja emaila
+    if (email.isEmpty) {
+      _showErrorDialog('Please enter your email address');
+      return false;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showErrorDialog('Please enter a valid email address');
+      return false;
+    }
+
+    // Walidacja hasła
+    if (password.isEmpty) {
+      _showErrorDialog('Please enter your password');
+      return false;
+    }
+
+    if (!isLogin && password.length < 6) {
+      _showErrorDialog('Password should be at least 6 characters');
+      return false;
+    }
+
+    // Walidacja checkboxa przy rejestracji
+    if (!isLogin && !termsAccepted) {
+      _showErrorDialog('Please accept the terms & conditions');
+      return false;
+    }
+
+    return true;
   }
 
   // ================= TERMS =================
@@ -56,9 +98,32 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // ================= ERROR DIALOG =================
+
+  Future<void> _showErrorDialog(String message) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Validation Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ================= SUBMIT =================
 
   Future<void> submit() async {
+    // Walidacja przed wysłaniem do Firebase
+    if (!_validateInputs()) {
+      return;
+    }
+
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
@@ -74,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => GetStarted()),
+          MaterialPageRoute(builder: (_) => const GetStarted()),
         );
       } else {
         // ===== REGISTER =====
@@ -193,8 +258,7 @@ class _LoginPageState extends State<LoginPage> {
                     TextField(
                       controller: passwordController,
                       enabled: isLogin || termsAccepted,
-                      decoration:
-                          const InputDecoration(labelText: 'Password'),
+                      decoration: const InputDecoration(labelText: 'Password'),
                       obscureText: true,
                     ),
                     const SizedBox(height: 16),
@@ -224,8 +288,7 @@ class _LoginPageState extends State<LoginPage> {
                                       text: 'terms & conditions',
                                       style: TextStyle(
                                         color: Colors.blue,
-                                        decoration:
-                                            TextDecoration.underline,
+                                        decoration: TextDecoration.underline,
                                       ),
                                     ),
                                   ],
