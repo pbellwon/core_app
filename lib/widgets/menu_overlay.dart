@@ -15,14 +15,14 @@ class MenuOverlay extends StatelessWidget {
         // GŁÓWNA ZAWARTOŚĆ
         child,
 
-        // MENU OVERLAY
+        // MENU OVERLAY (tylko odnośniki do stron)
         Consumer<MenuProvider>(
           builder: (context, menuProvider, child) {
             if (!menuProvider.isMenuOpen) return const SizedBox.shrink();
 
             return Stack(
               children: [
-                // PRZYCIMNIONE TŁO (zamyka menu po kliknięciu)
+                // PRZYCIMNIONE TŁO
                 Positioned.fill(
                   child: GestureDetector(
                     onTap: () => menuProvider.closeMenu(),
@@ -32,7 +32,7 @@ class MenuOverlay extends StatelessWidget {
                   ),
                 ),
 
-                // MENU PANEL
+                // PANEL Z ODNIEWNIKAMI
                 Positioned(
                   top: MediaQuery.of(context).padding.top + kToolbarHeight,
                   left: 8,
@@ -48,7 +48,7 @@ class MenuOverlay extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // NAGŁÓWEK
+                          // NAGŁÓWEK - ZACHOWANY ORYGINALNY KOLOR
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -60,54 +60,60 @@ class MenuOverlay extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.menu, color: Colors.blue),
+                                Icon(Icons.menu, color: Theme.of(context).primaryColor),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Menu - ${menuProvider.currentPage.replaceAll('_', ' ').toUpperCase()}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
+                                    color: Theme.of(context).primaryColor,
                                   ),
                                 ),
                               ],
                             ),
                           ),
 
-                          // OPCJE MENU
-                          ...menuProvider.currentPageMenuItems.map((item) {
+                          // ODNIEWNIKI DO STRON - ZACHOWANY KOLOR #860E66
+                          ...menuProvider.pageLinks.map((item) {
                             return ListTile(
                               leading: Icon(item.icon, color: const Color(0xFF860E66)),
                               title: Text(
                                 item.title,
-                                style: const TextStyle(color: Color(0xFF860E66)),
+                                style: const TextStyle(
+                                  color: Color(0xFF860E66),
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               onTap: () {
                                 menuProvider.closeMenu();
-                                // Tutaj nawigacja do odpowiedniej strony
-                                // np. Navigator.pushNamed(context, item.route);
+                                Navigator.pushNamed(context, item.route);
                               },
                             );
                           }).toList(),
-
-                          // SEPARATOR
-                          const Divider(height: 1),
-
-                          // OPCJE GLOBALNE (dla wszystkich stron)
-                          ...menuProvider.currentPageMenuItems
-                              .where((item) => item.pageFilter == null)
-                              .map((item) {
-                            return ListTile(
-                              leading: Icon(item.icon, color: Colors.grey[600]),
-                              title: Text(
-                                item.title,
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                              onTap: () {
-                                menuProvider.closeMenu();
-                                // Nawigacja
-                              },
-                            );
-                          }).toList(),
+                          
+                          // OPCJE GLOBALNE W HAMBURGER MENU - SZARY KOLOR
+                          if (menuProvider.globalActions.isNotEmpty) ...[
+                            const Divider(height: 1, thickness: 1),
+                            ...menuProvider.globalActions.map((item) {
+                              return ListTile(
+                                leading: Icon(item.icon, color: Colors.grey[600]),
+                                title: Text(
+                                  item.title,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                onTap: () {
+                                  menuProvider.closeMenu();
+                                  Navigator.pushNamed(context, item.route);
+                                },
+                              );
+                            }).toList(),
+                          ],
+                          
+                          // SEPARATOR NA DOLE (opcjonalnie)
+                          const SizedBox(height: 8),
                         ],
                       ),
                     ),

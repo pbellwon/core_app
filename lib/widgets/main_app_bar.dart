@@ -2,8 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
-import '../providers/menu_provider.dart';  // DODANE
+import '../providers/menu_provider.dart';
 import '../models/user_model.dart';
+import '../models/menu_item_model.dart'; // DODAJ
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -61,53 +62,92 @@ class UserProfileButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final menuProvider = Provider.of<MenuProvider>(context, listen: false);
+    final userActions = menuProvider.getUserActions(menuProvider.currentPage);
+    final globalActions = menuProvider.globalActions;
+    
+    // Łączymy akcje użytkownika z globalnymi
+    final allActions = [...userActions, ...globalActions];
+
     return Container(
       margin: const EdgeInsets.only(right: 8),
-      child: PopupMenuButton<String>(
+      child: PopupMenuButton<MenuItem>(
         offset: const Offset(0, kToolbarHeight),
-        onSelected: (value) {
-          if (value == 'logout') {
-            _showLogoutDialog(context);
-          } else if (value == 'profile') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Profile page - to be implemented')),
-            );
-          }
+        onSelected: (MenuItem item) {
+          _handleMenuItemSelection(context, item);
         },
-        itemBuilder: (BuildContext context) => [
-          PopupMenuItem(
-            value: 'profile',
-            child: Row(
-              children: [
-                const Icon(Icons.person, size: 20),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.displayName ?? user.email.split('@')[0],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+        itemBuilder: (BuildContext context) {
+          final items = <PopupMenuEntry<MenuItem>>[];
+          
+          // Nagłówek z profilem
+          items.add(
+            PopupMenuItem<MenuItem>(
+              enabled: false,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.blue,
+                    child: Text(
+                      user.email.substring(0, 1).toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.displayName ?? user.email.split('@')[0],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        user.email,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+          
+          items.add(const PopupMenuDivider());
+          
+          // Lista akcji
+          for (var item in allActions) {
+            items.add(
+              PopupMenuItem<MenuItem>(
+                value: item,
+                child: Row(
+                  children: [
+                    Icon(
+                      item.icon,
+                      size: 20,
+                      color: item.title == 'Logout' ? Colors.red : null,
+                    ),
+                    const SizedBox(width: 12),
                     Text(
-                      user.email,
-                      style: const TextStyle(fontSize: 12),
+                      item.title,
+                      style: TextStyle(
+                        color: item.title == 'Logout' ? Colors.red : null,
+                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          const PopupMenuItem(
-            value: 'logout',
-            child: Row(
-              children: [
-                Icon(Icons.logout, size: 20, color: Colors.red),
-                SizedBox(width: 8),
-                Text('Logout', style: TextStyle(color: Colors.red)),
-              ],
-            ),
-          ),
-        ],
+              ),
+            );
+          }
+          
+          return items;
+        },
         child: Container(
           height: kToolbarHeight,
           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -143,11 +183,21 @@ class UserProfileButton extends StatelessWidget {
                   ),
                 ],
               ),
+              const Icon(Icons.arrow_drop_down, color: Colors.white70),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _handleMenuItemSelection(BuildContext context, MenuItem item) {
+    if (item.route == '/logout') {
+      _showLogoutDialog(context);
+    } else {
+      // Nawigacja do innych stron
+      Navigator.pushNamed(context, item.route);
+    }
   }
 
   void _showLogoutDialog(BuildContext context) {

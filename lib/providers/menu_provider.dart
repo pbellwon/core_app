@@ -1,85 +1,112 @@
 // lib/providers/menu_provider.dart
-import 'package:flutter/material.dart';  // DODAJ
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../models/menu_item_model.dart';
 
 class MenuProvider with ChangeNotifier {
   bool _isMenuOpen = false;
-  String _currentPage = 'get_started'; // Aktualna strona
-  List<MenuItem> _allMenuItems = []; // Wszystkie możliwe opcje
+  String _currentPage = 'get_started';
+  List<MenuItem> _allMenuItems = [];
 
   bool get isMenuOpen => _isMenuOpen;
   String get currentPage => _currentPage;
   
-  // Filtrowane opcje dla aktualnej strony
-  List<MenuItem> get currentPageMenuItems {
+  // Odnośniki do stron (tylko dla hamburger menu)
+  List<MenuItem> get pageLinks {
     return _allMenuItems.where((item) {
-      // Jeśli item nie ma pageFilter, pokazuj wszędzie
-      if (item.pageFilter == null) return true;
-      // Pokazuj tylko jeśli pasuje do aktualnej strony
-      return item.pageFilter == _currentPage;
+      return item.type == MenuItemType.pageLink && 
+             (item.pageFilter == null || item.pageFilter == _currentPage);
+    }).toList();
+  }
+
+  // Opcje użytkownika (dla menu po prawej)
+  List<MenuItem> getUserActions(String pageName) {
+    return _allMenuItems.where((item) {
+      return item.type == MenuItemType.userAction && 
+             (item.pageFilter == null || item.pageFilter == pageName);
+    }).toList();
+  }
+
+  // Opcje globalne (dostępne w obu miejscach)
+  List<MenuItem> get globalActions {
+    return _allMenuItems.where((item) {
+      return item.type == MenuItemType.global;
     }).toList();
   }
 
   MenuProvider() {
-    // Inicjalizuj wszystkie możliwe opcje menu
     _initializeMenuItems();
   }
 
   void _initializeMenuItems() {
     _allMenuItems = [
-      // Opcje dla GET_STARTED
+      // ODNIEWNIKI DO STRON (tylko w hamburger menu) - MenuItemType.pageLink
       MenuItem(
         title: 'Welcome Page',
         icon: Icons.home,
         route: '/welcome',
         pageFilter: 'get_started',
+        type: MenuItemType.pageLink,
       ),
-      MenuItem(
-        title: 'Settings',
-        icon: Icons.settings,
-        route: '/settings',
-        pageFilter: 'get_started',
-      ),
-      MenuItem(
-        title: 'Profile',
-        icon: Icons.person,
-        route: '/profile',
-        pageFilter: 'get_started',
-      ),
-
-      // Opcje dla AB_CD (przyszła strona)
       MenuItem(
         title: 'Dashboard',
         icon: Icons.dashboard,
         route: '/dashboard',
         pageFilter: 'ab_cd',
+        type: MenuItemType.pageLink,
       ),
       MenuItem(
         title: 'Reports',
         icon: Icons.assessment,
         route: '/reports',
         pageFilter: 'ab_cd',
+        type: MenuItemType.pageLink,
       ),
       MenuItem(
         title: 'Analytics',
         icon: Icons.analytics,
         route: '/analytics',
         pageFilter: 'ab_cd',
+        type: MenuItemType.pageLink,
       ),
 
-      // Opcje dla WSZYSTKICH stron
+      // AKCJE UŻYTKOWNIKA (tylko w menu profilu po prawej) - MenuItemType.userAction
+      MenuItem(
+        title: 'Settings',
+        icon: Icons.settings,
+        route: '/settings',
+        pageFilter: null, // dostępne na wszystkich stronach
+        type: MenuItemType.userAction,
+      ),
+      MenuItem(
+        title: 'Profile',
+        icon: Icons.person,
+        route: '/profile',
+        pageFilter: null,
+        type: MenuItemType.userAction,
+      ),
+      MenuItem(
+        title: 'Logout',
+        icon: Icons.logout,
+        route: '/logout',
+        pageFilter: null,
+        type: MenuItemType.userAction,
+      ),
+
+      // OPCJE GLOBALNE (dostępne wszędzie) - MenuItemType.global
       MenuItem(
         title: 'Help',
         icon: Icons.help,
         route: '/help',
-        pageFilter: null, // null = pokazuj wszędzie
+        pageFilter: null,
+        type: MenuItemType.global,
       ),
       MenuItem(
         title: 'About',
         icon: Icons.info,
         route: '/about',
         pageFilter: null,
+        type: MenuItemType.global,
       ),
     ];
   }
@@ -99,7 +126,6 @@ class MenuProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Dodaj nową opcję menu (można użyć w dowolnym miejscu)
   void addMenuItem(MenuItem item) {
     _allMenuItems.add(item);
     notifyListeners();

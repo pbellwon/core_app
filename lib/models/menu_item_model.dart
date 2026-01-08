@@ -1,21 +1,24 @@
 // lib/models/menu_item_model.dart
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart'; // DODAJ TEN IMPORT
 
 class MenuItem {
   final String title;
   final IconData icon;
   final String route;
-  final bool requiresAuth;
   final String? pageFilter;
+  final MenuItemType type;
 
-  const MenuItem({
+  MenuItem({
     required this.title,
     required this.icon,
     required this.route,
-    this.requiresAuth = true,
     this.pageFilter,
+    required this.type,
   });
+}
 
-  @override
-  String toString() => 'MenuItem(title: $title, route: $route)';
+enum MenuItemType {
+  pageLink,    // Odnośnik do strony (w hamburgerze)
+  userAction,  // Akcja użytkownika (w profilu po prawej)
+  global,      // Globalne opcje (w obu miejscach)
 }
