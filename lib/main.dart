@@ -31,6 +31,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🌈 Kolory globalne
+    const backgroundColor = Color(0xFFFBF3F9);
+    const accentColor = Color(0xFFB31288);
+    const altAccentColor = Color(0xFFCC5500);
+    const headingTextColor = Color(0xFF860E66);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppAuthProvider(), lazy: false),
@@ -41,14 +47,33 @@ class MyApp extends StatelessWidget {
         navigatorKey: navigatorKey, // 🔑 globalny navigatorKey
         theme: ThemeData(
           useMaterial3: false,
-          scaffoldBackgroundColor: const Color(0xFFFBF3F9),
+          scaffoldBackgroundColor: backgroundColor,
+          primaryColor: headingTextColor,
+          colorScheme: ColorScheme.fromSwatch().copyWith(
+            primary: headingTextColor,
+            secondary: accentColor,
+          ),
           appBarTheme: const AppBarTheme(
-            backgroundColor: Color(0xFFFBF3F9),
-            foregroundColor: Color(0xFF860E66),
+            backgroundColor: backgroundColor,
+            foregroundColor: headingTextColor,
             elevation: 0,
           ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: accentColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              foregroundColor: headingTextColor,
+            ),
+          ),
         ),
-        home: const RootPage(),
+        home: const RootPage(), // pierwsza strona LoginPage
         routes: {
           '/welcome': (_) => const WelcomePage(),
           '/login': (_) => const LoginPage(),
@@ -56,6 +81,7 @@ class MyApp extends StatelessWidget {
           '/profile': (_) => const ProfilePage(),
           '/help': (_) => const HelpPage(),
           '/about': (_) => const AboutPage(),
+          '/get_started': (_) => const GetStartedPageWithAppBar(),
           '/dashboard': (_) => const AbCdPage(),
         },
       ),
@@ -63,6 +89,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/// Strona sprawdzająca auth state
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
 
@@ -72,7 +99,9 @@ class RootPage extends StatelessWidget {
       builder: (context, authProvider, child) {
         if (authProvider.isLoading) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator(color: Color(0xFFB31288))),
+            body: Center(
+              child: CircularProgressIndicator(color: Color(0xFFB31288)),
+            ),
           );
         }
         return authProvider.isLoggedIn
@@ -83,12 +112,13 @@ class RootPage extends StatelessWidget {
   }
 }
 
-/// Page wrapper z AppBar + Drawer
+/// GetStartedPage z AppBar + Drawer
 class GetStartedPageWithAppBar extends StatefulWidget {
   const GetStartedPageWithAppBar({super.key});
 
   @override
-  State<GetStartedPageWithAppBar> createState() => _GetStartedPageWithAppBarState();
+  State<GetStartedPageWithAppBar> createState() =>
+      _GetStartedPageWithAppBarState();
 }
 
 class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
@@ -96,7 +126,8 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MenuProvider>(context, listen: false).setCurrentPage('get_started');
+      Provider.of<MenuProvider>(context, listen: false)
+          .setCurrentPage('get_started');
     });
   }
 
@@ -104,13 +135,13 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainAppBar(title: "Get Started", showBackButton: false),
-      drawer: const AppDrawer(), // 🔑 Drawer z menu
+      drawer: const AppDrawer(),
       body: const GetStarted(),
     );
   }
 }
 
-/// PRZYKŁADOWE STRONY
+/// Przykładowe strony
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -171,7 +202,8 @@ class _AbCdPageState extends State<AbCdPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MenuProvider>(context, listen: false).setCurrentPage('ab_cd');
+      Provider.of<MenuProvider>(context, listen: false)
+          .setCurrentPage('ab_cd');
     });
   }
 
@@ -181,6 +213,33 @@ class _AbCdPageState extends State<AbCdPage> {
       appBar: const MainAppBar(title: "AB CD Page", showBackButton: true),
       drawer: const AppDrawer(),
       body: const Center(child: Text("Strona AB CD")),
+    );
+  }
+}
+
+/// Testowa strona GetStarted
+class GetStarted extends StatelessWidget {
+  const GetStarted({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Get Started Page',
+            style: TextStyle(fontSize: 24, color: Color(0xFF860E66)),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              navigatorKey.currentState?.pushNamed('/welcome');
+            },
+            child: const Text('Go to Welcome Page'),
+          ),
+        ],
+      ),
     );
   }
 }

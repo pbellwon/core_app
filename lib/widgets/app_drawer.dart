@@ -46,41 +46,7 @@ class AppDrawer extends StatelessWidget {
                   ),
 
                 const Divider(),
-
-                // Global actions (Help, About)
-                for (var item in menuProvider.globalActions)
-                  ListTile(
-                    leading: Icon(item.icon, color: Colors.grey),
-                    title: Text(item.title),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      menuProvider.closeMenu();
-                      if (item.route == '/logout') {
-                        _handleLogout(context);
-                      } else {
-                        navigatorKey.currentState?.pushNamed(item.route);
-                      }
-                    },
-                  ),
-
-                const Divider(),
-
-                // User actions (Settings, Profile, Logout)
-                for (var item in menuProvider.getUserActions(menuProvider.currentPage))
-                  ListTile(
-                    leading: Icon(item.icon, color: Colors.grey),
-                    title: Text(item.title),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      menuProvider.closeMenu();
-                      if (item.route == '/logout') {
-                        _handleLogout(context);
-                      } else {
-                        navigatorKey.currentState?.pushNamed(item.route);
-                      }
-                    },
-                  ),
-              ],
+      ],
             );
           },
         ),
