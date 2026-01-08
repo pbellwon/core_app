@@ -1,51 +1,72 @@
 // lib/providers/menu_provider.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 import '../models/menu_item_model.dart';
 import 'auth_provider.dart';
-import '../main.dart'; // dla navigatorKey
-import 'package:provider/provider.dart';
 
 class MenuProvider with ChangeNotifier {
   bool _isMenuOpen = false;
   String _currentPage = 'get_started';
   List<MenuItem> _allMenuItems = [];
 
+  final GlobalKey<NavigatorState>? navigatorKey;
+
+  MenuProvider({this.navigatorKey}) {
+    if (kDebugMode) print('🆕 [MenuProvider] Constructor called');
+    _initializeMenuItems();
+  }
+
   bool get isMenuOpen => _isMenuOpen;
   String get currentPage => _currentPage;
 
-  // Page links (hamburger menu)
+  // Odnośniki do stron (tylko dla hamburger menu)
   List<MenuItem> get pageLinks {
     final filteredItems = _allMenuItems.where((item) {
       final isPageLink = item.type == MenuItemType.pageLink;
-      final matches = isPageLink && (item.pageFilter == null || item.pageFilter == _currentPage);
+      final filterMatches = item.pageFilter == null || item.pageFilter == _currentPage;
+      final matches = isPageLink && filterMatches;
 
       if (kDebugMode && item.title == 'Welcome Page') {
-        print('🔍 [MenuProvider] Welcome Page check: matches=$matches');
+        print('🔍 [MenuProvider] Checking Welcome Page:');
+        print('   - Type: ${item.type}, isPageLink: $isPageLink');
+        print('   - Filter: ${item.pageFilter}, Current: $_currentPage');
+        print('   - Matches: $matches');
       }
 
       return matches;
     }).toList();
 
+    if (kDebugMode) {
+      print('📋 [MenuProvider] pageLinks for "$_currentPage": ${filteredItems.length}');
+    }
+
     return filteredItems;
   }
 
-  // User actions (menu po prawej)
+  // Opcje użytkownika (menu po prawej)
   List<MenuItem> getUserActions(String pageName) {
-    return _allMenuItems.where((item) {
+    final filteredItems = _allMenuItems.where((item) {
       return item.type == MenuItemType.userAction &&
           (item.pageFilter == null || item.pageFilter == pageName);
     }).toList();
+
+    if (kDebugMode) {
+      print('👤 [MenuProvider] getUserActions for "$pageName": ${filteredItems.length}');
+    }
+
+    return filteredItems;
   }
 
-  // Global actions (wszędzie)
+  // Opcje globalne (wszędzie)
   List<MenuItem> get globalActions {
-    return _allMenuItems.where((item) => item.type == MenuItemType.global).toList();
-  }
+    final filteredItems = _allMenuItems.where((item) => item.type == MenuItemType.global).toList();
 
-  MenuProvider() {
-    if (kDebugMode) print('🆕 [MenuProvider] Constructor called');
-    _initializeMenuItems();
+    if (kDebugMode) {
+      print('🌐 [MenuProvider] globalActions: ${filteredItems.length}');
+    }
+
+    return filteredItems;
   }
 
   void _initializeMenuItems() {
@@ -53,10 +74,70 @@ class MenuProvider with ChangeNotifier {
       // PAGE LINKS
       MenuItem(
         title: 'Welcome Page',
-        icon: null, // <--- brak ikony
+        icon: Icons.home,
         route: '/welcome',
         pageFilter: 'get_started',
         type: MenuItemType.pageLink,
+      ),
+      MenuItem(
+        title: 'Dashboard',
+        icon: Icons.dashboard,
+        route: '/dashboard',
+        pageFilter: 'ab_cd',
+        type: MenuItemType.pageLink,
+      ),
+      MenuItem(
+        title: 'Reports',
+        icon: Icons.assessment,
+        route: '/reports',
+        pageFilter: 'ab_cd',
+        type: MenuItemType.pageLink,
+      ),
+      MenuItem(
+        title: 'Analytics',
+        icon: Icons.analytics,
+        route: '/analytics',
+        pageFilter: 'ab_cd',
+        type: MenuItemType.pageLink,
+      ),
+
+      // USER ACTIONS
+      MenuItem(
+        title: 'Settings',
+        icon: Icons.settings,
+        route: '/settings',
+        pageFilter: null,
+        type: MenuItemType.userAction,
+      ),
+      MenuItem(
+        title: 'Profile',
+        icon: Icons.person,
+        route: '/profile',
+        pageFilter: null,
+        type: MenuItemType.userAction,
+      ),
+      MenuItem(
+        title: 'Logout',
+        icon: Icons.logout,
+        route: '/logout',
+        pageFilter: null,
+        type: MenuItemType.userAction,
+      ),
+
+      // GLOBAL
+      MenuItem(
+        title: 'Help',
+        icon: Icons.help,
+        route: '/help',
+        pageFilter: null,
+        type: MenuItemType.global,
+      ),
+      MenuItem(
+        title: 'About',
+        icon: Icons.info,
+        route: '/about',
+        pageFilter: null,
+        type: MenuItemType.global,
       ),
     ];
 
@@ -84,17 +165,18 @@ class MenuProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Wylogowanie użytkownika
+  /// 🔑 Funkcja wylogowania użytkownika
   void logoutUser() {
     if (kDebugMode) print('🚪 [MenuProvider] Logging out user...');
+    if (navigatorKey == null) {
+      if (kDebugMode) print('❌ [MenuProvider] navigatorKey is null, cannot log out');
+      return;
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        final context = navigatorKey.currentContext;
-        if (context != null) {
-          Provider.of<AppAuthProvider>(context, listen: false).signOut();
-        }
-      } catch (e) {
-        if (kDebugMode) print('❌ [MenuProvider] logoutUser failed: $e');
+      final context = navigatorKey!.currentContext;
+      if (context != null) {
+        Provider.of<AppAuthProvider>(context, listen: false).signOut();
       }
     });
   }
