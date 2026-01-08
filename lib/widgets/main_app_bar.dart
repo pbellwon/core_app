@@ -87,7 +87,7 @@ class UserProfileButton extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Color(0xFF860E66),
                     child: Text(
                       user.email.substring(0, 1).toUpperCase(),
                       style: const TextStyle(
@@ -131,13 +131,13 @@ class UserProfileButton extends StatelessWidget {
                     Icon(
                       item.icon,
                       size: 20,
-                      color: item.title == 'Logout' ? Colors.red : null,
+                      color: item.title == 'Logout' ? Color(0xFF860E66) : null,
                     ),
                     const SizedBox(width: 12),
                     Text(
                       item.title,
                       style: TextStyle(
-                        color: item.title == 'Logout' ? Colors.red : null,
+                        color: item.title == 'Logout' ? Color(0xFF860E66) : null,
                       ),
                     ),
                   ],
@@ -155,7 +155,7 @@ class UserProfileButton extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 16,
-                backgroundColor: Colors.blue,
+                backgroundColor: Color(0xFF860E66),
                 foregroundColor: Colors.white,
                 child: Text(
                   user.email.substring(0, 1).toUpperCase(),
@@ -178,12 +178,12 @@ class UserProfileButton extends StatelessWidget {
                     user.email,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.white70,
+                      color: Color(0xFFB31288),
                     ),
                   ),
                 ],
               ),
-              const Icon(Icons.arrow_drop_down, color: Colors.white70),
+              const Icon(Icons.arrow_drop_down, color: Color(0xFFB31288)),
             ],
           ),
         ),
@@ -216,7 +216,7 @@ class UserProfileButton extends StatelessWidget {
               Navigator.of(context).pop();
               Provider.of<AppAuthProvider>(context, listen: false).signOut();
             },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            child: const Text('Logout', style: TextStyle(color: Color(0xFF860E66) )),
           ),
         ],
       ),

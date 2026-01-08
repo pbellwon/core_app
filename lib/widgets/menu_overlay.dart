@@ -48,31 +48,6 @@ class MenuOverlay extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // NAGŁÓWEK - ZACHOWANY ORYGINALNY KOLOR
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.blue[50],
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(12),
-                                topRight: Radius.circular(12),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.menu, color: Theme.of(context).primaryColor),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Menu - ${menuProvider.currentPage.replaceAll('_', ' ').toUpperCase()}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
                           // ODNIEWNIKI DO STRON - ZACHOWANY KOLOR #860E66
                           ...menuProvider.pageLinks.map((item) {
                             return ListTile(
@@ -112,7 +87,7 @@ class MenuOverlay extends StatelessWidget {
                             }).toList(),
                           ],
                           
-                          // SEPARATOR NA DOLE (opcjonalnie)
+                          // DODATKOWY MARGINES NA DOLE DLA LEPSZEGO WYGLĄDU
                           const SizedBox(height: 8),
                         ],
                       ),
