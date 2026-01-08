@@ -43,8 +43,8 @@ class MenuProvider with ChangeNotifier {
       // ODNIEWNIKI DO STRON (tylko w hamburger menu) - MenuItemType.pageLink
       MenuItem(
         title: 'Welcome Page',
-        icon: Icons.home,
-        route: '/welcome',
+        icon: Icons.home, // To jest ignorowane dla Welcome Page w hamburgerze
+        route: '/welcome', // To powinno prowadzić do Twojej WelcomePage
         pageFilter: 'get_started',
         type: MenuItemType.pageLink,
       ),

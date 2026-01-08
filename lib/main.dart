@@ -9,12 +9,20 @@ import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'widgets/main_app_bar.dart';
 import 'widgets/menu_overlay.dart';
+import 'welcome_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  // Dodaj globalne error handling
+  FlutterError.onError = (details) {
+    print('FLUTTER ERROR: ${details.exception}');
+    print('Stack trace: ${details.stack}');
+  };
+  
   runApp(MyApp());
 }
 
@@ -85,9 +93,91 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           return MenuOverlay(child: child!);
         },
-        home: const RootPage(),
+        initialRoute: '/',
+        routes: {
+          '/': (context) {
+            print('🚀 [MAIN] Navigating to RootPage');
+            return const RootPage();
+          },
+          '/welcome': (context) {
+            print('🚀 [MAIN] Navigating to WelcomePage');
+            return const WelcomePage();
+          },
+          '/dashboard': (context) {
+            print('🚀 [MAIN] Navigating to AbCdPage');
+            return const AbCdPage();
+          },
+          '/settings': (context) {
+            print('🚀 [MAIN] Navigating to SettingsPage');
+            return const SettingsPage();
+          },
+          '/profile': (context) {
+            print('🚀 [MAIN] Navigating to ProfilePage');
+            return const ProfilePage();
+          },
+          '/help': (context) {
+            print('🚀 [MAIN] Navigating to HelpPage');
+            return const HelpPage();
+          },
+          '/about': (context) {
+            print('🚀 [MAIN] Navigating to AboutPage');
+            return const AboutPage();
+          },
+          '/login': (context) {
+            print('🚀 [MAIN] Navigating to LoginPage');
+            return const LoginPage();
+          },
+        },
+        onGenerateRoute: (settings) {
+          print('🔄 [MAIN] onGenerateRoute called for: ${settings.name}');
+          if (settings.name == '/logout') {
+            return null;
+          }
+          
+          // Jeśli route nie istnieje, pokaż error page
+          return MaterialPageRoute(
+            builder: (context) => Scaffold(
+              appBar: AppBar(title: const Text('Error')),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Page not found'),
+                    Text('Route: ${settings.name}'),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Go back'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+        navigatorObservers: [_RouteObserver()],
+        onUnknownRoute: (settings) {
+          print('❌ [MAIN] onUnknownRoute called for: ${settings.name}');
+          return MaterialPageRoute(
+            builder: (context) => Scaffold(
+              appBar: AppBar(title: const Text('404')),
+              body: Center(child: Text('Unknown route: ${settings.name}')),
+            ),
+          );
+        },
       ),
     );
+  }
+}
+
+class _RouteObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    print('📍 [ROUTE] Pushed: ${route.settings.name} (from: ${previousRoute?.settings.name})');
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    print('↩️ [ROUTE] Popped: ${route.settings.name} (back to: ${previousRoute?.settings.name})');
   }
 }
 
@@ -96,9 +186,11 @@ class RootPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('📱 [RootPage] Building widget');
     return Consumer<AppAuthProvider>(
       builder: (context, authProvider, child) {
-        // POKAŻ ŁADOWANIE
+        print('🔐 [RootPage] Auth state: isLoading=${authProvider.isLoading}, isLoggedIn=${authProvider.isLoggedIn}');
+        
         if (authProvider.isLoading) {
           return Scaffold(
             backgroundColor: const Color(0xFFFBF3F9),
@@ -118,12 +210,11 @@ class RootPage extends StatelessWidget {
           );
         }
 
-        // SPRAWDŹ CZY ZALOGOWANY
         if (authProvider.isLoggedIn) {
-          // JEST ZALOGOWANY - IDŹ DO GET_STARTED Z MainAppBar
+          print('✅ [RootPage] User logged in, going to GetStartedPageWithAppBar');
           return const GetStartedPageWithAppBar();
         } else {
-          // NIE ZALOGOWANY - IDŹ DO LOGIN_PAGE BEZ MainAppBar
+          print('🚫 [RootPage] User not logged in, going to LoginPage');
           return const LoginPage();
         }
       },
@@ -131,7 +222,6 @@ class RootPage extends StatelessWidget {
   }
 }
 
-// GET_STARTED Z MainAppBar
 class GetStartedPageWithAppBar extends StatefulWidget {
   const GetStartedPageWithAppBar({super.key});
 
@@ -143,26 +233,139 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
   @override
   void initState() {
     super.initState();
-    // Ustaw stronę dla menu PO zbudowaniu widgetu
+    print('🎬 [GetStartedPage] initState');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final menuProvider = Provider.of<MenuProvider>(context, listen: false);
-      menuProvider.setCurrentPage('get_started');
+      print('🔄 [GetStartedPage] Setting currentPage to get_started');
+      try {
+        final menuProvider = Provider.of<MenuProvider>(context, listen: false);
+        menuProvider.setCurrentPage('get_started');
+        print('✅ [GetStartedPage] Current page set successfully');
+        
+        // Test: sprawdź jakie pageLinks są dostępne
+        final pageLinks = menuProvider.pageLinks;
+        print('📋 [GetStartedPage] Available pageLinks: ${pageLinks.length}');
+        for (var link in pageLinks) {
+          print('   - ${link.title}: ${link.route} (filter: ${link.pageFilter})');
+        }
+      } catch (e) {
+        print('❌ [GetStartedPage] Error setting current page: $e');
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print('📱 [GetStartedPage] Building widget');
     return Scaffold(
       appBar: MainAppBar(
         title: "Get Started",
         showBackButton: false,
       ),
-      body: GetStarted(),
+      body: Column(
+        children: [
+          Expanded(child: GetStarted()),
+          // DODAJEMY TEST BUTTON
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: () {
+                print('🧪 [TEST] Direct navigation to /welcome');
+                Navigator.pushNamed(context, '/welcome');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('TEST: Go to Welcome Page directly'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// PRZYKŁAD: Jak używać na innych stronach
+// PRZYKŁADOWE STRONY
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: MainAppBar(
+        title: "Settings",
+        showBackButton: true,
+      ),
+      body: Center(
+        child: Text(
+          "Settings Page",
+          style: TextStyle(color: const Color(0xFF860E66)),
+        ),
+      ),
+    );
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: MainAppBar(
+        title: "Profile",
+        showBackButton: true,
+      ),
+      body: Center(
+        child: Text(
+          "Profile Page",
+          style: TextStyle(color: const Color(0xFF860E66)),
+        ),
+      ),
+    );
+  }
+}
+
+class HelpPage extends StatelessWidget {
+  const HelpPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: MainAppBar(
+        title: "Help",
+        showBackButton: true,
+      ),
+      body: Center(
+        child: Text(
+          "Help Page",
+          style: TextStyle(color: const Color(0xFF860E66)),
+        ),
+      ),
+    );
+  }
+}
+
+class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: MainAppBar(
+        title: "About",
+        showBackButton: true,
+      ),
+      body: Center(
+        child: Text(
+          "About Page",
+          style: TextStyle(color: const Color(0xFF860E66)),
+        ),
+      ),
+    );
+  }
+}
+
 class AbCdPage extends StatefulWidget {
   const AbCdPage({super.key});
 
@@ -197,41 +400,6 @@ class _AbCdPageState extends State<AbCdPage> {
   }
 }
 
-class WelcomePageWithAppBar extends StatefulWidget {
-  const WelcomePageWithAppBar({super.key});
-
-  @override
-  State<WelcomePageWithAppBar> createState() => _WelcomePageWithAppBarState();
-}
-
-class _WelcomePageWithAppBarState extends State<WelcomePageWithAppBar> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final menuProvider = Provider.of<MenuProvider>(context, listen: false);
-      menuProvider.setCurrentPage('welcome');
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MainAppBar(
-        title: "Welcome",
-        showBackButton: true,
-      ),
-      body: Center(
-        child: Text(
-          "Strona Welcome",
-          style: TextStyle(color: const Color(0xFF860E66)),
-        ),
-      ),
-    );
-  }
-}
-
-// Zachowujemy oryginalną TitlePage jeśli jest używana gdzieś indziej
 class TitlePage extends StatelessWidget {
   const TitlePage({super.key});
 
@@ -241,22 +409,16 @@ class TitlePage extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            // GÓRNY PRZYCISK (LOGIN)
             Positioned(
               top: 20,
               right: 20,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginPage()),
-                  );
+                  Navigator.pushNamed(context, '/login');
                 },
                 child: const Text("Login"),
               ),
             ),
-
-            // ZAWARTOŚĆ STRONY (TITLE)
             Center(
               child: Text(
                 "Welcome!",
@@ -267,8 +429,6 @@ class TitlePage extends StatelessWidget {
                 ),
               ),
             ),
-
-            // DOLNY PRZYCISK "LET'S START"
             Positioned(
               bottom: 40,
               left: 20,
@@ -281,10 +441,7 @@ class TitlePage extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const GetStartedPageWithAppBar()),
-                  );
+                  Navigator.pushReplacementNamed(context, '/');
                 },
                 child: const Text(
                   "Let's Start",

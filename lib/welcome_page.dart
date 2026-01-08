@@ -1,6 +1,10 @@
+// lib/welcome_page.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'login_page.dart';
+import 'providers/auth_provider.dart';
+import 'widgets/main_app_bar.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -10,59 +14,62 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  Future<void> _signOutAndGotoLogin() async {
-    try {
-      await _auth.signOut();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error signing out: $e')),
-      );
-    }
-
-    if (!mounted) return;
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginPage()),
-    );
+  @override
+  void initState() {
+    super.initState();
+    print('🎬 [WelcomePage] initState');
   }
 
   @override
   Widget build(BuildContext context) {
+    print('📱 [WelcomePage] Building widget');
+    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Welcome to Core Content',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            tooltip: 'Logout',
-            icon: const Icon(Icons.logout),
-            onPressed: _signOutAndGotoLogin,
-          ),
-        ],
+      appBar: MainAppBar(
+        title: 'Welcome to Core Content',
+        showBackButton: true,
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Text(
-                'What kind of experience would be most helpful for you at this moment?',
-                style: TextStyle(fontSize: 16),
+                'Welcome Page Loaded Successfully! 🎉',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF860E66),
+                ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 32),
+              const SizedBox(height: 32),
+              Text(
+                'What kind of experience would be most helpful for you at this moment?',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: const Color(0xFF860E66),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
               _WelcomeButton(text: 'Help me reconnect'),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _WelcomeButton(text: "Show me what's possible"),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _WelcomeButton(text: 'Go to my favourites'),
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Go Back'),
+              ),
             ],
           ),
         ),
@@ -80,10 +87,12 @@ class _WelcomeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // TODO: dodaj nawigację do odpowiedniej podstrony
+        print('Button pressed: $text');
       },
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+        backgroundColor: const Color(0xFFB31288),
+        foregroundColor: Colors.white,
       ),
       child: Text(text),
     );

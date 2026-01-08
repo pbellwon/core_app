@@ -27,7 +27,7 @@ class MenuOverlay extends StatelessWidget {
                   child: GestureDetector(
                     onTap: () => menuProvider.closeMenu(),
                     child: Container(
-                      color: Colors.black.withOpacity(0.3),
+                      color: const Color.fromRGBO(0, 0, 0, 0.3),
                     ),
                   ),
                 ),
@@ -48,10 +48,15 @@ class MenuOverlay extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // ODNIEWNIKI DO STRON - ZACHOWANY KOLOR #860E66
+                          // ODNIEWNIKI DO STRON
                           ...menuProvider.pageLinks.map((item) {
+                            // Sprawdź czy to Welcome Page - jeśli tak, to bez ikony
+                            final bool isWelcomePage = item.title == 'Welcome Page';
+                            
                             return ListTile(
-                              leading: Icon(item.icon, color: const Color(0xFF860E66)),
+                              leading: isWelcomePage 
+                                  ? null // Bez ikony dla Welcome Page
+                                  : Icon(item.icon, color: const Color(0xFF860E66)),
                               title: Text(
                                 item.title,
                                 style: const TextStyle(
@@ -60,8 +65,34 @@ class MenuOverlay extends StatelessWidget {
                                 ),
                               ),
                               onTap: () {
+                                // DEBUG: Logowanie które kliknięto
+                                debugPrint('MenuOverlay: Kliknięto "${item.title}" -> route: "${item.route}"');
+                                
                                 menuProvider.closeMenu();
-                                Navigator.pushNamed(context, item.route);
+                                
+                                // Nawigacja do odpowiedniej strony
+                                try {
+                                  if (item.route == '/logout') {
+                                    // Logout jest obsługiwany w UserProfileButton
+                                    debugPrint('MenuOverlay: Logout powinien być obsługiwany w profilu');
+                                    return;
+                                  }
+                                  
+                                  // Użyj Navigator.pushNamed dla nawigacji
+                                  Navigator.pushNamed(context, item.route)
+                                    .then((_) {
+                                      // Po powrocie z nawigacji możesz coś zrobić
+                                      debugPrint('MenuOverlay: Powrót z ${item.route}');
+                                    })
+                                    .catchError((error) {
+                                      // Jeśli wystąpi błąd nawigacji
+                                      debugPrint('MenuOverlay: Błąd nawigacji do ${item.route}: $error');
+                                      _showNavigationError(context, item.title);
+                                    });
+                                } catch (e) {
+                                  debugPrint('MenuOverlay: Wyjątek podczas nawigacji: $e');
+                                  _showNavigationError(context, item.title);
+                                }
                               },
                             );
                           }).toList(),
@@ -80,8 +111,28 @@ class MenuOverlay extends StatelessWidget {
                                   ),
                                 ),
                                 onTap: () {
+                                  debugPrint('MenuOverlay: Kliknięto globalne "${item.title}" -> route: "${item.route}"');
+                                  
                                   menuProvider.closeMenu();
-                                  Navigator.pushNamed(context, item.route);
+                                  
+                                  try {
+                                    if (item.route == '/logout') {
+                                      debugPrint('MenuOverlay: Global Logout - obsługa w profilu');
+                                      return;
+                                    }
+                                    
+                                    Navigator.pushNamed(context, item.route)
+                                      .then((_) {
+                                        debugPrint('MenuOverlay: Powrót z globalnej strony ${item.route}');
+                                      })
+                                      .catchError((error) {
+                                        debugPrint('MenuOverlay: Błąd nawigacji do globalnej ${item.route}: $error');
+                                        _showNavigationError(context, item.title);
+                                      });
+                                  } catch (e) {
+                                    debugPrint('MenuOverlay: Wyjątek podczas nawigacji globalnej: $e');
+                                    _showNavigationError(context, item.title);
+                                  }
                                 },
                               );
                             }).toList(),
@@ -99,6 +150,17 @@ class MenuOverlay extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+  
+  // Funkcja do pokazywania błędu nawigacji
+  void _showNavigationError(BuildContext context, String pageName) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Nie można przejść do "$pageName" - strona nie została zaimplementowana'),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 }
