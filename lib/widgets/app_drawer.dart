@@ -2,83 +2,83 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/menu_provider.dart';
-import '../providers/auth_provider.dart'; 
+import '../providers/auth_provider.dart';
 import '../models/menu_item_model.dart';
-import '../main.dart'; // dla navigatorKey
+import '../main.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final menuProvider = Provider.of<MenuProvider>(context);
+    final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
+
     return Drawer(
-      child: SafeArea(
-        child: Consumer<MenuProvider>(
-          builder: (context, menuProvider, _) {
-            final pageLinks = menuProvider.pageLinks;
-
-            return ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                const DrawerHeader(
-                  decoration: BoxDecoration(color: Color(0xFF860E66)),
-                  child: Text(
-                    'Menu',
-                    style: TextStyle(color: Colors.white, fontSize: 24),
-                  ),
-                ),
-
-                // Strony typu pageLink
-                for (var item in pageLinks)
-                  ListTile(
-                    leading: Icon(item.icon, color: const Color(0xFF860E66)),
-                    title: Text(item.title),
-                    onTap: () {
-                      Navigator.of(context).pop(); // Zamknij Drawer
-                      menuProvider.closeMenu();     // Zresetuj overlay
-                      // Nawigacja
-                      if (item.route == '/logout') {
-                        _handleLogout(context);
-                      } else {
-                        navigatorKey.currentState?.pushNamed(item.route);
-                      }
-                    },
-                  ),
-
-                const Divider(),
-      ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  void _handleLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 🟢 USUNIĘTO DrawerHeader z napisem MENU
+          Container(
+            height: 0,
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Provider.of<AppAuthProvider>(context, listen: false).signOut();
-              navigatorKey.currentState?.pushNamedAndRemoveUntil(
-                '/login', 
-                (route) => false,
-              );
-            },
-            child: const Text(
-              'Logout',
-              style: TextStyle(color: Color(0xFF860E66)),
+
+          // PAGE LINKS
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: menuProvider.pageLinks.map((item) {
+                return ListTile(
+                  leading: item.icon != null ? Icon(item.icon) : null,
+                  title: Text(
+                    item.title,
+                    style: const TextStyle(color: Color(0xFF860E66)), // heading color
+                  ),
+                  onTap: () {
+                    Navigator.pop(context); // zamknij drawer
+                    if (item.route != null) {
+                      Navigator.pushNamed(context, item.route!);
+                      menuProvider.setCurrentPage(item.pageFilter ?? '');
+                    }
+                  },
+                );
+              }).toList(),
             ),
           ),
+
+          const Divider(),
+
+          // USER ACTIONS
+          ...menuProvider.getUserActions(menuProvider.currentPage).map((item) {
+            return ListTile(
+              leading: item.icon != null ? Icon(item.icon) : null,
+              title: Text(item.title),
+              onTap: () {
+                Navigator.pop(context);
+                if (item.title.toLowerCase() == 'logout') {
+                  menuProvider.logoutUser();
+                } else if (item.route != null) {
+                  Navigator.pushNamed(context, item.route!);
+                }
+              },
+            );
+          }).toList(),
+
+          const Divider(),
+
+          // GLOBAL ACTIONS
+          ...menuProvider.globalActions.map((item) {
+            return ListTile(
+              leading: item.icon != null ? Icon(item.icon) : null,
+              title: Text(item.title),
+              onTap: () {
+                Navigator.pop(context);
+                if (item.route != null) {
+                  Navigator.pushNamed(context, item.route!);
+                }
+              },
+            );
+          }).toList(),
         ],
       ),
     );

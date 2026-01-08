@@ -3,7 +3,7 @@ import 'package:flutter/material.dart'; // DODAJ TEN IMPORT
 
 class MenuItem {
   final String title;
-  final IconData icon;
+  final IconData? icon;
   final String route;
   final String? pageFilter;
   final MenuItemType type;

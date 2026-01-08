@@ -23,9 +23,9 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     print('📱 [WelcomePage] Building widget');
-    
+
     return Scaffold(
-      appBar: MainAppBar(
+      appBar: const MainAppBar(
         title: 'Welcome to Core Content',
         showBackButton: true,
       ),
@@ -37,19 +37,19 @@ class _WelcomePageState extends State<WelcomePage> {
             children: [
               Text(
                 'Welcome Page Loaded Successfully! 🎉',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF860E66),
+                  color: Color(0xFF860E66), // heading color
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
               Text(
                 'What kind of experience would be most helpful for you at this moment?',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
-                  color: const Color(0xFF860E66),
+                  color: Color(0xFF860E66),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -91,7 +91,7 @@ class _WelcomeButton extends StatelessWidget {
       },
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-        backgroundColor: const Color(0xFFB31288),
+        backgroundColor: const Color(0xFFB31288), // accent color
         foregroundColor: Colors.white,
       ),
       child: Text(text),
