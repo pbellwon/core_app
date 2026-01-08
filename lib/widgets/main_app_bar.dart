@@ -26,18 +26,19 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: title.isNotEmpty ? Text(title) : null,
       leading: showBackButton
-          ? IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          : Consumer<MenuProvider>(
-              builder: (context, menuProvider, child) {
-                return IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => menuProvider.toggleMenu(),
-                );
-              },
-            ),
+    ? IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => Navigator.of(context).pop(),
+      )
+    : Builder(
+        builder: (context) => IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
+        ),
+      ),
+
       centerTitle: false,
       titleSpacing: showBackButton ? 0 : 16,
       actions: [
