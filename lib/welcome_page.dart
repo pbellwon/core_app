@@ -1,9 +1,5 @@
 // lib/welcome_page.dart
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
-import 'login_page.dart';
-import 'providers/auth_provider.dart';
 import 'widgets/main_app_bar.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -17,13 +13,11 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
-    print('🎬 [WelcomePage] initState');
+    // initState - bez debug print
   }
 
   @override
   Widget build(BuildContext context) {
-    print('📱 [WelcomePage] Building widget');
-
     return Scaffold(
       appBar: const MainAppBar(
         title: 'Welcome to Core Content',
@@ -35,9 +29,9 @@ class _WelcomePageState extends State<WelcomePage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 'Welcome Page Loaded Successfully! 🎉',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF860E66), // heading color
@@ -45,9 +39,9 @@ class _WelcomePageState extends State<WelcomePage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              Text(
+              const Text(
                 'What kind of experience would be most helpful for you at this moment?',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   color: Color(0xFF860E66),
                 ),
@@ -87,7 +81,7 @@ class _WelcomeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        print('Button pressed: $text');
+        // Przycisk naciśnięty - bez debug print
       },
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),

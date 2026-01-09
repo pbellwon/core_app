@@ -25,17 +25,15 @@ class AppDrawer extends StatelessWidget {
               padding: EdgeInsets.zero,
               children: menuProvider.pageLinks.map((item) {
                 return ListTile(
-                  leading: item.icon != null ? Icon(item.icon) : null,
+                  leading: item.icon != null ? Icon(item.icon!) : null,
                   title: Text(
                     item.title,
                     style: const TextStyle(color: Color(0xFF860E66)), // heading color
                   ),
                   onTap: () {
                     Navigator.pop(context); // zamknij drawer
-                    if (item.route != null) {
-                      Navigator.pushNamed(context, item.route!);
-                      menuProvider.setCurrentPage(item.pageFilter ?? '');
-                    }
+                    Navigator.pushNamed(context, item.route); // route NIE jest null
+                    menuProvider.setCurrentPage(item.pageFilter ?? '');
                   },
                 );
               }).toList(),
@@ -47,14 +45,14 @@ class AppDrawer extends StatelessWidget {
           // USER ACTIONS
           ...menuProvider.getUserActions(menuProvider.currentPage).map((item) {
             return ListTile(
-              leading: item.icon != null ? Icon(item.icon) : null,
+              leading: item.icon != null ? Icon(item.icon!) : null,
               title: Text(item.title),
               onTap: () {
                 Navigator.pop(context);
                 if (item.title.toLowerCase() == 'logout') {
                   menuProvider.logoutUser();
-                } else if (item.route != null) {
-                  Navigator.pushNamed(context, item.route!);
+                } else {
+                  Navigator.pushNamed(context, item.route); // route NIE jest null
                 }
               },
             );
@@ -65,13 +63,11 @@ class AppDrawer extends StatelessWidget {
           // GLOBAL ACTIONS
           ...menuProvider.globalActions.map((item) {
             return ListTile(
-              leading: item.icon != null ? Icon(item.icon) : null,
+              leading: item.icon != null ? Icon(item.icon!) : null,
               title: Text(item.title),
               onTap: () {
                 Navigator.pop(context);
-                if (item.route != null) {
-                  Navigator.pushNamed(context, item.route!);
-                }
+                Navigator.pushNamed(context, item.route); // route NIE jest null
               },
             );
           }),
