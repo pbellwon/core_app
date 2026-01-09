@@ -1,6 +1,5 @@
 // lib/providers/menu_provider.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../models/menu_item_model.dart';
 import 'auth_provider.dart';
@@ -13,7 +12,7 @@ class MenuProvider with ChangeNotifier {
   final GlobalKey<NavigatorState>? navigatorKey;
 
   MenuProvider({this.navigatorKey}) {
-    if (kDebugMode) print('🆕 [MenuProvider] Constructor called');
+    _log('🆕 [MenuProvider] Constructor called');
     _initializeMenuItems();
   }
 
@@ -27,19 +26,17 @@ class MenuProvider with ChangeNotifier {
       final filterMatches = item.pageFilter == null || item.pageFilter == _currentPage;
       final matches = isPageLink && filterMatches;
 
-      if (kDebugMode && item.title == 'Welcome Page') {
-        print('🔍 [MenuProvider] Checking Welcome Page:');
-        print('   - Type: ${item.type}, isPageLink: $isPageLink');
-        print('   - Filter: ${item.pageFilter}, Current: $_currentPage');
-        print('   - Matches: $matches');
+      if (item.title == 'Welcome Page') {
+        _log('🔍 [MenuProvider] Checking Welcome Page:');
+        _log('   - Type: ${item.type}, isPageLink: $isPageLink');
+        _log('   - Filter: ${item.pageFilter}, Current: $_currentPage');
+        _log('   - Matches: $matches');
       }
 
       return matches;
     }).toList();
 
-    if (kDebugMode) {
-      print('📋 [MenuProvider] pageLinks for "$_currentPage": ${filteredItems.length}');
-    }
+    _log('📋 [MenuProvider] pageLinks for "$_currentPage": ${filteredItems.length}');
 
     return filteredItems;
   }
@@ -51,9 +48,7 @@ class MenuProvider with ChangeNotifier {
           (item.pageFilter == null || item.pageFilter == pageName);
     }).toList();
 
-    if (kDebugMode) {
-      print('👤 [MenuProvider] getUserActions for "$pageName": ${filteredItems.length}');
-    }
+    _log('👤 [MenuProvider] getUserActions for "$pageName": ${filteredItems.length}');
 
     return filteredItems;
   }
@@ -62,9 +57,7 @@ class MenuProvider with ChangeNotifier {
   List<MenuItem> get globalActions {
     final filteredItems = _allMenuItems.where((item) => item.type == MenuItemType.global).toList();
 
-    if (kDebugMode) {
-      print('🌐 [MenuProvider] globalActions: ${filteredItems.length}');
-    }
+    _log('🌐 [MenuProvider] globalActions: ${filteredItems.length}');
 
     return filteredItems;
   }
@@ -141,7 +134,7 @@ class MenuProvider with ChangeNotifier {
       ),
     ];
 
-    if (kDebugMode) print('✅ [MenuProvider] Menu items initialized: ${_allMenuItems.length}');
+    _log('✅ [MenuProvider] Menu items initialized: ${_allMenuItems.length}');
   }
 
   void toggleMenu() {
@@ -156,7 +149,7 @@ class MenuProvider with ChangeNotifier {
 
   void setCurrentPage(String pageName) {
     _currentPage = pageName;
-    if (kDebugMode) print('📍 [MenuProvider] Current page set to "$_currentPage"');
+    _log('📍 [MenuProvider] Current page set to "$_currentPage"');
     notifyListeners();
   }
 
@@ -167,9 +160,9 @@ class MenuProvider with ChangeNotifier {
 
   /// 🔑 Funkcja wylogowania użytkownika
   void logoutUser() {
-    if (kDebugMode) print('🚪 [MenuProvider] Logging out user...');
+    _log('🚪 [MenuProvider] Logging out user...');
     if (navigatorKey == null) {
-      if (kDebugMode) print('❌ [MenuProvider] navigatorKey is null, cannot log out');
+      _log('❌ [MenuProvider] navigatorKey is null, cannot log out');
       return;
     }
 
@@ -193,4 +186,12 @@ class MenuProvider with ChangeNotifier {
   }
 
   List<String> getAvailablePageTitles() => pageLinks.map((item) => item.title).toList();
+
+  // ⭐ Warunkowe logowanie tylko w trybie debug
+  void _log(String message) {
+    assert(() {
+      debugPrint(message);
+      return true;
+    }());
+  }
 }

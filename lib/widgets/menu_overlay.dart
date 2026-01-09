@@ -23,7 +23,7 @@ class MenuOverlay extends StatelessWidget {
                 GestureDetector(
                   onTap: () => menuProvider.closeMenu(),
                   child: Container(
-                    color: Colors.black.withOpacity(0.3),
+                    color: const Color.fromRGBO(0, 0, 0, 0.3), // Zamiast withOpacity(0.3)
                   ),
                 ),
 
@@ -44,7 +44,7 @@ class MenuOverlay extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: const Color.fromRGBO(0, 0, 0, 0.2), // Zamiast withOpacity(0.2)
                                 blurRadius: 10,
                                 spreadRadius: 2,
                               ),
