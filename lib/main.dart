@@ -133,7 +133,7 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainAppBar(title: "Get Started", showBackButton: false),
+      appBar: const MainAppBar(title: "", showBackButton: false),
       drawer: const AppDrawer(),
       body: const GetStarted(), // Używamy klasy z get_started.dart
     );
