@@ -43,34 +43,34 @@ class AppDrawer extends StatelessWidget {
           const Divider(),
 
           // USER ACTIONS
-          ...menuProvider.getUserActions(menuProvider.currentPage).map((item) {
-            return ListTile(
-              leading: item.icon != null ? Icon(item.icon!) : null,
-              title: Text(item.title),
-              onTap: () {
-                Navigator.pop(context);
-                if (item.title.toLowerCase() == 'logout') {
-                  menuProvider.logoutUser();
-                } else {
-                  Navigator.pushNamed(context, item.route); // route NIE jest null
-                }
-              },
-            );
-          }),
+         // ...menuProvider.getUserActions(menuProvider.currentPage).map((item) {
+           // return ListTile(
+             // leading: item.icon != null ? Icon(item.icon!) : null,
+              //title: Text(item.title),
+              //onTap: () {
+                //Navigator.pop(context);
+                //if (item.title.toLowerCase() == 'logout') {
+                 // menuProvider.logoutUser();
+                //} else {
+                 // Navigator.pushNamed(context, item.route); // route NIE jest null
+                //}
+              //},
+            //);
+          //}),
 
-          const Divider(),
+         // const Divider(),
 
           // GLOBAL ACTIONS
-          ...menuProvider.globalActions.map((item) {
-            return ListTile(
-              leading: item.icon != null ? Icon(item.icon!) : null,
-              title: Text(item.title),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, item.route); // route NIE jest null
-              },
-            );
-          }),
+          //...menuProvider.globalActions.map((item) {
+            //return ListTile(
+              //leading: item.icon != null ? Icon(item.icon!) : null,
+              //title: Text(item.title),
+              //onTap: () {
+                //Navigator.pop(context);
+                //Navigator.pushNamed(context, item.route); // route NIE jest null
+              //},
+            //);
+          //}),
         ],
       ),
     );
