@@ -67,7 +67,7 @@ class MenuProvider with ChangeNotifier {
       // PAGE LINKS
       MenuItem(
         title: 'Welcome Page',
-        icon: Icons.home,
+        icon: null, // ZMIANA: Bez ikony! (było: Icons.home)
         route: '/welcome',
         pageFilter: 'get_started',
         type: MenuItemType.pageLink,
