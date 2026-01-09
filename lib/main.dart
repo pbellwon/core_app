@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'login_page.dart';
-import 'get_started.dart';
+import 'get_started.dart'; // Importujemy prawdziwą stronę główną
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'welcome_page.dart';
@@ -19,8 +19,8 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   FlutterError.onError = (details) {
-    print('FLUTTER ERROR: ${details.exception}');
-    print('Stack trace: ${details.stack}');
+    debugPrint('FLUTTER ERROR: ${details.exception}');
+    debugPrint('Stack trace: ${details.stack}');
   };
 
   runApp(const MyApp());
@@ -34,7 +34,6 @@ class MyApp extends StatelessWidget {
     // 🌈 Kolory globalne
     const backgroundColor = Color(0xFFFBF3F9);
     const accentColor = Color(0xFFB31288);
-    const altAccentColor = Color(0xFFCC5500);
     const headingTextColor = Color(0xFF860E66);
 
     return MultiProvider(
@@ -112,7 +111,7 @@ class RootPage extends StatelessWidget {
   }
 }
 
-/// GetStartedPage z AppBar + Drawer
+/// GetStartedPage z AppBar + Drawer - UŻYWA klasy z get_started.dart
 class GetStartedPageWithAppBar extends StatefulWidget {
   const GetStartedPageWithAppBar({super.key});
 
@@ -136,7 +135,7 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
     return Scaffold(
       appBar: const MainAppBar(title: "Get Started", showBackButton: false),
       drawer: const AppDrawer(),
-      body: const GetStarted(),
+      body: const GetStarted(), // Używamy klasy z get_started.dart
     );
   }
 }
@@ -213,33 +212,6 @@ class _AbCdPageState extends State<AbCdPage> {
       appBar: const MainAppBar(title: "AB CD Page", showBackButton: true),
       drawer: const AppDrawer(),
       body: const Center(child: Text("Strona AB CD")),
-    );
-  }
-}
-
-/// Testowa strona GetStarted
-class GetStarted extends StatelessWidget {
-  const GetStarted({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Get Started Page',
-            style: TextStyle(fontSize: 24, color: Color(0xFF860E66)),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              navigatorKey.currentState?.pushNamed('/welcome');
-            },
-            child: const Text('Go to Welcome Page'),
-          ),
-        ],
-      ),
     );
   }
 }

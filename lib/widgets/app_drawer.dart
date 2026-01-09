@@ -2,9 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/menu_provider.dart';
-import '../providers/auth_provider.dart';
-import '../models/menu_item_model.dart';
-import '../main.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -12,7 +9,6 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final menuProvider = Provider.of<MenuProvider>(context);
-    final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
 
     return Drawer(
       child: Column(
@@ -62,7 +58,7 @@ class AppDrawer extends StatelessWidget {
                 }
               },
             );
-          }).toList(),
+          }),
 
           const Divider(),
 
@@ -78,7 +74,7 @@ class AppDrawer extends StatelessWidget {
                 }
               },
             );
-          }).toList(),
+          }),
         ],
       ),
     );
