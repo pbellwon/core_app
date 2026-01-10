@@ -1,23 +1,24 @@
-// lib/main.dart
+// lib/main.dart - LOGIKA POPRAWIONA, UI BEZ ZMIAN
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+
 import 'firebase_options.dart';
 import 'login_page.dart';
-import 'profile_page.dart'; // ✅ Importujemy PRAWDZIWY ProfilePage
+import 'profile_page.dart';
 import 'get_started.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
-import 'welcome_page.dart';
 import 'widgets/main_app_bar.dart';
 import 'widgets/app_drawer.dart';
 
-/// 🔑 Globalny navigatorKey dla MenuProvider (wylogowanie)
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   FlutterError.onError = (details) {
     debugPrint('FLUTTER ERROR: ${details.exception}');
@@ -32,7 +33,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🌈 Kolory globalne
     const backgroundColor = Color(0xFFFBF3F9);
     const accentColor = Color(0xFFB31288);
     const headingTextColor = Color(0xFF860E66);
@@ -68,19 +68,20 @@ class MyApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppAuthProvider(), lazy: false),
+        ChangeNotifierProvider(
+          create: (_) => AppAuthProvider(),
+          lazy: false,
+        ),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
         theme: theme,
-        
-        // ✅ KLUCZOWA ZMIANA: Używamy initialRoute zamiast home
+
+        // ⬇️ ROOT JAKO JEDYNE ŹRÓDŁO PRAWDY
         initialRoute: '/',
-        
         routes: {
-          // ✅ KLUCZOWA ZMIANA: RootPage jako '/'
           '/': (_) => const RootPage(),
           '/welcome': (_) => const WelcomePage(),
           '/login': (_) => const LoginPage(),
@@ -91,41 +92,47 @@ class MyApp extends StatelessWidget {
           '/get_started': (_) => const GetStartedPageWithAppBar(),
           '/dashboard': (_) => const AbCdPage(),
         },
+
+        // ⬇️ KLUCZOWE: jeśli Flutter Web trafi na „zły” URL
+        // (np. po logout z /profile), ZAWSZE wracamy do '/'
+        onUnknownRoute: (_) {
+          return MaterialPageRoute(
+            builder: (_) => const RootPage(),
+          );
+        },
       ),
     );
   }
 }
 
-/// Strona sprawdzająca auth state - ZAKTUALIZOWANA
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AppAuthProvider>(
-      builder: (context, authProvider, child) {
-        // Jeśli ładowanie - pokaż loading
+      builder: (context, authProvider, _) {
         if (authProvider.isLoading) {
           return const Scaffold(
             body: Center(
-              child: CircularProgressIndicator(color: Color(0xFFB31288)),
+              child: CircularProgressIndicator(
+                color: Color(0xFFB31288),
+              ),
             ),
           );
         }
-        
-        // ✅ DLA NIEZALOGOWANEGO: Pełna strona LoginPage
+
+        // ❗ JEDYNE MIEJSCE DECYZJI
         if (!authProvider.isLoggedIn) {
           return const LoginPage();
         }
-        
-        // ✅ DLA ZALOGOWANEGO: GetStartedPage
+
         return const GetStartedPageWithAppBar();
       },
     );
   }
 }
 
-/// GetStartedPage z AppBar + Drawer
 class GetStartedPageWithAppBar extends StatefulWidget {
   const GetStartedPageWithAppBar({super.key});
 
@@ -154,7 +161,23 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
   }
 }
 
-/// Przykładowe strony
+class WelcomePage extends StatelessWidget {
+  const WelcomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const MainAppBar(title: "Welcome", showBackButton: true),
+      body: const Center(
+        child: Text(
+          'Welcome Page',
+          style: TextStyle(fontSize: 24, color: Color(0xFF860E66)),
+        ),
+      ),
+    );
+  }
+}
+
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
