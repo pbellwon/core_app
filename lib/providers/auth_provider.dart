@@ -208,6 +208,7 @@ class AppAuthProvider with ChangeNotifier {
       await FirebaseAuth.instance.signOut();
       _currentUser = null;
       _firebaseUser = null;
+      _isLoading = false; // ✅ WAŻNE: reset isLoading
       notifyListeners();
       print('✅ User signed out successfully');
     } catch (e) {

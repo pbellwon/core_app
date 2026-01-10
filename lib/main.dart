@@ -37,6 +37,35 @@ class MyApp extends StatelessWidget {
     const accentColor = Color(0xFFB31288);
     const headingTextColor = Color(0xFF860E66);
 
+    final theme = ThemeData(
+      useMaterial3: false,
+      scaffoldBackgroundColor: backgroundColor,
+      primaryColor: headingTextColor,
+      colorScheme: ColorScheme.fromSwatch().copyWith(
+        primary: headingTextColor,
+        secondary: accentColor,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: backgroundColor,
+        foregroundColor: headingTextColor,
+        elevation: 0,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: accentColor,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: headingTextColor,
+        ),
+      ),
+    );
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppAuthProvider(), lazy: false),
@@ -45,40 +74,18 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
-        theme: ThemeData(
-          useMaterial3: false,
-          scaffoldBackgroundColor: backgroundColor,
-          primaryColor: headingTextColor,
-          colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: headingTextColor,
-            secondary: accentColor,
-          ),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: backgroundColor,
-            foregroundColor: headingTextColor,
-            elevation: 0,
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: accentColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-          textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              foregroundColor: headingTextColor,
-            ),
-          ),
-        ),
-        home: const RootPage(),
+        theme: theme,
+        
+        // ✅ KLUCZOWA ZMIANA: Używamy initialRoute zamiast home
+        initialRoute: '/',
+        
         routes: {
+          // ✅ KLUCZOWA ZMIANA: RootPage jako '/'
+          '/': (_) => const RootPage(),
           '/welcome': (_) => const WelcomePage(),
           '/login': (_) => const LoginPage(),
           '/settings': (_) => const SettingsPage(),
-          '/profile': (_) => const ProfilePage(), // ✅ UŻYWA importowanego ProfilePage
+          '/profile': (_) => const ProfilePage(),
           '/help': (_) => const HelpPage(),
           '/about': (_) => const AboutPage(),
           '/get_started': (_) => const GetStartedPageWithAppBar(),
@@ -89,7 +96,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// Strona sprawdzająca auth state
+/// Strona sprawdzająca auth state - ZAKTUALIZOWANA
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
 
@@ -97,6 +104,7 @@ class RootPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppAuthProvider>(
       builder: (context, authProvider, child) {
+        // Jeśli ładowanie - pokaż loading
         if (authProvider.isLoading) {
           return const Scaffold(
             body: Center(
@@ -104,9 +112,14 @@ class RootPage extends StatelessWidget {
             ),
           );
         }
-        return authProvider.isLoggedIn
-            ? const GetStartedPageWithAppBar()
-            : const LoginPage();
+        
+        // ✅ DLA NIEZALOGOWANEGO: Pełna strona LoginPage
+        if (!authProvider.isLoggedIn) {
+          return const LoginPage();
+        }
+        
+        // ✅ DLA ZALOGOWANEGO: GetStartedPage
+        return const GetStartedPageWithAppBar();
       },
     );
   }
@@ -141,7 +154,7 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
   }
 }
 
-/// Przykładowe strony - ZOSTAWIAMY TYLKO TE KTÓRE NIE MAJĄ OSOBNYCH PLIKÓW
+/// Przykładowe strony
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -153,18 +166,6 @@ class SettingsPage extends StatelessWidget {
     );
   }
 }
-
-// ❌ USUŃ TĘ KLASĘ - mamy ją w osobnym pliku!
-// class ProfilePage extends StatelessWidget {
-//   const ProfilePage({super.key});
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: const MainAppBar(title: "Profile", showBackButton: true),
-//       body: const Center(child: Text("Profile Page")),
-//     );
-//   }
-// }
 
 class HelpPage extends StatelessWidget {
   const HelpPage({super.key});
