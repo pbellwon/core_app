@@ -347,7 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 // 👤 AWATAR I PODSTAWOWE INFO
                 Center(child: _buildUserAvatar(user)),
                 
@@ -469,20 +469,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 
                 // 📋 INFORMACJE O KONCIE
                 _buildAccountInfo(user),
-                
-                // 🚪 PRZYCISK WYLOGOWANIA
-                Center(
-                  child: TextButton.icon(
-                    onPressed: () {
-                      authProvider.signOut();
-                    },
-                    icon: const Icon(Icons.logout, color: Colors.red),
-                    label: const Text(
-                      'Logout',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ),
               ],
             ),
           );
