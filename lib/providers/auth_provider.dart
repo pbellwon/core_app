@@ -1,4 +1,5 @@
 // lib/providers/auth_provider.dart
+
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,17 +41,16 @@ class AppAuthProvider with ChangeNotifier {
         
         if (userDoc.exists && userData != null) {
           // Użytkownik istnieje w Firestore - pobierz pełne dane
-          _currentUser = AppUser.fromFirebaseUser(
-            userData, 
-            user.email, 
-            user.uid
-          );
+          _currentUser = AppUser.fromFirestore(userDoc); // ✅ ZMIANA: użyj fromFirestore
         } else {
           // Pierwsze logowanie - utwórz podstawowego użytkownika
-          _currentUser = AppUser.fromFirebaseUser(
-            null, 
-            user.email, 
-            user.uid
+          _currentUser = AppUser(
+            uid: user.uid,
+            email: user.email ?? '',
+            createdAt: DateTime.now(),
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            role: UserRole.user,
           );
           
           // Automatycznie zapisz użytkownika do Firestore przy pierwszym logowaniu
@@ -61,10 +61,11 @@ class AppAuthProvider with ChangeNotifier {
         if (kDebugMode) {
           print('Błąd pobierania danych użytkownika: $e');
         }
-        _currentUser = AppUser.fromFirebaseUser(
-          null, 
-          user.email, 
-          user.uid
+        _currentUser = AppUser(
+          uid: user.uid,
+          email: user.email ?? '',
+          createdAt: DateTime.now(),
+          role: UserRole.user,
         );
       }
 
@@ -75,18 +76,19 @@ class AppAuthProvider with ChangeNotifier {
 
   Future<void> _createUserInFirestore(User firebaseUser) async {
     try {
-      final now = DateTime.now().toIso8601String();
+      final user = AppUser(
+        uid: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        createdAt: DateTime.now(),
+        displayName: firebaseUser.displayName,
+        photoURL: firebaseUser.photoURL,
+        role: UserRole.user,
+      );
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(firebaseUser.uid)
-          .set({
-            'uid': firebaseUser.uid,
-            'email': firebaseUser.email,
-            'displayName': firebaseUser.displayName,
-            'photoURL': firebaseUser.photoURL,
-            'createdAt': now,
-            'updatedAt': now,
-          });
+          .set(user.toMap());
     } catch (e) {
       if (kDebugMode) {
         print('Błąd tworzenia użytkownika w Firestore: $e');
@@ -111,23 +113,25 @@ class AppAuthProvider with ChangeNotifier {
   Future<void> updateUserProfile({
     String? displayName,
     String? photoURL,
+    DateTime? dateOfBirth,
+    String? phoneNumber,
   }) async {
     if (_currentUser == null || _firebaseUser == null) {
       throw Exception('Użytkownik nie jest zalogowany');
     }
 
     try {
-      // 1. Aktualizuj w Firebase Authentication
-      await _firebaseUser!.updateProfile(
-        displayName: displayName,
-        photoURL: photoURL,
-      );
+      // 1. Aktualizuj w Firebase Authentication (jeśli to displayName lub photoURL)
+      if (displayName != null || photoURL != null) {
+        await _firebaseUser!.updateProfile(
+          displayName: displayName,
+          photoURL: photoURL,
+        );
+        await _firebaseUser!.reload();
+        _firebaseUser = FirebaseAuth.instance.currentUser;
+      }
 
-      // 2. Odśwież obiekt Firebase User (ważne!)
-      await _firebaseUser!.reload();
-      _firebaseUser = FirebaseAuth.instance.currentUser;
-
-      // 3. Aktualizuj w Firestore
+      // 2. Aktualizuj w Firestore
       final updateData = <String, dynamic>{
         'updatedAt': DateTime.now().toIso8601String(),
       };
@@ -140,21 +144,29 @@ class AppAuthProvider with ChangeNotifier {
         updateData['photoURL'] = photoURL;
       }
 
+      if (dateOfBirth != null) {
+        updateData['dateOfBirth'] = dateOfBirth.toIso8601String();
+      }
+
+      if (phoneNumber != null) {
+        updateData['phoneNumber'] = phoneNumber;
+      }
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(_currentUser!.uid)
           .update(updateData);
 
-      // 4. Aktualizuj lokalny stan
-      _currentUser = AppUser(
-        uid: _currentUser!.uid,
-        email: _firebaseUser!.email ?? _currentUser!.email,
+      // 3. Aktualizuj lokalny stan
+      _currentUser = _currentUser!.copyWith(
         displayName: displayName ?? _currentUser!.displayName,
         photoURL: photoURL ?? _currentUser!.photoURL,
-        acceptedTermsAt: _currentUser!.acceptedTermsAt,
+        dateOfBirth: dateOfBirth ?? _currentUser!.dateOfBirth,
+        phoneNumber: phoneNumber ?? _currentUser!.phoneNumber,
+        updatedAt: DateTime.now(),
       );
 
-      // 5. Odśwież UI
+      // 4. Odśwież UI
       notifyListeners();
       
     } catch (e) {
@@ -197,22 +209,18 @@ class AppAuthProvider with ChangeNotifier {
     final now = DateTime.now();
     
     try {
-      // 1. Aktualizuj w Firestore
+      // 1. Aktualizuj w Firestore (możesz dodać pole 'acceptedTermsAt' jeśli potrzebujesz)
       await FirebaseFirestore.instance
           .collection('users')
           .doc(_currentUser!.uid)
           .update({
-            'accepted_terms_at': now.toIso8601String(),
-            'updatedAt': DateTime.now().toIso8601String(),
+            'updatedAt': now.toIso8601String(),
+            // Możesz dodać: 'acceptedTermsAt': now.toIso8601String(),
           });
 
-      // 2. Aktualizuj lokalnie
-      _currentUser = AppUser(
-        uid: _currentUser!.uid,
-        email: _currentUser!.email,
-        displayName: _currentUser!.displayName,
-        photoURL: _currentUser!.photoURL,
-        acceptedTermsAt: now,
+      // 2. Odśwież lokalnie (tylko updatedAt)
+      _currentUser = _currentUser!.copyWith(
+        updatedAt: now,
       );
 
       notifyListeners();
@@ -265,19 +273,14 @@ class AppAuthProvider with ChangeNotifier {
           .doc(_firebaseUser!.uid)
           .get();
 
-      final userData = userDoc.data();
-      
-      if (userDoc.exists && userData != null) {
-        _currentUser = AppUser.fromFirebaseUser(
-          userData, 
-          _firebaseUser!.email, 
-          _firebaseUser!.uid
-        );
+      if (userDoc.exists) {
+        _currentUser = AppUser.fromFirestore(userDoc); // ✅ ZMIANA
       } else {
-        _currentUser = AppUser.fromFirebaseUser(
-          null, 
-          _firebaseUser!.email, 
-          _firebaseUser!.uid
+        _currentUser = AppUser(
+          uid: _firebaseUser!.uid,
+          email: _firebaseUser!.email ?? '',
+          createdAt: DateTime.now(),
+          role: UserRole.user,
         );
       }
       

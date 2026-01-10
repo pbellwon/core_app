@@ -4,7 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'login_page.dart';
-import 'get_started.dart'; // Importujemy prawdziwą stronę główną
+import 'profile_page.dart'; // ✅ Importujemy PRAWDZIWY ProfilePage
+import 'get_started.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'welcome_page.dart';
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        navigatorKey: navigatorKey, // 🔑 globalny navigatorKey
+        navigatorKey: navigatorKey,
         theme: ThemeData(
           useMaterial3: false,
           scaffoldBackgroundColor: backgroundColor,
@@ -72,12 +73,12 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const RootPage(), // pierwsza strona LoginPage
+        home: const RootPage(),
         routes: {
           '/welcome': (_) => const WelcomePage(),
           '/login': (_) => const LoginPage(),
           '/settings': (_) => const SettingsPage(),
-          '/profile': (_) => const ProfilePage(),
+          '/profile': (_) => const ProfilePage(), // ✅ UŻYWA importowanego ProfilePage
           '/help': (_) => const HelpPage(),
           '/about': (_) => const AboutPage(),
           '/get_started': (_) => const GetStartedPageWithAppBar(),
@@ -111,7 +112,7 @@ class RootPage extends StatelessWidget {
   }
 }
 
-/// GetStartedPage z AppBar + Drawer - UŻYWA klasy z get_started.dart
+/// GetStartedPage z AppBar + Drawer
 class GetStartedPageWithAppBar extends StatefulWidget {
   const GetStartedPageWithAppBar({super.key});
 
@@ -135,12 +136,12 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
     return Scaffold(
       appBar: const MainAppBar(title: "", showBackButton: false),
       drawer: const AppDrawer(),
-      body: const GetStarted(), // Używamy klasy z get_started.dart
+      body: const GetStarted(),
     );
   }
 }
 
-/// Przykładowe strony
+/// Przykładowe strony - ZOSTAWIAMY TYLKO TE KTÓRE NIE MAJĄ OSOBNYCH PLIKÓW
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -153,17 +154,17 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MainAppBar(title: "Profile", showBackButton: true),
-      body: const Center(child: Text("Profile Page")),
-    );
-  }
-}
+// ❌ USUŃ TĘ KLASĘ - mamy ją w osobnym pliku!
+// class ProfilePage extends StatelessWidget {
+//   const ProfilePage({super.key});
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: const MainAppBar(title: "Profile", showBackButton: true),
+//       body: const Center(child: Text("Profile Page")),
+//     );
+//   }
+// }
 
 class HelpPage extends StatelessWidget {
   const HelpPage({super.key});
