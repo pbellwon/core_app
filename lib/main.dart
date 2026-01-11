@@ -8,7 +8,8 @@ import 'login_page.dart';
 import 'profile_page.dart';
 import 'get_started.dart';
 import 'about_page.dart';
-import 'help_page.dart'; 
+import 'help_page.dart';
+import 'settings_page.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'widgets/main_app_bar.dart';
@@ -180,17 +181,7 @@ class WelcomePage extends StatelessWidget {
   }
 }
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MainAppBar(title: "Settings", showBackButton: true),
-      body: const Center(child: Text("Settings Page")),
-    );
-  }
-}
 
 
 

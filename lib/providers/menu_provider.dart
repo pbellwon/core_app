@@ -79,20 +79,7 @@ class MenuProvider with ChangeNotifier {
         pageFilter: 'ab_cd',
         type: MenuItemType.pageLink,
       ),
-      MenuItem(
-        title: 'Reports',
-        icon: Icons.assessment,
-        route: '/reports',
-        pageFilter: 'ab_cd',
-        type: MenuItemType.pageLink,
-      ),
-      MenuItem(
-        title: 'Analytics',
-        icon: Icons.analytics,
-        route: '/analytics',
-        pageFilter: 'ab_cd',
-        type: MenuItemType.pageLink,
-      ),
+      
 
       // USER ACTIONS
       MenuItem(
