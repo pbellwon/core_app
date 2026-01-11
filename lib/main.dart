@@ -7,6 +7,8 @@ import 'firebase_options.dart';
 import 'login_page.dart';
 import 'profile_page.dart';
 import 'get_started.dart';
+import 'about_page.dart';
+import 'help_page.dart'; 
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'widgets/main_app_bar.dart';
@@ -88,7 +90,7 @@ class MyApp extends StatelessWidget {
           '/settings': (_) => const SettingsPage(),
           '/profile': (_) => const ProfilePage(),
           '/help': (_) => const HelpPage(),
-          '/about': (_) => const AboutPage(),
+          '/about': (_) => const AboutPage(), // Teraz używa zewnętrznego pliku
           '/get_started': (_) => const GetStartedPageWithAppBar(),
           '/dashboard': (_) => const AbCdPage(),
         },
@@ -190,29 +192,7 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class HelpPage extends StatelessWidget {
-  const HelpPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MainAppBar(title: "Help", showBackButton: true),
-      body: const Center(child: Text("Help Page")),
-    );
-  }
-}
-
-class AboutPage extends StatelessWidget {
-  const AboutPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MainAppBar(title: "About", showBackButton: true),
-      body: const Center(child: Text("About Page")),
-    );
-  }
-}
 
 class AbCdPage extends StatefulWidget {
   const AbCdPage({super.key});
