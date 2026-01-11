@@ -7,6 +7,7 @@ import 'auth_provider.dart';
 class MenuProvider with ChangeNotifier {
   bool _isMenuOpen = false;
   String _currentPage = 'get_started';
+  String _lastMainPage = 'get_started'; // DODANE: pamięć ostatniej głównej strony
   List<MenuItem> _allMenuItems = [];
 
   final GlobalKey<NavigatorState>? navigatorKey;
@@ -17,6 +18,7 @@ class MenuProvider with ChangeNotifier {
 
   bool get isMenuOpen => _isMenuOpen;
   String get currentPage => _currentPage;
+  String get lastMainPage => _lastMainPage; // DODANE getter
 
   // Odnośniki do stron (tylko dla hamburger menu)
   List<MenuItem> get pageLinks {
@@ -47,18 +49,18 @@ class MenuProvider with ChangeNotifier {
       // Welcome Page - TYLKO na Get Started Page
       MenuItem(
         title: 'Welcome Page',
-        icon: null,
+        icon: Icons.home,
         route: '/welcome',
-        pageFilter: 'get_started', // TYLKO gdy currentPage == 'get_started'
+        pageFilter: 'get_started',
         type: MenuItemType.pageLink,
       ),
 
       // Get Started Page - TYLKO na Welcome Page
       MenuItem(
         title: 'Get Started Page',
-        icon: null,
+        icon: Icons.play_arrow,
         route: '/get_started',
-        pageFilter: 'welcome', // TYLKO gdy currentPage == 'welcome'
+        pageFilter: 'welcome',
         type: MenuItemType.pageLink,
       ),
 
@@ -67,21 +69,21 @@ class MenuProvider with ChangeNotifier {
         title: 'Dashboard',
         icon: Icons.dashboard,
         route: '/dashboard',
-        pageFilter: 'ab_cd', // TYLKO gdy currentPage == 'ab_cd'
+        pageFilter: 'ab_cd',
         type: MenuItemType.pageLink,
       ),
       MenuItem(
         title: 'Reports',
         icon: Icons.assessment,
         route: '/reports',
-        pageFilter: 'ab_cd', // TYLKO gdy currentPage == 'ab_cd'
+        pageFilter: 'ab_cd',
         type: MenuItemType.pageLink,
       ),
       MenuItem(
         title: 'Analytics',
         icon: Icons.analytics,
         route: '/analytics',
-        pageFilter: 'ab_cd', // TYLKO gdy currentPage == 'ab_cd'
+        pageFilter: 'ab_cd',
         type: MenuItemType.pageLink,
       ),
 
@@ -90,21 +92,21 @@ class MenuProvider with ChangeNotifier {
         title: 'Settings',
         icon: Icons.settings,
         route: '/settings',
-        pageFilter: null, // WSZĘDZIE
+        pageFilter: null,
         type: MenuItemType.userAction,
       ),
       MenuItem(
         title: 'Profile',
         icon: Icons.person,
         route: '/profile',
-        pageFilter: null, // WSZĘDZIE
+        pageFilter: null,
         type: MenuItemType.userAction,
       ),
       MenuItem(
         title: 'Logout',
         icon: Icons.logout,
         route: '/logout',
-        pageFilter: null, // WSZĘDZIE
+        pageFilter: null,
         type: MenuItemType.userAction,
       ),
 
@@ -113,7 +115,7 @@ class MenuProvider with ChangeNotifier {
         title: 'Help',
         icon: Icons.help,
         route: '/help',
-        pageFilter: null, // WSZĘDZIE
+        pageFilter: null,
         type: MenuItemType.global,
       ),
       
@@ -121,7 +123,7 @@ class MenuProvider with ChangeNotifier {
         title: 'About',
         icon: Icons.info,
         route: '/about',
-        pageFilter: null, // WSZĘDZIE
+        pageFilter: null,
         type: MenuItemType.global,
       ),
     ];
@@ -139,7 +141,20 @@ class MenuProvider with ChangeNotifier {
 
   void setCurrentPage(String pageName) {
     _currentPage = pageName;
+    
+    // DODANE: Zapamiętaj jeśli to główna strona
+    if (_isMainPage(pageName)) {
+      _lastMainPage = pageName;
+    }
+    
     notifyListeners();
+  }
+
+  bool _isMainPage(String pageName) {
+    // Główne strony to te które mają hamburger menu
+    return pageName == 'welcome' || 
+           pageName == 'get_started' || 
+           pageName == 'ab_cd';
   }
 
   void addMenuItem(MenuItem item) {

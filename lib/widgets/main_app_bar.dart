@@ -1,3 +1,4 @@
+// lib/widgets/main_app_bar.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +30,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: showBackButton
           ? IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => _handleBackButton(context),
             )
           : Builder(
               builder: (context) => IconButton(
@@ -52,8 +53,19 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
     );
   }
+
+  void _handleBackButton(BuildContext context) {
+    final menuProvider = Provider.of<MenuProvider>(context, listen: false);
+    
+    // Ustaw currentPage na ostatnią główną stronę
+    menuProvider.setCurrentPage(menuProvider.lastMainPage);
+    
+    // Wykonaj pop
+    Navigator.of(context).pop();
+  }
 }
 
+// UserProfileButton pozostaje BEZ ZMIAN
 class UserProfileButton extends StatelessWidget {
   final AppUser user;
 
