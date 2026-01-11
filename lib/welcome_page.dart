@@ -1,6 +1,9 @@
 // lib/welcome_page.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'widgets/main_app_bar.dart';
+import 'widgets/app_drawer.dart';
+import 'providers/menu_provider.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -13,7 +16,10 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
-    // initState - bez debug print
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MenuProvider>(context, listen: false)
+          .setCurrentPage('welcome');
+    });
   }
 
   @override
@@ -23,6 +29,7 @@ class _WelcomePageState extends State<WelcomePage> {
         title: 'Welcome to Core Content',
         showBackButton: true,
       ),
+      drawer: const AppDrawer(), // DODANE: hamburger menu
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),

@@ -23,13 +23,19 @@ class MenuProvider with ChangeNotifier {
   List<MenuItem> get pageLinks {
     final filteredItems = _allMenuItems.where((item) {
       final isPageLink = item.type == MenuItemType.pageLink;
+      
+      // Logika filtrowania:
+      // 1. Musi być pageLink
+      // 2. Jeśli ma pageFilter → pokaż tylko gdy matches currentPage
+      // 3. Jeśli nie ma pageFilter (null) → pokaż wszędzie
       final filterMatches = item.pageFilter == null || item.pageFilter == _currentPage;
       final matches = isPageLink && filterMatches;
 
-      if (item.title == 'Welcome Page') {
-        _log('🔍 [MenuProvider] Checking Welcome Page:');
+      if (item.title == 'Get Started Page' || item.title == 'Welcome Page') {
+        _log('🔍 [MenuProvider] Checking ${item.title}:');
         _log('   - Type: ${item.type}, isPageLink: $isPageLink');
         _log('   - Filter: ${item.pageFilter}, Current: $_currentPage');
+        _log('   - Filter matches: $filterMatches');
         _log('   - Matches: $matches');
       }
 
@@ -64,59 +70,86 @@ class MenuProvider with ChangeNotifier {
 
   void _initializeMenuItems() {
     _allMenuItems = [
-      // PAGE LINKS
+      // PAGE LINKS - pokazują się w hamburger menu
+      
+      // Welcome Page - TYLKO na Get Started Page
       MenuItem(
         title: 'Welcome Page',
-        icon: null, // ZMIANA: Bez ikony! (było: Icons.home)
+        icon: Icons.home, // lub Icons.waving_hand, Icons.emoji_emotions
         route: '/welcome',
-        pageFilter: 'get_started',
+        pageFilter: 'get_started', // TYLKO gdy currentPage == 'get_started'
         type: MenuItemType.pageLink,
       ),
+
+      // Get Started Page - TYLKO na Welcome Page
+      MenuItem(
+        title: 'Get Started Page',
+        icon: Icons.play_arrow, // lub Icons.rocket_launch, Icons.directions_run
+        route: '/get_started',
+        pageFilter: 'welcome', // TYLKO gdy currentPage == 'welcome'
+        type: MenuItemType.pageLink,
+      ),
+
+      // Dashboard, Reports, Analytics - TYLKO na stronie AB CD
       MenuItem(
         title: 'Dashboard',
         icon: Icons.dashboard,
         route: '/dashboard',
-        pageFilter: 'ab_cd',
+        pageFilter: 'ab_cd', // TYLKO gdy currentPage == 'ab_cd'
         type: MenuItemType.pageLink,
       ),
-      
+      MenuItem(
+        title: 'Reports',
+        icon: Icons.assessment,
+        route: '/reports',
+        pageFilter: 'ab_cd', // TYLKO gdy currentPage == 'ab_cd'
+        type: MenuItemType.pageLink,
+      ),
+      MenuItem(
+        title: 'Analytics',
+        icon: Icons.analytics,
+        route: '/analytics',
+        pageFilter: 'ab_cd', // TYLKO gdy currentPage == 'ab_cd'
+        type: MenuItemType.pageLink,
+      ),
 
-      // USER ACTIONS
+      // USER ACTIONS - pokazują się w menu użytkownika (po prawej)
       MenuItem(
         title: 'Settings',
         icon: Icons.settings,
         route: '/settings',
-        pageFilter: null,
+        pageFilter: null, // WSZĘDZIE
         type: MenuItemType.userAction,
       ),
       MenuItem(
         title: 'Profile',
         icon: Icons.person,
         route: '/profile',
-        pageFilter: null,
+        pageFilter: null, // WSZĘDZIE
         type: MenuItemType.userAction,
       ),
       MenuItem(
         title: 'Logout',
         icon: Icons.logout,
         route: '/logout',
-        pageFilter: null,
+        pageFilter: null, // WSZĘDZIE
         type: MenuItemType.userAction,
       ),
 
-      // GLOBAL
+      // GLOBAL ACTIONS - pokazują się wszędzie
       MenuItem(
         title: 'Help',
         icon: Icons.help,
         route: '/help',
-        pageFilter: null,
+        pageFilter: null, // WSZĘDZIE
         type: MenuItemType.global,
       ),
+      
       MenuItem(
         title: 'About',
         icon: Icons.info,
         route: '/about',
-        pageFilter: null,
+        pageFilter: null, // WSZĘDZIE
         type: MenuItemType.global,
       ),
     ];

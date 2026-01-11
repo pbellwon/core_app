@@ -10,6 +10,7 @@ import 'get_started.dart';
 import 'about_page.dart';
 import 'help_page.dart';
 import 'settings_page.dart';
+import 'welcome_page.dart'; // DODANY IMPORT - nowy plik welcome_page.dart
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'widgets/main_app_bar.dart';
@@ -160,37 +161,6 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
       appBar: const MainAppBar(title: "", showBackButton: false),
       drawer: const AppDrawer(),
       body: const GetStarted(),
-    );
-  }
-}
-
-class WelcomePage extends StatefulWidget {
-  const WelcomePage({super.key});
-
-  @override
-  State<WelcomePage> createState() => _WelcomePageState();
-}
-
-class _WelcomePageState extends State<WelcomePage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MenuProvider>(context, listen: false)
-          .setCurrentPage('welcome');
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MainAppBar(title: "Welcome", showBackButton: true),
-      body: const Center(
-        child: Text(
-          'Welcome Page',
-          style: TextStyle(fontSize: 24, color: Color(0xFF860E66)),
-        ),
-      ),
     );
   }
 }
