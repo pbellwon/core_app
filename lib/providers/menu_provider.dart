@@ -21,29 +21,24 @@ class MenuProvider with ChangeNotifier {
 
   // Odnośniki do stron (tylko dla hamburger menu)
   List<MenuItem> get pageLinks {
+    _log('🔍 [MenuProvider.pageLinks] currentPage = "$_currentPage"');
+    
     final filteredItems = _allMenuItems.where((item) {
       final isPageLink = item.type == MenuItemType.pageLink;
-      
-      // Logika filtrowania:
-      // 1. Musi być pageLink
-      // 2. Jeśli ma pageFilter → pokaż tylko gdy matches currentPage
-      // 3. Jeśli nie ma pageFilter (null) → pokaż wszędzie
       final filterMatches = item.pageFilter == null || item.pageFilter == _currentPage;
       final matches = isPageLink && filterMatches;
 
-      if (item.title == 'Get Started Page' || item.title == 'Welcome Page') {
-        _log('🔍 [MenuProvider] Checking ${item.title}:');
-        _log('   - Type: ${item.type}, isPageLink: $isPageLink');
-        _log('   - Filter: ${item.pageFilter}, Current: $_currentPage');
-        _log('   - Filter matches: $filterMatches');
-        _log('   - Matches: $matches');
-      }
+      // Loguj WSZYSTKIE pageLinks dla debugowania
+      _log('   ${item.title}: type=${item.type}, filter=${item.pageFilter}, matches=$matches');
 
       return matches;
     }).toList();
 
-    _log('📋 [MenuProvider] pageLinks for "$_currentPage": ${filteredItems.length}');
-
+    _log('📋 [MenuProvider] Znaleziono ${filteredItems.length} pageLinks');
+    filteredItems.forEach((item) {
+      _log('   ✓ ${item.title}');
+    });
+    
     return filteredItems;
   }
 
@@ -155,6 +150,10 @@ class MenuProvider with ChangeNotifier {
     ];
 
     _log('✅ [MenuProvider] Menu items initialized: ${_allMenuItems.length}');
+    _log('   PageLinks z filtrami:');
+    _allMenuItems.where((item) => item.type == MenuItemType.pageLink).forEach((item) {
+      _log('   - ${item.title}: filter=${item.pageFilter}, route=${item.route}');
+    });
   }
 
   void toggleMenu() {
@@ -168,9 +167,14 @@ class MenuProvider with ChangeNotifier {
   }
 
   void setCurrentPage(String pageName) {
+    _log('📍 [MenuProvider] Zmiana currentPage: "$_currentPage" → "$pageName"');
     _currentPage = pageName;
-    _log('📍 [MenuProvider] Current page set to "$_currentPage"');
     notifyListeners();
+    
+    // Dodatkowe logowanie po zmianie
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _log('📍 [MenuProvider] Po zmianie - pageLinks: ${pageLinks.length} items');
+    });
   }
 
   void addMenuItem(MenuItem item) {

@@ -16,9 +16,11 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
+    // Używamy addPostFrameCallback aby mieć pewność, że context jest dostępny
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MenuProvider>(context, listen: false)
-          .setCurrentPage('welcome');
+      final menuProvider = Provider.of<MenuProvider>(context, listen: false);
+      menuProvider.setCurrentPage('welcome');
+      debugPrint('✅ WelcomePage: currentPage ustawione na "welcome"');
     });
   }
 
@@ -26,10 +28,10 @@ class _WelcomePageState extends State<WelcomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainAppBar(
-        title: 'Welcome to Core Content',
-        showBackButton: true,
+        title: '',
+        showBackButton: false,
       ),
-      drawer: const AppDrawer(), // DODANE: hamburger menu
+      drawer: const AppDrawer(),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -41,7 +43,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF860E66), // heading color
+                  color: Color(0xFF860E66),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -88,11 +90,11 @@ class _WelcomeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // Przycisk naciśnięty - bez debug print
+        debugPrint('Przycisk "$text" naciśnięty');
       },
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-        backgroundColor: const Color(0xFFB31288), // accent color
+        backgroundColor: const Color(0xFFB31288),
         foregroundColor: Colors.white,
       ),
       child: Text(text),

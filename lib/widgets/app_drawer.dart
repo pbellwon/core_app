@@ -14,10 +14,7 @@ class AppDrawer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 🟢 USUNIĘTO DrawerHeader z napisem MENU
-          Container(
-            height: 0,
-          ),
+          Container(height: 0), // miejsce po starym DrawerHeader
 
           // PAGE LINKS
           Expanded(
@@ -28,12 +25,19 @@ class AppDrawer extends StatelessWidget {
                   leading: item.icon != null ? Icon(item.icon!) : null,
                   title: Text(
                     item.title,
-                    style: const TextStyle(color: Color(0xFF860E66)), // heading color
+                    style: const TextStyle(color: Color(0xFF860E66)),
                   ),
                   onTap: () {
                     Navigator.pop(context); // zamknij drawer
-                    Navigator.pushNamed(context, item.route); // route NIE jest null
-                    menuProvider.setCurrentPage(item.pageFilter ?? '');
+                    
+                    // WAŻNE: Najpierw ustaw currentPage dla strony docelowej
+                    final targetPageId = _getPageIdFromRoute(item.route);
+                    menuProvider.setCurrentPage(targetPageId);
+                    
+                    debugPrint('🔄 AppDrawer: Przechodzę do ${item.route}, ustawiam currentPage = $targetPageId');
+                    
+                    // Potem przejdź do strony
+                    Navigator.pushNamed(context, item.route);
                   },
                 );
               }).toList(),
@@ -41,38 +45,27 @@ class AppDrawer extends StatelessWidget {
           ),
 
           const Divider(),
-
-          // USER ACTIONS
-         // ...menuProvider.getUserActions(menuProvider.currentPage).map((item) {
-           // return ListTile(
-             // leading: item.icon != null ? Icon(item.icon!) : null,
-              //title: Text(item.title),
-              //onTap: () {
-                //Navigator.pop(context);
-                //if (item.title.toLowerCase() == 'logout') {
-                 // menuProvider.logoutUser();
-                //} else {
-                 // Navigator.pushNamed(context, item.route); // route NIE jest null
-                //}
-              //},
-            //);
-          //}),
-
-         // const Divider(),
-
-          // GLOBAL ACTIONS
-          //...menuProvider.globalActions.map((item) {
-            //return ListTile(
-              //leading: item.icon != null ? Icon(item.icon!) : null,
-              //title: Text(item.title),
-              //onTap: () {
-                //Navigator.pop(context);
-                //Navigator.pushNamed(context, item.route); // route NIE jest null
-              //},
-            //);
-          //}),
         ],
       ),
     );
+  }
+
+  // Pomocnicza funkcja do ekstrakcji ID strony z route
+  String _getPageIdFromRoute(String route) {
+    switch (route) {
+      case '/welcome':
+        return 'welcome';
+      case '/get_started':
+        return 'get_started';
+      case '/dashboard':
+        return 'ab_cd';
+      case '/reports':
+        return 'reports';
+      case '/analytics':
+        return 'analytics';
+      default:
+        // Usuwa '/' z początku
+        return route.startsWith('/') ? route.substring(1) : route;
+    }
   }
 }
