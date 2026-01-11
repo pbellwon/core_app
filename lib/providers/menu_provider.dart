@@ -12,7 +12,6 @@ class MenuProvider with ChangeNotifier {
   final GlobalKey<NavigatorState>? navigatorKey;
 
   MenuProvider({this.navigatorKey}) {
-    _log('🆕 [MenuProvider] Constructor called');
     _initializeMenuItems();
   }
 
@@ -21,46 +20,24 @@ class MenuProvider with ChangeNotifier {
 
   // Odnośniki do stron (tylko dla hamburger menu)
   List<MenuItem> get pageLinks {
-    _log('🔍 [MenuProvider.pageLinks] currentPage = "$_currentPage"');
-    
-    final filteredItems = _allMenuItems.where((item) {
+    return _allMenuItems.where((item) {
       final isPageLink = item.type == MenuItemType.pageLink;
       final filterMatches = item.pageFilter == null || item.pageFilter == _currentPage;
-      final matches = isPageLink && filterMatches;
-
-      // Loguj WSZYSTKIE pageLinks dla debugowania
-      _log('   ${item.title}: type=${item.type}, filter=${item.pageFilter}, matches=$matches');
-
-      return matches;
+      return isPageLink && filterMatches;
     }).toList();
-
-    _log('📋 [MenuProvider] Znaleziono ${filteredItems.length} pageLinks');
-    filteredItems.forEach((item) {
-      _log('   ✓ ${item.title}');
-    });
-    
-    return filteredItems;
   }
 
   // Opcje użytkownika (menu po prawej)
   List<MenuItem> getUserActions(String pageName) {
-    final filteredItems = _allMenuItems.where((item) {
+    return _allMenuItems.where((item) {
       return item.type == MenuItemType.userAction &&
           (item.pageFilter == null || item.pageFilter == pageName);
     }).toList();
-
-    _log('👤 [MenuProvider] getUserActions for "$pageName": ${filteredItems.length}');
-
-    return filteredItems;
   }
 
   // Opcje globalne (wszędzie)
   List<MenuItem> get globalActions {
-    final filteredItems = _allMenuItems.where((item) => item.type == MenuItemType.global).toList();
-
-    _log('🌐 [MenuProvider] globalActions: ${filteredItems.length}');
-
-    return filteredItems;
+    return _allMenuItems.where((item) => item.type == MenuItemType.global).toList();
   }
 
   void _initializeMenuItems() {
@@ -70,7 +47,7 @@ class MenuProvider with ChangeNotifier {
       // Welcome Page - TYLKO na Get Started Page
       MenuItem(
         title: 'Welcome Page',
-        icon: Icons.home, // lub Icons.waving_hand, Icons.emoji_emotions
+        icon: Icons.home,
         route: '/welcome',
         pageFilter: 'get_started', // TYLKO gdy currentPage == 'get_started'
         type: MenuItemType.pageLink,
@@ -79,7 +56,7 @@ class MenuProvider with ChangeNotifier {
       // Get Started Page - TYLKO na Welcome Page
       MenuItem(
         title: 'Get Started Page',
-        icon: Icons.play_arrow, // lub Icons.rocket_launch, Icons.directions_run
+        icon: Icons.play_arrow,
         route: '/get_started',
         pageFilter: 'welcome', // TYLKO gdy currentPage == 'welcome'
         type: MenuItemType.pageLink,
@@ -148,12 +125,6 @@ class MenuProvider with ChangeNotifier {
         type: MenuItemType.global,
       ),
     ];
-
-    _log('✅ [MenuProvider] Menu items initialized: ${_allMenuItems.length}');
-    _log('   PageLinks z filtrami:');
-    _allMenuItems.where((item) => item.type == MenuItemType.pageLink).forEach((item) {
-      _log('   - ${item.title}: filter=${item.pageFilter}, route=${item.route}');
-    });
   }
 
   void toggleMenu() {
@@ -167,14 +138,8 @@ class MenuProvider with ChangeNotifier {
   }
 
   void setCurrentPage(String pageName) {
-    _log('📍 [MenuProvider] Zmiana currentPage: "$_currentPage" → "$pageName"');
     _currentPage = pageName;
     notifyListeners();
-    
-    // Dodatkowe logowanie po zmianie
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _log('📍 [MenuProvider] Po zmianie - pageLinks: ${pageLinks.length} items');
-    });
   }
 
   void addMenuItem(MenuItem item) {
@@ -184,9 +149,7 @@ class MenuProvider with ChangeNotifier {
 
   /// 🔑 Funkcja wylogowania użytkownika
   void logoutUser() {
-    _log('🚪 [MenuProvider] Logging out user...');
     if (navigatorKey == null) {
-      _log('❌ [MenuProvider] navigatorKey is null, cannot log out');
       return;
     }
 
@@ -209,13 +172,11 @@ class MenuProvider with ChangeNotifier {
     }
   }
 
-  List<String> getAvailablePageTitles() => pageLinks.map((item) => item.title).toList();
-
-  // ⭐ Warunkowe logowanie tylko w trybie debug
-  void _log(String message) {
-    assert(() {
-      debugPrint(message);
-      return true;
-    }());
+  List<String> getAvailablePageTitles() {
+    final titles = <String>[];
+    for (final item in pageLinks) {
+      titles.add(item.title);
+    }
+    return titles;
   }
 }
