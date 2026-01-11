@@ -91,7 +91,7 @@ class MyApp extends StatelessWidget {
           '/settings': (_) => const SettingsPage(),
           '/profile': (_) => const ProfilePage(),
           '/help': (_) => const HelpPage(),
-          '/about': (_) => const AboutPage(), // Teraz używa zewnętrznego pliku
+          '/about': (_) => const AboutPage(),
           '/get_started': (_) => const GetStartedPageWithAppBar(),
           '/dashboard': (_) => const AbCdPage(),
         },
@@ -164,8 +164,22 @@ class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
   }
 }
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
+
+  @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MenuProvider>(context, listen: false)
+          .setCurrentPage('welcome');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,10 +194,6 @@ class WelcomePage extends StatelessWidget {
     );
   }
 }
-
-
-
-
 
 class AbCdPage extends StatefulWidget {
   const AbCdPage({super.key});
