@@ -350,7 +350,7 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainAppBar(
-        title: 'Client Profile Quiz',
+        title: '',
         showBackButton: true,
       ),
       body: Consumer<AppAuthProvider>(
@@ -520,64 +520,25 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
                 const SizedBox(height: 32),
                 
                 // 📤 Przycisk submit
-                Column(
-                  children: [
-                    // Informacja o niezapisanych zmianach
-                    if (currentAnswersCount > 0)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.orange[50],
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.orange[100]!),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.warning_amber,
-                              color: Colors.orange,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'You have $currentAnswersCount unsaved answer(s). '
-                                'Click "Submit Quiz" to save them to your profile.',
-                                style: TextStyle(
-                                  color: Colors.orange[800],
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _submitQuiz,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          backgroundColor: const Color(0xFF860E66),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Submit Quiz',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _submitQuiz,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      backgroundColor: const Color(0xFF860E66),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  ],
+                    child: const Text(
+                      'Submit Quiz',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
                 
                 const SizedBox(height: 20),

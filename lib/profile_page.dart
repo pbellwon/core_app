@@ -306,7 +306,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainAppBar(
-        title: 'My Profile',
+        title: '',
         showBackButton: true,
       ),
       body: Consumer<AppAuthProvider>(
