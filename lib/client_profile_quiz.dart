@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widgets/main_app_bar.dart';
 import 'providers/auth_provider.dart';
+import 'models/user_model.dart';
 
 /// 🎯 STRONA QUIZU PROFILU KLIENTA
 /// Zawiera 10 pytań z odpowiedziami A, B, C
@@ -15,17 +16,49 @@ class ClientProfileQuizPage extends StatefulWidget {
 }
 
 class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
-  // 🗂️ Lista pytań
-  final List<QuizQuestion> _questions = List.generate(10, (index) {
-    return QuizQuestion(
-      id: index + 1,
-      text: 'Question ${index + 1}',
-      options: ['A', 'B', 'C'],
-      selectedAnswer: null,
-    );
-  });
+  // 🗂️ Lista pytań - teraz inicjalizowana w initState
+  late List<QuizQuestion> _questions;
+  bool _isInitialized = false;
 
-  /// 💾 ZAPISZ WYNIKI QUIZU
+  @override
+  void initState() {
+    super.initState();
+    // Opóźniona inicjalizacja po zbudowaniu widgetu
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeQuestions();
+    });
+  }
+
+  /// 🎬 INICJALIZACJA PYTAŃ Z ZAPISANYMI ODPOWIEDZIAMI
+  void _initializeQuestions() {
+    final authProvider = Provider.of<AppAuthProvider>(
+      context,
+      listen: false,
+    );
+
+    final user = authProvider.currentUser;
+    
+    // Tworzymy 10 pytań
+    _questions = List.generate(10, (index) {
+      final questionId = index + 1;
+      
+      // Sprawdzamy czy użytkownik ma już zapisaną odpowiedź na to pytanie
+      final savedAnswer = user?.getAnswerForQuestion(questionId);
+      
+      return QuizQuestion(
+        id: questionId,
+        text: 'Question $questionId',
+        options: ['A', 'B', 'C'],
+        selectedAnswer: savedAnswer,
+      );
+    });
+    
+    setState(() {
+      _isInitialized = true;
+    });
+  }
+
+  /// 💾 ZAPISZ WYNIKI QUIZU DO FIREBASE
   Future<void> _submitQuiz() async {
     // Sprawdź czy wszystkie pytania mają odpowiedzi
     final unansweredQuestions = _questions.where((q) => q.selectedAnswer == null).toList();
@@ -47,12 +80,36 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
     }
     
     try {
-      // Tutaj możesz dodać logikę zapisu wyników do Firebase
-      // Na razie tylko symulacja
-      await Future.delayed(const Duration(milliseconds: 500));
+      final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
+      
+      // Zapisujemy wszystkie odpowiedzi na raz
+      final quizAnswers = _questions.map((question) => QuizAnswer(
+        questionId: question.id,
+        answer: question.selectedAnswer!,
+        answeredAt: DateTime.now(),
+      )).toList();
+      
+      // Pokazujemy loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFF860E66),
+          ),
+        ),
+      );
+      
+      // Zapisujemy do Firebase
+      await authProvider.saveAllQuizAnswers(quizAnswers);
+      
+      // Zamykamy loading indicator
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
       
       // Oblicz wynik
-      final score = _questions.length; // Tutaj możesz dodać logikę punktacji
+      final score = _questions.length;
       
       if (mounted) {
         // Pokaż dialog z wynikiem
@@ -72,7 +129,7 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Your quiz has been submitted successfully.',
+                  '✅ Your quiz has been submitted successfully.',
                   style: TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 16),
@@ -84,12 +141,17 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
                     color: Color(0xFF860E66),
                   ),
                 ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Your answers have been saved to your profile.',
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
               ],
             ),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Zamknij dialog
+                  Navigator.of(context).pop(); // Zamknij dialog wyników
                   Navigator.of(context).pop(); // Wróć do profilu
                 },
                 child: const Text('OK'),
@@ -99,10 +161,15 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
         );
       }
     } catch (e) {
+      // Zamykamy loading indicator jeśli wystąpił błąd
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error submitting quiz: ${e.toString()}'),
+            content: Text('❌ Error submitting quiz: ${e.toString()}'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -111,13 +178,25 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
     }
   }
 
-  /// 🔄 ZAZNACZ ODPOWIEDŹ
+  /// 🔄 ZAZNACZ ODPOWIEDŹ (tylko lokalnie, bez zapisu do Firebase)
   void _selectAnswer(int questionId, String answer) {
     setState(() {
       final questionIndex = _questions.indexWhere((q) => q.id == questionId);
       if (questionIndex != -1) {
         _questions[questionIndex] = _questions[questionIndex].copyWith(
           selectedAnswer: answer,
+        );
+      }
+    });
+  }
+
+  /// 🔄 RESETUJ ODPOWIEDŹ NA PYTANIE
+  void _resetAnswer(int questionId) {
+    setState(() {
+      final questionIndex = _questions.indexWhere((q) => q.id == questionId);
+      if (questionIndex != -1) {
+        _questions[questionIndex] = _questions[questionIndex].copyWith(
+          selectedAnswer: null,
         );
       }
     });
@@ -213,7 +292,7 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
             
             const SizedBox(height: 8),
             
-            // ✅ Wybrana odpowiedź (jeśli istnieje)
+            // ✅ Wybrana odpowiedź (jeśli istnieje) + przycisk reset
             if (question.selectedAnswer != null)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
@@ -221,15 +300,41 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
                   children: [
                     const Icon(
                       Icons.check_circle,
-                      color: Colors.green,
+                      color: Color(0xFF860E66),
                       size: 16,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Selected: ${question.selectedAnswer}',
                       style: const TextStyle(
-                        color: Colors.green,
+                        color: Color(0xFF860E66),
                         fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const Spacer(),
+                    // Przycisk do resetowania odpowiedzi
+                    TextButton(
+                      onPressed: () => _resetAnswer(question.id),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        minimumSize: Size.zero,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.clear,
+                            color: Colors.red,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Clear',
+                            style: TextStyle(
+                              color: Colors.red[700],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -251,7 +356,7 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
       body: Consumer<AppAuthProvider>(
         builder: (context, authProvider, child) {
           // ⏳ Ładowanie
-          if (authProvider.isLoading) {
+          if (authProvider.isLoading || !_isInitialized) {
             return const Center(
               child: CircularProgressIndicator(
                 color: Color(0xFF860E66),
@@ -290,6 +395,10 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
             );
           }
           
+          final user = authProvider.currentUser!;
+          final savedAnswersCount = user.quizAnswers?.length ?? 0;
+          final currentAnswersCount = _questions.where((q) => q.selectedAnswer != null).length;
+          
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -324,7 +433,7 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
                         const SizedBox(height: 15),
                         Text(
                           'Please answer all 10 questions to complete your client profile. '
-                          'This will help us better understand your needs and preferences.',
+                          'Your answers will be saved only when you click "Submit Quiz".',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.grey[700],
@@ -333,6 +442,42 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
+                        
+                        // ℹ️ Informacja o zapisanych odpowiedziach
+                        if (savedAnswersCount > 0)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.blue[50],
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.blue[100]!),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.info_outline,
+                                  color: Colors.blue,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'You have $savedAnswersCount saved answer(s) from your previous quiz.',
+                                    style: TextStyle(
+                                      color: Colors.blue[800],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        
+                        const SizedBox(height: 20),
+                        
                         // 📊 Postęp
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -353,7 +498,7 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
                                 ),
                               ),
                               Text(
-                                '${_questions.where((q) => q.selectedAnswer != null).length}/${_questions.length}',
+                                '$currentAnswersCount/${_questions.length}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF860E66),
@@ -375,28 +520,95 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
                 const SizedBox(height: 32),
                 
                 // 📤 Przycisk submit
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _submitQuiz,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      backgroundColor: const Color(0xFF860E66),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                Column(
+                  children: [
+                    // Informacja o niezapisanych zmianach
+                    if (currentAnswersCount > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.orange[50],
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.orange[100]!),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.warning_amber,
+                              color: Colors.orange,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'You have $currentAnswersCount unsaved answer(s). '
+                                'Click "Submit Quiz" to save them to your profile.',
+                                style: TextStyle(
+                                  color: Colors.orange[800],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _submitQuiz,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          backgroundColor: const Color(0xFF860E66),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Submit Quiz',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      'Submit Quiz',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
                 
                 const SizedBox(height: 20),
+                
+                // 💾 Informacja o zapisie
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        color: Colors.grey,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text(
+                          'Answers will be saved to your profile only when you click "Submit Quiz".',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           );

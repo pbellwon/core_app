@@ -118,6 +118,54 @@ class AppAuthProvider with ChangeNotifier {
     }
   }
 
+  /// 🎯 ZAPISANIE WSZYSTKICH ODPOWIEDZI QUIZU NA RAZ
+  /// Zapisuje całą listę odpowiedzi quizu
+  Future<void> saveAllQuizAnswers(List<QuizAnswer> answers) async {
+    if (_currentUser == null || _firebaseUser == null) {
+      debugPrint('❌ Cannot save quiz answers: no user logged in');
+      throw Exception('User is not logged in');
+    }
+
+    debugPrint('🎯 Saving ${answers.length} quiz answers');
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // 1️⃣ AKTUALIZUJ LOKALNY STAN UŻYTKOWNIKA
+      for (final answer in answers) {
+        _currentUser = _currentUser!.withQuizAnswer(answer);
+      }
+
+      // 2️⃣ PRZYGOTUJ DANE DO AKTUALIZACJI W FIRESTORE
+      final updateData = <String, dynamic>{
+        'updatedAt': DateTime.now().toIso8601String(),
+      };
+
+      // 3️⃣ PRZYGOTUJ TABLICĘ ODPOWIEDZI QUIZU
+      final currentAnswers = _currentUser!.quizAnswers ?? [];
+      if (currentAnswers.isNotEmpty) {
+        updateData['quizAnswers'] = currentAnswers.map((a) => a.toMap()).toList();
+        debugPrint('💾 Saving ${currentAnswers.length} quiz answers to Firestore');
+      }
+
+      // 4️⃣ ZAPISZ DO FIRESTORE
+      debugPrint('💾 Updating quiz answers in Firestore...');
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update(updateData);
+      debugPrint('✅ All quiz answers saved successfully');
+
+    } catch (e) {
+      debugPrint('❌ Error saving quiz answers: $e');
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+      debugPrint('✅ Quiz answers operation completed');
+    }
+  }
+
   /// ✏️ AKTUALIZACJA PROFILU UŻYTKOWNIKA
   Future<void> updateUserProfile({
     String? displayName,
@@ -374,6 +422,7 @@ class AppAuthProvider with ChangeNotifier {
       debugPrint('Phone: ${_currentUser!.phoneNumber ?? "Not set"}');
       debugPrint('Date of Birth: ${_currentUser!.dateOfBirth ?? "Not set"}');
       debugPrint('Role: ${_currentUser!.role.name}');
+      debugPrint('Quiz Answers: ${_currentUser!.quizAnswers?.length ?? 0}');
     } else {
       debugPrint('No current user');
     }

@@ -6,9 +6,41 @@ import 'package:flutter/foundation.dart';
 
 /// 🏷️ TYP wyliczeniowy dla ról użytkownika (do rozbudowy)
 enum UserRole {
-  user,     // zwykły użytkownik
+  user,     // zwykły użytkowni
   admin,    // administrator
   moderator // moderator
+}
+
+/// 📊 MODEL ODPOWIEDZI QUIZU
+/// Przechowuje odpowiedź na jedno pytanie quizu
+class QuizAnswer {
+  final int questionId;
+  final String answer;
+  final DateTime answeredAt;
+
+  const QuizAnswer({
+    required this.questionId,
+    required this.answer,
+    required this.answeredAt,
+  });
+
+  /// 🔄 KONWERSJA NA MAP
+  Map<String, dynamic> toMap() {
+    return {
+      'questionId': questionId,
+      'answer': answer,
+      'answeredAt': answeredAt.toIso8601String(),
+    };
+  }
+
+  /// 🔄 TWORZENIE Z MAP
+  factory QuizAnswer.fromMap(Map<String, dynamic> map) {
+    return QuizAnswer(
+      questionId: map['questionId'] ?? 0,
+      answer: map['answer'] ?? '',
+      answeredAt: DateTime.parse(map['answeredAt']),
+    );
+  }
 }
 
 /// 👤 GŁÓWNA KLASA MODELU UŻYTKOWNIKA
@@ -26,6 +58,7 @@ class AppUser {
   final String? photoURL;      // URL do zdjęcia profilowego
   final DateTime? updatedAt;   // Data ostatniej aktualizacji
   final UserRole role;         // Rola użytkownika
+  final List<QuizAnswer>? quizAnswers; // Odpowiedzi na quiz profilowy
 
   /// 🏗️ KONSTRUKTOR
   AppUser({
@@ -38,6 +71,7 @@ class AppUser {
     this.photoURL,
     this.updatedAt,
     this.role = UserRole.user, // Domyślnie zwykły użytkownik
+    this.quizAnswers,
   });
 
   /// 🔄 KONWERSJA NA MAP (dla Firestore)
@@ -56,6 +90,8 @@ class AppUser {
       if (phoneNumber != null) 'phoneNumber': phoneNumber,
       if (photoURL != null) 'photoURL': photoURL,
       if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
+      if (quizAnswers != null && quizAnswers!.isNotEmpty)
+        'quizAnswers': quizAnswers!.map((answer) => answer.toMap()).toList(),
     };
   }
 
@@ -91,6 +127,27 @@ class AppUser {
         return UserRole.user;
       }
     }
+
+    // 🔍 Parsowanie odpowiedzi quizu
+    List<QuizAnswer>? parseQuizAnswers(List<dynamic>? answersList) {
+      if (answersList == null || answersList.isEmpty) return null;
+      
+      try {
+        return answersList.map((answerData) {
+          if (answerData is Map<String, dynamic>) {
+            return QuizAnswer.fromMap(answerData);
+          }
+          return QuizAnswer(
+            questionId: 0,
+            answer: '',
+            answeredAt: DateTime.now(),
+          );
+        }).toList();
+      } catch (e) {
+        debugPrint('⚠️ Error parsing quiz answers: $e');
+        return null;
+      }
+    }
     
     return AppUser(
       uid: data['uid'] ?? doc.id, // Używamy doc.id jeśli uid brak
@@ -102,7 +159,37 @@ class AppUser {
       createdAt: parseDate(data['createdAt']) ?? DateTime.now(),
       updatedAt: parseDate(data['updatedAt']),
       role: parseRole(data['role']),
+      quizAnswers: parseQuizAnswers(data['quizAnswers']),
     );
+  }
+
+  /// 🎯 POBRANIE ODPOWIEDZI NA PYTANIE
+  /// Zwraca odpowiedź na konkretne pytanie lub null jeśli nie odpowiedziano
+  String? getAnswerForQuestion(int questionId) {
+    if (quizAnswers == null || quizAnswers!.isEmpty) return null;
+    
+    final answer = quizAnswers!.firstWhere(
+      (answer) => answer.questionId == questionId,
+      orElse: () => QuizAnswer(questionId: 0, answer: '', answeredAt: DateTime.now()),
+    );
+    
+    return answer.questionId == questionId ? answer.answer : null;
+  }
+
+  /// 🎯 DODANIE/LUB ZAKTUALIZOWANIE ODPOWIEDZI
+  /// Zwraca nowy obiekt użytkownika z zaktualizowaną odpowiedzią
+  AppUser withQuizAnswer(QuizAnswer newAnswer) {
+    final currentAnswers = quizAnswers ?? [];
+    
+    // Usuń starą odpowiedź na to pytanie jeśli istnieje
+    final filteredAnswers = currentAnswers.where(
+      (answer) => answer.questionId != newAnswer.questionId
+    ).toList();
+    
+    // Dodaj nową odpowiedź
+    final updatedAnswers = [...filteredAnswers, newAnswer];
+    
+    return copyWith(quizAnswers: updatedAnswers);
   }
 
   /// 🎂 OBLICZANIE WIEKU (getter)
@@ -151,7 +238,7 @@ class AppUser {
   /// 📋 DEBUG STRING (dla konsoli)
   @override
   String toString() {
-    return 'AppUser(uid: $uid, email: $email, displayName: $displayName, age: $age)';
+    return 'AppUser(uid: $uid, email: $email, displayName: $displayName, age: $age, quizAnswers: ${quizAnswers?.length ?? 0})';
   }
 
   /// 🔄 KOPIOWANIE Z AKTUALIZACJĄ
@@ -165,6 +252,7 @@ class AppUser {
     String? photoURL,
     DateTime? updatedAt,
     UserRole? role,
+    List<QuizAnswer>? quizAnswers,
   }) {
     return AppUser(
       uid: uid ?? this.uid,
@@ -176,6 +264,7 @@ class AppUser {
       photoURL: photoURL ?? this.photoURL,
       updatedAt: updatedAt ?? this.updatedAt,
       role: role ?? this.role,
+      quizAnswers: quizAnswers ?? this.quizAnswers,
     );
   }
 }
