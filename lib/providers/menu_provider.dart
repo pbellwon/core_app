@@ -49,7 +49,7 @@ class MenuProvider with ChangeNotifier {
       // Welcome Page - TYLKO na Get Started Page
       MenuItem(
         title: 'Welcome Page',
-        icon: Icons.home,
+        icon: null,
         route: '/welcome',
         pageFilter: 'get_started',
         type: MenuItemType.pageLink,
@@ -58,7 +58,7 @@ class MenuProvider with ChangeNotifier {
       // Get Started Page - TYLKO na Welcome Page
       MenuItem(
         title: 'Get Started Page',
-        icon: Icons.play_arrow,
+        icon: null,
         route: '/get_started',
         pageFilter: 'welcome',
         type: MenuItemType.pageLink,
