@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'widgets/main_app_bar.dart';
 import 'models/user_model.dart';
+import 'client_profile_quiz.dart'; // DODANY IMPORT
 
 /// 👤 STRONA PROFILU UŻYTKOWNIKA
 /// Pozwala przeglądać i edytować dane profilowe
@@ -179,6 +180,15 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  /// 🎯 NAWIGACJA DO QUIZU PROFILU KLIENTA
+  void _navigateToClientQuiz() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ClientProfileQuizPage(),
+      ),
+    );
+  }
+
   /// 👤 WIDGET AWATARA UŻYTKOWNIKA
   Widget _buildUserAvatar(AppUser user) {
     return Column(
@@ -348,6 +358,39 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                // 🎯 PRZYCISK "TAKE QUIZ" - NA GÓRZE, NA ŚRODKU
+                Center(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _navigateToClientQuiz,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: const Color(0xFF860E66),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.quiz, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Take Quiz',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 32),
+                
                 // 👤 AWATAR I PODSTAWOWE INFO
                 Center(child: _buildUserAvatar(user)),
                 

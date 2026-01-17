@@ -10,7 +10,8 @@ import 'get_started.dart';
 import 'about_page.dart';
 import 'help_page.dart';
 import 'settings_page.dart';
-import 'welcome_page.dart'; // DODANY IMPORT - nowy plik welcome_page.dart
+import 'welcome_page.dart';
+import 'client_profile_quiz.dart'; // DODANY IMPORT - nowa strona quizu
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'widgets/main_app_bar.dart';
@@ -95,6 +96,7 @@ class MyApp extends StatelessWidget {
           '/about': (_) => const AboutPage(),
           '/get_started': (_) => const GetStartedPageWithAppBar(),
           '/dashboard': (_) => const AbCdPage(),
+          '/client_quiz': (_) => const ClientProfileQuizPage(), // DODANA TRASA
         },
 
         // ⬇️ KLUCZOWE: jeśli Flutter Web trafi na „zły” URL
