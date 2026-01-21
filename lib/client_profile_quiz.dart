@@ -58,6 +58,19 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
     });
   }
 
+  /// 🔢 LICZ ODPOWIEDZI A, B, C
+  Map<String, int> _getAnswerCounts() {
+    final counts = {'A': 0, 'B': 0, 'C': 0};
+    
+    for (final question in _questions) {
+      if (question.selectedAnswer != null) {
+        counts[question.selectedAnswer!] = counts[question.selectedAnswer!]! + 1;
+      }
+    }
+    
+    return counts;
+  }
+
   /// 💾 ZAPISZ WYNIKI QUIZU DO FIREBASE
   Future<void> _submitQuiz() async {
     // Sprawdź czy wszystkie pytania mają odpowiedzi
@@ -108,56 +121,18 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
         Navigator.of(context).pop();
       }
       
-      // Oblicz wynik
-      final score = _questions.length;
+      // Liczymy odpowiedzi A, B, C
+      final answerCounts = _getAnswerCounts();
       
+      // Przekierowujemy na proposals_page z wynikami
       if (mounted) {
-        // Pokaż dialog z wynikiem
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            title: const Text(
-              'Quiz Completed!',
-              style: TextStyle(
-                color: Color(0xFF860E66),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '✅ Your quiz has been submitted successfully.',
-                  style: TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Score: $score/${_questions.length}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF860E66),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Your answers have been saved to your profile.',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Zamknij dialog wyników
-                  Navigator.of(context).pop(); // Wróć do profilu
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
+        Navigator.pushNamed(
+          context,
+          '/proposals',
+          arguments: {
+            'answerCounts': answerCounts,
+            'totalQuestions': _questions.length,
+          },
         );
       }
     } catch (e) {
