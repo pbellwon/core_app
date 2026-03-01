@@ -104,7 +104,7 @@ class _GetStartedState extends State<GetStarted> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        'Welcome to the Application TESTING FOR DANA',
+                        'Welcome to the Application DANA test',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
