@@ -5,7 +5,232 @@ import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'widgets/main_app_bar.dart';
 import 'models/user_model.dart';
-import 'client_profile_quiz.dart'; // DODANY IMPORT
+import 'client_profile_quiz.dart';
+
+/// 🌍 Model dla kodu kierunkowego kraju
+class CountryCode {
+  final String name;
+  final String code;
+
+  CountryCode({
+    required this.name,
+    required this.code,
+  });
+}
+
+/// 🌍 Lista kodów kierunkowych dla wszystkich krajów świata
+final List<CountryCode> allCountryCodes = [
+  // Europa
+  CountryCode(name: 'Albania', code: '+355'),
+  CountryCode(name: 'Andorra', code: '+376'),
+  CountryCode(name: 'Austria', code: '+43'),
+  CountryCode(name: 'Belarus', code: '+375'),
+  CountryCode(name: 'Belgium', code: '+32'),
+  CountryCode(name: 'Bosnia and Herzegovina', code: '+387'),
+  CountryCode(name: 'Bulgaria', code: '+359'),
+  CountryCode(name: 'Croatia', code: '+385'),
+  CountryCode(name: 'Cyprus', code: '+357'),
+  CountryCode(name: 'Czech Republic', code: '+420'),
+  CountryCode(name: 'Denmark', code: '+45'),
+  CountryCode(name: 'Estonia', code: '+372'),
+  CountryCode(name: 'Finland', code: '+358'),
+  CountryCode(name: 'France', code: '+33'),
+  CountryCode(name: 'Germany', code: '+49'),
+  CountryCode(name: 'Greece', code: '+30'),
+  CountryCode(name: 'Hungary', code: '+36'),
+  CountryCode(name: 'Iceland', code: '+354'),
+  CountryCode(name: 'Ireland', code: '+353'),
+  CountryCode(name: 'Italy', code: '+39'),
+  CountryCode(name: 'Kosovo', code: '+383'),
+  CountryCode(name: 'Latvia', code: '+371'),
+  CountryCode(name: 'Liechtenstein', code: '+423'),
+  CountryCode(name: 'Lithuania', code: '+370'),
+  CountryCode(name: 'Luxembourg', code: '+352'),
+  CountryCode(name: 'Malta', code: '+356'),
+  CountryCode(name: 'Moldova', code: '+373'),
+  CountryCode(name: 'Monaco', code: '+377'),
+  CountryCode(name: 'Montenegro', code: '+382'),
+  CountryCode(name: 'Netherlands', code: '+31'),
+  CountryCode(name: 'North Macedonia', code: '+389'),
+  CountryCode(name: 'Norway', code: '+47'),
+  CountryCode(name: 'Poland', code: '+48'),
+  CountryCode(name: 'Portugal', code: '+351'),
+  CountryCode(name: 'Romania', code: '+40'),
+  CountryCode(name: 'Russia', code: '+7'),
+  CountryCode(name: 'San Marino', code: '+378'),
+  CountryCode(name: 'Serbia', code: '+381'),
+  CountryCode(name: 'Slovakia', code: '+421'),
+  CountryCode(name: 'Slovenia', code: '+386'),
+  CountryCode(name: 'Spain', code: '+34'),
+  CountryCode(name: 'Sweden', code: '+46'),
+  CountryCode(name: 'Switzerland', code: '+41'),
+  CountryCode(name: 'Ukraine', code: '+380'),
+  CountryCode(name: 'United Kingdom', code: '+44'),
+  CountryCode(name: 'Vatican City', code: '+379'),
+  
+  // Azja
+  CountryCode(name: 'Afghanistan', code: '+93'),
+  CountryCode(name: 'Armenia', code: '+374'),
+  CountryCode(name: 'Azerbaijan', code: '+994'),
+  CountryCode(name: 'Bahrain', code: '+973'),
+  CountryCode(name: 'Bangladesh', code: '+880'),
+  CountryCode(name: 'Bhutan', code: '+975'),
+  CountryCode(name: 'Brunei', code: '+673'),
+  CountryCode(name: 'Cambodia', code: '+855'),
+  CountryCode(name: 'China', code: '+86'),
+  CountryCode(name: 'Georgia', code: '+995'),
+  CountryCode(name: 'Hong Kong', code: '+852'),
+  CountryCode(name: 'India', code: '+91'),
+  CountryCode(name: 'Indonesia', code: '+62'),
+  CountryCode(name: 'Iran', code: '+98'),
+  CountryCode(name: 'Iraq', code: '+964'),
+  CountryCode(name: 'Israel', code: '+972'),
+  CountryCode(name: 'Japan', code: '+81'),
+  CountryCode(name: 'Jordan', code: '+962'),
+  CountryCode(name: 'Kazakhstan', code: '+7'),
+  CountryCode(name: 'Kuwait', code: '+965'),
+  CountryCode(name: 'Kyrgyzstan', code: '+996'),
+  CountryCode(name: 'Laos', code: '+856'),
+  CountryCode(name: 'Lebanon', code: '+961'),
+  CountryCode(name: 'Macau', code: '+853'),
+  CountryCode(name: 'Malaysia', code: '+60'),
+  CountryCode(name: 'Maldives', code: '+960'),
+  CountryCode(name: 'Mongolia', code: '+976'),
+  CountryCode(name: 'Myanmar', code: '+95'),
+  CountryCode(name: 'Nepal', code: '+977'),
+  CountryCode(name: 'North Korea', code: '+850'),
+  CountryCode(name: 'Oman', code: '+968'),
+  CountryCode(name: 'Pakistan', code: '+92'),
+  CountryCode(name: 'Palestine', code: '+970'),
+  CountryCode(name: 'Philippines', code: '+63'),
+  CountryCode(name: 'Qatar', code: '+974'),
+  CountryCode(name: 'Saudi Arabia', code: '+966'),
+  CountryCode(name: 'Singapore', code: '+65'),
+  CountryCode(name: 'South Korea', code: '+82'),
+  CountryCode(name: 'Sri Lanka', code: '+94'),
+  CountryCode(name: 'Syria', code: '+963'),
+  CountryCode(name: 'Taiwan', code: '+886'),
+  CountryCode(name: 'Tajikistan', code: '+992'),
+  CountryCode(name: 'Thailand', code: '+66'),
+  CountryCode(name: 'Timor-Leste', code: '+670'),
+  CountryCode(name: 'Turkey', code: '+90'),
+  CountryCode(name: 'Turkmenistan', code: '+993'),
+  CountryCode(name: 'United Arab Emirates', code: '+971'),
+  CountryCode(name: 'Uzbekistan', code: '+998'),
+  CountryCode(name: 'Vietnam', code: '+84'),
+  CountryCode(name: 'Yemen', code: '+967'),
+  
+  // Afryka
+  CountryCode(name: 'Algeria', code: '+213'),
+  CountryCode(name: 'Angola', code: '+244'),
+  CountryCode(name: 'Benin', code: '+229'),
+  CountryCode(name: 'Botswana', code: '+267'),
+  CountryCode(name: 'Burkina Faso', code: '+226'),
+  CountryCode(name: 'Burundi', code: '+257'),
+  CountryCode(name: 'Cabo Verde', code: '+238'),
+  CountryCode(name: 'Cameroon', code: '+237'),
+  CountryCode(name: 'Central African Republic', code: '+236'),
+  CountryCode(name: 'Chad', code: '+235'),
+  CountryCode(name: 'Comoros', code: '+269'),
+  CountryCode(name: 'Congo', code: '+242'),
+  CountryCode(name: 'DR Congo', code: '+243'),
+  CountryCode(name: 'Djibouti', code: '+253'),
+  CountryCode(name: 'Egypt', code: '+20'),
+  CountryCode(name: 'Equatorial Guinea', code: '+240'),
+  CountryCode(name: 'Eritrea', code: '+291'),
+  CountryCode(name: 'Eswatini', code: '+268'),
+  CountryCode(name: 'Ethiopia', code: '+251'),
+  CountryCode(name: 'Gabon', code: '+241'),
+  CountryCode(name: 'Gambia', code: '+220'),
+  CountryCode(name: 'Ghana', code: '+233'),
+  CountryCode(name: 'Guinea', code: '+224'),
+  CountryCode(name: 'Guinea-Bissau', code: '+245'),
+  CountryCode(name: 'Ivory Coast', code: '+225'),
+  CountryCode(name: 'Kenya', code: '+254'),
+  CountryCode(name: 'Lesotho', code: '+266'),
+  CountryCode(name: 'Liberia', code: '+231'),
+  CountryCode(name: 'Libya', code: '+218'),
+  CountryCode(name: 'Madagascar', code: '+261'),
+  CountryCode(name: 'Malawi', code: '+265'),
+  CountryCode(name: 'Mali', code: '+223'),
+  CountryCode(name: 'Mauritania', code: '+222'),
+  CountryCode(name: 'Mauritius', code: '+230'),
+  CountryCode(name: 'Morocco', code: '+212'),
+  CountryCode(name: 'Mozambique', code: '+258'),
+  CountryCode(name: 'Namibia', code: '+264'),
+  CountryCode(name: 'Niger', code: '+227'),
+  CountryCode(name: 'Nigeria', code: '+234'),
+  CountryCode(name: 'Rwanda', code: '+250'),
+  CountryCode(name: 'Sao Tome and Principe', code: '+239'),
+  CountryCode(name: 'Senegal', code: '+221'),
+  CountryCode(name: 'Seychelles', code: '+248'),
+  CountryCode(name: 'Sierra Leone', code: '+232'),
+  CountryCode(name: 'Somalia', code: '+252'),
+  CountryCode(name: 'South Africa', code: '+27'),
+  CountryCode(name: 'South Sudan', code: '+211'),
+  CountryCode(name: 'Sudan', code: '+249'),
+  CountryCode(name: 'Tanzania', code: '+255'),
+  CountryCode(name: 'Togo', code: '+228'),
+  CountryCode(name: 'Tunisia', code: '+216'),
+  CountryCode(name: 'Uganda', code: '+256'),
+  CountryCode(name: 'Zambia', code: '+260'),
+  CountryCode(name: 'Zimbabwe', code: '+263'),
+  
+  // Ameryka Północna
+  CountryCode(name: 'Antigua and Barbuda', code: '+1268'),
+  CountryCode(name: 'Bahamas', code: '+1242'),
+  CountryCode(name: 'Barbados', code: '+1246'),
+  CountryCode(name: 'Belize', code: '+501'),
+  CountryCode(name: 'Canada', code: '+1'),
+  CountryCode(name: 'Costa Rica', code: '+506'),
+  CountryCode(name: 'Cuba', code: '+53'),
+  CountryCode(name: 'Dominica', code: '+1767'),
+  CountryCode(name: 'Dominican Republic', code: '+1809'),
+  CountryCode(name: 'El Salvador', code: '+503'),
+  CountryCode(name: 'Grenada', code: '+1473'),
+  CountryCode(name: 'Guatemala', code: '+502'),
+  CountryCode(name: 'Haiti', code: '+509'),
+  CountryCode(name: 'Honduras', code: '+504'),
+  CountryCode(name: 'Jamaica', code: '+1876'),
+  CountryCode(name: 'Mexico', code: '+52'),
+  CountryCode(name: 'Nicaragua', code: '+505'),
+  CountryCode(name: 'Panama', code: '+507'),
+  CountryCode(name: 'Saint Kitts and Nevis', code: '+1869'),
+  CountryCode(name: 'Saint Lucia', code: '+1758'),
+  CountryCode(name: 'Saint Vincent and the Grenadines', code: '+1784'),
+  CountryCode(name: 'Trinidad and Tobago', code: '+1868'),
+  CountryCode(name: 'United States', code: '+1'),
+  
+  // Ameryka Południowa
+  CountryCode(name: 'Argentina', code: '+54'),
+  CountryCode(name: 'Bolivia', code: '+591'),
+  CountryCode(name: 'Brazil', code: '+55'),
+  CountryCode(name: 'Chile', code: '+56'),
+  CountryCode(name: 'Colombia', code: '+57'),
+  CountryCode(name: 'Ecuador', code: '+593'),
+  CountryCode(name: 'Guyana', code: '+592'),
+  CountryCode(name: 'Paraguay', code: '+595'),
+  CountryCode(name: 'Peru', code: '+51'),
+  CountryCode(name: 'Suriname', code: '+597'),
+  CountryCode(name: 'Uruguay', code: '+598'),
+  CountryCode(name: 'Venezuela', code: '+58'),
+  
+  // Australia i Oceania
+  CountryCode(name: 'Australia', code: '+61'),
+  CountryCode(name: 'Fiji', code: '+679'),
+  CountryCode(name: 'Kiribati', code: '+686'),
+  CountryCode(name: 'Marshall Islands', code: '+692'),
+  CountryCode(name: 'Micronesia', code: '+691'),
+  CountryCode(name: 'Nauru', code: '+674'),
+  CountryCode(name: 'New Zealand', code: '+64'),
+  CountryCode(name: 'Palau', code: '+680'),
+  CountryCode(name: 'Papua New Guinea', code: '+675'),
+  CountryCode(name: 'Samoa', code: '+685'),
+  CountryCode(name: 'Solomon Islands', code: '+677'),
+  CountryCode(name: 'Tonga', code: '+676'),
+  CountryCode(name: 'Tuvalu', code: '+688'),
+  CountryCode(name: 'Vanuatu', code: '+678'),
+];
 
 /// 👤 STRONA PROFILU UŻYTKOWNIKA
 /// Pozwala przeglądać i edytować dane profilowe
@@ -24,6 +249,16 @@ class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController _displayNameController;
   late TextEditingController _dateOfBirthController;
   late TextEditingController _phoneNumberController;
+  
+  // 🌍 Zmienne dla wyszukiwarki kraju
+  CountryCode? _selectedCountryCode;
+  final TextEditingController _countrySearchController = TextEditingController();
+  List<CountryCode> _filteredCountries = allCountryCodes;
+  bool _showCountrySuggestions = false;
+  final FocusNode _countryFocusNode = FocusNode();
+  
+  // 📱 Kontroler dla samego numeru telefonu (bez kodu)
+  late TextEditingController _phoneNumberOnlyController;
 
   @override
   void initState() {
@@ -31,6 +266,18 @@ class _ProfilePageState extends State<ProfilePage> {
     
     // 🔄 Inicjalizacja kontrolerów z aktualnymi danymi użytkownika
     _initializeControllers();
+    
+    // Dodajemy listener do wyszukiwarki
+    _countrySearchController.addListener(_filterCountries);
+    
+    // Listener do focus node
+    _countryFocusNode.addListener(() {
+      if (_countryFocusNode.hasFocus) {
+        setState(() {
+          _showCountrySuggestions = true;
+        });
+      }
+    });
   }
 
   /// 🎬 INICJALIZACJA KONTROLERÓW
@@ -48,9 +295,71 @@ class _ProfilePageState extends State<ProfilePage> {
           : ''
     );
     
+    // 📱 Rozdzielenie numeru telefonu na kod i numer właściwy
     _phoneNumberController = TextEditingController(
       text: user?.phoneNumber ?? ''
     );
+    
+    _phoneNumberOnlyController = TextEditingController();
+    
+    if (user?.phoneNumber != null && user!.phoneNumber!.isNotEmpty) {
+      _parsePhoneNumber(user.phoneNumber!);
+    } else {
+      // Domyślnie wybierz Polskę (+48)
+      _selectedCountryCode = allCountryCodes.firstWhere(
+        (code) => code.code == '+48',
+        orElse: () => allCountryCodes.first,
+      );
+    }
+  }
+
+  /// 🔍 Filtrowanie krajów na podstawie wpisanej nazwy
+  void _filterCountries() {
+    final query = _countrySearchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredCountries = allCountryCodes;
+      } else {
+        _filteredCountries = allCountryCodes.where((country) {
+          return country.name.toLowerCase().contains(query);
+        }).toList();
+      }
+    });
+  }
+
+  /// ✅ Wybór kraju z listy
+  void _selectCountry(CountryCode country) {
+    setState(() {
+      _selectedCountryCode = country;
+      _countrySearchController.text = country.name;
+      _showCountrySuggestions = false;
+    });
+    
+    // Przenieś focus na pole numeru telefonu
+    FocusScope.of(context).nextFocus();
+  }
+
+  /// 📱 Parsowanie numeru telefonu na kod i numer właściwy
+  void _parsePhoneNumber(String fullPhoneNumber) {
+    // Szukamy dopasowania kodu kierunkowego
+    for (var country in allCountryCodes) {
+      if (fullPhoneNumber.startsWith(country.code.substring(1))) { // bez '+'
+        _selectedCountryCode = country;
+        _countrySearchController.text = country.name;
+        _phoneNumberOnlyController.text = fullPhoneNumber.substring(
+          country.code.length - 1
+        );
+        return;
+      }
+    }
+    
+    // Jeśli nie znaleziono kodu, użyj domyślnego
+    _selectedCountryCode = allCountryCodes.firstWhere(
+      (code) => code.code == '+48',
+      orElse: () => allCountryCodes.first,
+    );
+    _countrySearchController.text = '';
+    _phoneNumberOnlyController.text = fullPhoneNumber;
   }
 
   /// 📅 FORMATOWANIE DATY (yyyy-MM-dd)
@@ -109,6 +418,9 @@ class _ProfilePageState extends State<ProfilePage> {
     _displayNameController.dispose();
     _dateOfBirthController.dispose();
     _phoneNumberController.dispose();
+    _phoneNumberOnlyController.dispose();
+    _countrySearchController.dispose();
+    _countryFocusNode.dispose();
     super.dispose();
   }
 
@@ -136,6 +448,18 @@ class _ProfilePageState extends State<ProfilePage> {
       return;
     }
     
+    // Sprawdź czy kraj został wybrany
+    if (_selectedCountryCode == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('❌ Please select a country code'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    
     try {
       final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
       
@@ -145,15 +469,19 @@ class _ProfilePageState extends State<ProfilePage> {
         dateOfBirth = _parseDate(_dateOfBirthController.text);
       }
       
-      // ✏️ Aktualizacja profilu (używamy updateUserProfile, nie updateProfile)
+      // 📱 Połączenie kodu kierunkowego z numerem telefonu
+      String? fullPhoneNumber;
+      if (_phoneNumberOnlyController.text.isNotEmpty && _selectedCountryCode != null) {
+        fullPhoneNumber = '${_selectedCountryCode!.code.substring(1)}${_phoneNumberOnlyController.text}';
+      }
+      
+      // ✏️ Aktualizacja profilu
       await authProvider.updateUserProfile(
         displayName: _displayNameController.text.isNotEmpty
             ? _displayNameController.text.trim()
             : null,
         dateOfBirth: dateOfBirth,
-        phoneNumber: _phoneNumberController.text.isNotEmpty
-            ? _phoneNumberController.text.trim()
-            : null,
+        phoneNumber: fullPhoneNumber,
       );
       
       // 🎉 Powiadomienie o sukcesie
@@ -457,30 +785,161 @@ class _ProfilePageState extends State<ProfilePage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 📱 NUMER TELEFONU
-                      TextFormField(
-                        controller: _phoneNumberController,
-                        decoration: InputDecoration(
-                          labelText: 'Phone Number',
-                          hintText: 'Enter your phone number',
-                          prefixIcon: const Icon(Icons.phone),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                      // 📱 NUMER TELEFONU (pole wyboru kraju obok numeru)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 🌍 Pole wyszukiwarki kraju (po lewej)
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: Colors.grey[50],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _countrySearchController,
+                                          focusNode: _countryFocusNode,
+                                          decoration: InputDecoration(
+                                            hintText: 'Country',
+                                            prefixIcon: const Icon(Icons.public),
+                                            border: InputBorder.none,
+                                            contentPadding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 16,
+                                            ),
+                                          ),
+                                          onSubmitted: (value) {
+                                            if (_filteredCountries.isNotEmpty) {
+                                              _selectCountry(_filteredCountries.first);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      if (_selectedCountryCode != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 12),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF860E66).withOpacity(0.1),
+                                              borderRadius: BorderRadius.circular(16),
+                                            ),
+                                            child: Text(
+                                              _selectedCountryCode!.code,
+                                              style: const TextStyle(
+                                                color: Color(0xFF860E66),
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                
+                                // Lista podpowiedzi (pod polem kraju)
+                                if (_showCountrySuggestions && _filteredCountries.isNotEmpty)
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 4),
+                                    constraints: const BoxConstraints(
+                                      maxHeight: 200,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.2),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: _filteredCountries.length,
+                                      itemBuilder: (context, index) {
+                                        final country = _filteredCountries[index];
+                                        final isSelected = _selectedCountryCode?.name == country.name;
+                                        
+                                        return ListTile(
+                                          title: Text(
+                                            country.name,
+                                            style: TextStyle(
+                                              fontWeight: isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
+                                              color: isSelected
+                                                  ? const Color(0xFF860E66)
+                                                  : null,
+                                            ),
+                                          ),
+                                          subtitle: Text(country.code),
+                                          onTap: () => _selectCountry(country),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
-                          filled: true,
-                          fillColor: Colors.grey[50],
-                        ),
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value != null && value.isNotEmpty) {
-                            // Prosta walidacja numeru telefonu
-                            final phoneRegex = RegExp(r'^[+]?[0-9\s\-]{9,15}$');
-                            if (!phoneRegex.hasMatch(value)) {
-                              return 'Please enter a valid phone number';
-                            }
-                          }
-                          return null;
-                        },
+                          
+                          const SizedBox(width: 12),
+                          
+                          // 📱 Pole na numer telefonu (po prawej)
+                          Expanded(
+                            flex: 3,
+                            child: TextFormField(
+                              controller: _phoneNumberOnlyController,
+                              decoration: InputDecoration(
+                                labelText: 'Phone Number',
+                                hintText: 'Enter number',
+                                prefixIcon: const Icon(Icons.phone),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                              ),
+                              keyboardType: TextInputType.phone,
+                              validator: (value) {
+                                if (value != null && value.isNotEmpty) {
+                                  if (value.length < 6) {
+                                    return 'Too short';
+                                  }
+                                  if (!RegExp(r'^[0-9\s\-]+$').hasMatch(value)) {
+                                    return 'Only numbers, spaces and hyphens';
+                                  }
+                                }
+                                return null;
+                              },
+                              onTap: () {
+                                // Ukryj podpowiedzi gdy klikamy w pole numeru
+                                setState(() {
+                                  _showCountrySuggestions = false;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                       
                       const SizedBox(height: 32),
