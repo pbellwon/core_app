@@ -17,7 +17,7 @@ class LoginPageState extends State<LoginPage> {
 
   bool isLogin = true; // true = logowanie, false = rejestracja
   bool termsAccepted = false;
-  bool _isLoading = false;  // Dodane dla stanu ładowania
+  bool _isLoading = false; // Dodane dla stanu ładowania
 
   @override
   void dispose() {
@@ -254,14 +254,14 @@ class LoginPageState extends State<LoginPage> {
                   children: [
                     TextField(
                       controller: emailController,
-                      enabled: (isLogin || termsAccepted) && !_isLoading,
+                      enabled: !_isLoading, // 🔥 ZMIANA: pole zawsze aktywne (jeśli nie ładuje)
                       decoration: const InputDecoration(labelText: 'Email'),
                       keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       controller: passwordController,
-                      enabled: (isLogin || termsAccepted) && !_isLoading,
+                      enabled: !_isLoading, // 🔥 ZMIANA: pole zawsze aktywne (jeśli nie ładuje)
                       decoration:
                           const InputDecoration(labelText: 'Password'),
                       obscureText: true,
