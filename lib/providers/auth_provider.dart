@@ -172,6 +172,8 @@ class AppAuthProvider with ChangeNotifier {
     String? photoURL,
     DateTime? dateOfBirth,
     String? phoneNumber,
+    String? country,        // nowe pole
+    String? timezone,       // nowe pole
   }) async {
     if (_currentUser == null || _firebaseUser == null) {
       debugPrint('❌ Cannot update profile: no user logged in');
@@ -220,6 +222,16 @@ class AppAuthProvider with ChangeNotifier {
         debugPrint('📱 Setting phoneNumber: $phoneNumber');
       }
 
+      if (country != null) {
+        updateData['country'] = country;
+        debugPrint('🌍 Setting country: $country');
+      }
+
+      if (timezone != null) {
+        updateData['timezone'] = timezone;
+        debugPrint('🕒 Setting timezone: $timezone');
+      }
+
       // 3️⃣ ZAPISZ DO FIRESTORE
       debugPrint('💾 Saving to Firestore...');
       await FirebaseFirestore.instance
@@ -234,6 +246,8 @@ class AppAuthProvider with ChangeNotifier {
         photoURL: photoURL ?? _currentUser!.photoURL,
         dateOfBirth: dateOfBirth ?? _currentUser!.dateOfBirth,
         phoneNumber: phoneNumber ?? _currentUser!.phoneNumber,
+        country: country ?? _currentUser!.country,          // nowe
+        timezone: timezone ?? _currentUser!.timezone,       // nowe
         updatedAt: DateTime.now(),
       );
 
@@ -421,6 +435,8 @@ class AppAuthProvider with ChangeNotifier {
       debugPrint('Display Name: ${_currentUser!.displayName ?? "Not set"}');
       debugPrint('Phone: ${_currentUser!.phoneNumber ?? "Not set"}');
       debugPrint('Date of Birth: ${_currentUser!.dateOfBirth ?? "Not set"}');
+      debugPrint('Country: ${_currentUser!.country ?? "Not set"}');
+      debugPrint('Timezone: ${_currentUser!.timezone ?? "Not set"}');
       debugPrint('Role: ${_currentUser!.role.name}');
       debugPrint('Quiz Answers: ${_currentUser!.quizAnswers?.length ?? 0}');
     } else {

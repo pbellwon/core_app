@@ -18,9 +18,213 @@ class CountryCode {
   });
 }
 
+/// 🗺️ Mapa krajów do stref czasowych (UTC)
+/// Zawiera wszystkie kraje z listy allCountryCodes z poprawnymi strefami UTC.
+const Map<String, String> countryTimezoneMap = {
+  'Afghanistan': 'UTC+4:30',
+  'Albania': 'UTC+1',
+  'Algeria': 'UTC+1',
+  'Andorra': 'UTC+1',
+  'Angola': 'UTC+1',
+  'Antigua and Barbuda': 'UTC-4',
+  'Argentina': 'UTC-3',
+  'Armenia': 'UTC+4',
+  'Australia': 'UTC+10',
+  'Austria': 'UTC+1',
+  'Azerbaijan': 'UTC+4',
+  'Bahamas': 'UTC-5',
+  'Bahrain': 'UTC+3',
+  'Bangladesh': 'UTC+6',
+  'Barbados': 'UTC-4',
+  'Belarus': 'UTC+3',
+  'Belgium': 'UTC+1',
+  'Belize': 'UTC-6',
+  'Benin': 'UTC+1',
+  'Bhutan': 'UTC+6',
+  'Bolivia': 'UTC-4',
+  'Bosnia and Herzegovina': 'UTC+1',
+  'Botswana': 'UTC+2',
+  'Brazil': 'UTC-3',
+  'Brunei': 'UTC+8',
+  'Bulgaria': 'UTC+2',
+  'Burkina Faso': 'UTC+0',
+  'Burundi': 'UTC+2',
+  'Cabo Verde': 'UTC-1',
+  'Cambodia': 'UTC+7',
+  'Cameroon': 'UTC+1',
+  'Canada': 'UTC-5',
+  'Central African Republic': 'UTC+1',
+  'Chad': 'UTC+1',
+  'Chile': 'UTC-3',
+  'China': 'UTC+8',
+  'Colombia': 'UTC-5',
+  'Comoros': 'UTC+3',
+  'Congo': 'UTC+1',
+  'Costa Rica': 'UTC-6',
+  'Croatia': 'UTC+1',
+  'Cuba': 'UTC-5',
+  'Cyprus': 'UTC+2',
+  'Czech Republic': 'UTC+1',
+  'Denmark': 'UTC+1',
+  'Djibouti': 'UTC+3',
+  'Dominica': 'UTC-4',
+  'Dominican Republic': 'UTC-4',
+  'DR Congo': 'UTC+2', // Kinshasa UTC+1, ale część wschodnia UTC+2, wybieramy UTC+2 jako reprezentatywne
+  'Ecuador': 'UTC-5',
+  'Egypt': 'UTC+2',
+  'El Salvador': 'UTC-6',
+  'Equatorial Guinea': 'UTC+1',
+  'Eritrea': 'UTC+3',
+  'Estonia': 'UTC+2',
+  'Eswatini': 'UTC+2',
+  'Ethiopia': 'UTC+3',
+  'Fiji': 'UTC+12',
+  'Finland': 'UTC+2',
+  'France': 'UTC+1',
+  'Gabon': 'UTC+1',
+  'Gambia': 'UTC+0',
+  'Georgia': 'UTC+4',
+  'Germany': 'UTC+1',
+  'Ghana': 'UTC+0',
+  'Greece': 'UTC+2',
+  'Grenada': 'UTC-4',
+  'Guatemala': 'UTC-6',
+  'Guinea': 'UTC+0',
+  'Guinea-Bissau': 'UTC+0',
+  'Guyana': 'UTC-4',
+  'Haiti': 'UTC-5',
+  'Honduras': 'UTC-6',
+  'Hong Kong': 'UTC+8',
+  'Hungary': 'UTC+1',
+  'Iceland': 'UTC+0',
+  'India': 'UTC+5:30',
+  'Indonesia': 'UTC+7', // Dżakarta UTC+7
+  'Iran': 'UTC+3:30',
+  'Iraq': 'UTC+3',
+  'Ireland': 'UTC+0',
+  'Israel': 'UTC+2',
+  'Italy': 'UTC+1',
+  'Ivory Coast': 'UTC+0',
+  'Jamaica': 'UTC-5',
+  'Japan': 'UTC+9',
+  'Jordan': 'UTC+3',
+  'Kazakhstan': 'UTC+5',
+  'Kenya': 'UTC+3',
+  'Kiribati': 'UTC+12',
+  'Kosovo': 'UTC+1',
+  'Kuwait': 'UTC+3',
+  'Kyrgyzstan': 'UTC+6',
+  'Laos': 'UTC+7',
+  'Latvia': 'UTC+2',
+  'Lebanon': 'UTC+2',
+  'Lesotho': 'UTC+2',
+  'Liberia': 'UTC+0',
+  'Libya': 'UTC+2',
+  'Liechtenstein': 'UTC+1',
+  'Lithuania': 'UTC+2',
+  'Luxembourg': 'UTC+1',
+  'Macau': 'UTC+8',
+  'Madagascar': 'UTC+3',
+  'Malawi': 'UTC+2',
+  'Malaysia': 'UTC+8',
+  'Maldives': 'UTC+5',
+  'Mali': 'UTC+0',
+  'Malta': 'UTC+1',
+  'Marshall Islands': 'UTC+12',
+  'Mauritania': 'UTC+0',
+  'Mauritius': 'UTC+4',
+  'Mexico': 'UTC-6',
+  'Micronesia': 'UTC+11',
+  'Moldova': 'UTC+2',
+  'Monaco': 'UTC+1',
+  'Mongolia': 'UTC+8',
+  'Montenegro': 'UTC+1',
+  'Morocco': 'UTC+1',
+  'Mozambique': 'UTC+2',
+  'Myanmar': 'UTC+6:30',
+  'Namibia': 'UTC+2',
+  'Nauru': 'UTC+12',
+  'Nepal': 'UTC+5:45',
+  'Netherlands': 'UTC+1',
+  'New Zealand': 'UTC+12',
+  'Nicaragua': 'UTC-6',
+  'Niger': 'UTC+1',
+  'Nigeria': 'UTC+1',
+  'North Korea': 'UTC+9',
+  'North Macedonia': 'UTC+1',
+  'Norway': 'UTC+1',
+  'Oman': 'UTC+4',
+  'Pakistan': 'UTC+5',
+  'Palau': 'UTC+9',
+  'Palestine': 'UTC+2',
+  'Panama': 'UTC-5',
+  'Papua New Guinea': 'UTC+10',
+  'Paraguay': 'UTC-4',
+  'Peru': 'UTC-5',
+  'Philippines': 'UTC+8',
+  'Poland': 'UTC+1',
+  'Portugal': 'UTC+0',
+  'Qatar': 'UTC+3',
+  'Romania': 'UTC+2',
+  'Russia': 'UTC+3',
+  'Rwanda': 'UTC+2',
+  'Saint Kitts and Nevis': 'UTC-4',
+  'Saint Lucia': 'UTC-4',
+  'Saint Vincent and the Grenadines': 'UTC-4',
+  'Samoa': 'UTC+13',
+  'San Marino': 'UTC+1',
+  'Sao Tome and Principe': 'UTC+0',
+  'Saudi Arabia': 'UTC+3',
+  'Senegal': 'UTC+0',
+  'Serbia': 'UTC+1',
+  'Seychelles': 'UTC+4',
+  'Sierra Leone': 'UTC+0',
+  'Singapore': 'UTC+8',
+  'Slovakia': 'UTC+1',
+  'Slovenia': 'UTC+1',
+  'Solomon Islands': 'UTC+11',
+  'Somalia': 'UTC+3',
+  'South Africa': 'UTC+2',
+  'South Korea': 'UTC+9',
+  'South Sudan': 'UTC+2',
+  'Spain': 'UTC+1',
+  'Sri Lanka': 'UTC+5:30',
+  'Sudan': 'UTC+2',
+  'Suriname': 'UTC-3',
+  'Sweden': 'UTC+1',
+  'Switzerland': 'UTC+1',
+  'Syria': 'UTC+3',
+  'Taiwan': 'UTC+8',
+  'Tajikistan': 'UTC+5',
+  'Tanzania': 'UTC+3',
+  'Thailand': 'UTC+7',
+  'Timor-Leste': 'UTC+9',
+  'Togo': 'UTC+0',
+  'Tonga': 'UTC+13',
+  'Trinidad and Tobago': 'UTC-4',
+  'Tunisia': 'UTC+1',
+  'Turkey': 'UTC+3',
+  'Turkmenistan': 'UTC+5',
+  'Tuvalu': 'UTC+12',
+  'Uganda': 'UTC+3',
+  'Ukraine': 'UTC+2',
+  'United Arab Emirates': 'UTC+4',
+  'United Kingdom': 'UTC+0',
+  'United States': 'UTC-5',
+  'Uruguay': 'UTC-3',
+  'Uzbekistan': 'UTC+5',
+  'Vanuatu': 'UTC+11',
+  'Vatican City': 'UTC+1',
+  'Venezuela': 'UTC-4',
+  'Vietnam': 'UTC+7',
+  'Yemen': 'UTC+3',
+  'Zambia': 'UTC+2',
+  'Zimbabwe': 'UTC+2',
+};
+
 /// 🌍 Lista kodów kierunkowych dla wszystkich krajów świata
 final List<CountryCode> allCountryCodes = [
-    CountryCode(name: 'Afghanistan', code: '+93'),
+  CountryCode(name: 'Afghanistan', code: '+93'),
   CountryCode(name: 'Albania', code: '+355'),
   CountryCode(name: 'Algeria', code: '+213'),
   CountryCode(name: 'Andorra', code: '+376'),
@@ -239,7 +443,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController _dateOfBirthController;
   late TextEditingController _phoneNumberController;
   
-  // 🌍 Zmienne dla wyszukiwarki kraju
+  // 🌍 Zmienne dla wyszukiwarki kraju (dla numeru telefonu)
   CountryCode? _selectedCountryCode;
   final TextEditingController _countrySearchController = TextEditingController();
   List<CountryCode> _filteredCountries = allCountryCodes;
@@ -249,6 +453,14 @@ class _ProfilePageState extends State<ProfilePage> {
   // 📱 Kontroler dla samego numeru telefonu (bez kodu)
   late TextEditingController _phoneNumberOnlyController;
 
+  // 🌍 Nowe pole: wybrany kraj (dla strefy czasowej)
+  String? _selectedCountry;
+  // Dodajemy kontrolery i zmienne dla nowego pola
+  final TextEditingController _countryTimezoneSearchController = TextEditingController();
+  List<CountryCode> _filteredTimezoneCountries = allCountryCodes;
+  bool _showTimezoneSuggestions = false;
+  final FocusNode _countryTimezoneFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -256,14 +468,24 @@ class _ProfilePageState extends State<ProfilePage> {
     // 🔄 Inicjalizacja kontrolerów z aktualnymi danymi użytkownika
     _initializeControllers();
     
-    // Dodajemy listener do wyszukiwarki
+    // Dodajemy listener do wyszukiwarki kraju telefonu
     _countrySearchController.addListener(_filterCountries);
     
-    // Listener do focus node
+    // Listener do focus node kraju telefonu
     _countryFocusNode.addListener(() {
       if (_countryFocusNode.hasFocus) {
         setState(() {
           _showCountrySuggestions = true;
+        });
+      }
+    });
+
+    // Listener dla nowego pola kraju (strefa czasowa)
+    _countryTimezoneSearchController.addListener(_filterTimezoneCountries);
+    _countryTimezoneFocusNode.addListener(() {
+      if (_countryTimezoneFocusNode.hasFocus) {
+        setState(() {
+          _showTimezoneSuggestions = true;
         });
       }
     });
@@ -300,9 +522,15 @@ class _ProfilePageState extends State<ProfilePage> {
         orElse: () => allCountryCodes.first,
       );
     }
+
+    // 🌍 Inicjalizacja wybranego kraju (dla strefy czasowej)
+    _selectedCountry = user?.country;
+    if (_selectedCountry != null) {
+      _countryTimezoneSearchController.text = _selectedCountry!;
+    }
   }
 
-  /// 🔍 Filtrowanie krajów na podstawie wpisanej nazwy
+  /// 🔍 Filtrowanie krajów na podstawie wpisanej nazwy (dla telefonu)
   void _filterCountries() {
     final query = _countrySearchController.text.toLowerCase();
     setState(() {
@@ -316,7 +544,21 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  /// ✅ Wybór kraju z listy
+  /// 🔍 Filtrowanie krajów dla strefy czasowej
+  void _filterTimezoneCountries() {
+    final query = _countryTimezoneSearchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredTimezoneCountries = allCountryCodes;
+      } else {
+        _filteredTimezoneCountries = allCountryCodes.where((country) {
+          return country.name.toLowerCase().contains(query);
+        }).toList();
+      }
+    });
+  }
+
+  /// ✅ Wybór kraju z listy (dla numeru telefonu)
   void _selectCountry(CountryCode country) {
     setState(() {
       _selectedCountryCode = country;
@@ -325,6 +567,17 @@ class _ProfilePageState extends State<ProfilePage> {
     });
     
     // Przenieś focus na pole numeru telefonu
+    FocusScope.of(context).nextFocus();
+  }
+
+  /// ✅ Wybór kraju dla strefy czasowej
+  void _selectTimezoneCountry(CountryCode country) {
+    setState(() {
+      _selectedCountry = country.name;
+      _countryTimezoneSearchController.text = country.name;
+      _showTimezoneSuggestions = false;
+    });
+    // Opcjonalnie: ukryj klawiaturę lub przenieś focus dalej
     FocusScope.of(context).nextFocus();
   }
 
@@ -410,6 +663,8 @@ class _ProfilePageState extends State<ProfilePage> {
     _phoneNumberOnlyController.dispose();
     _countrySearchController.dispose();
     _countryFocusNode.dispose();
+    _countryTimezoneSearchController.dispose();
+    _countryTimezoneFocusNode.dispose();
     super.dispose();
   }
 
@@ -437,11 +692,23 @@ class _ProfilePageState extends State<ProfilePage> {
       return;
     }
     
-    // Sprawdź czy kraj został wybrany
+    // Sprawdź czy kraj został wybrany (dla numeru telefonu)
     if (_selectedCountryCode == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('❌ Please select a country code'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Sprawdź czy kraj dla strefy czasowej został wybrany
+    if (_selectedCountry == null || _selectedCountry!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('❌ Please select your country for timezone'),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
         ),
@@ -464,13 +731,21 @@ class _ProfilePageState extends State<ProfilePage> {
         fullPhoneNumber = '${_selectedCountryCode!.code.substring(1)}${_phoneNumberOnlyController.text}';
       }
       
-      // ✏️ Aktualizacja profilu
+      // 🌍 Pobranie strefy czasowej na podstawie wybranego kraju
+      String? timezone;
+      if (_selectedCountry != null) {
+        timezone = countryTimezoneMap[_selectedCountry] ?? 'UTC+0'; // domyślnie UTC+0
+      }
+
+      // ✏️ Aktualizacja profilu (wraz z nowymi polami)
       await authProvider.updateUserProfile(
         displayName: _displayNameController.text.isNotEmpty
             ? _displayNameController.text.trim()
             : null,
         dateOfBirth: dateOfBirth,
         phoneNumber: fullPhoneNumber,
+        country: _selectedCountry,   // nowe pole
+        timezone: timezone,           // nowe pole
       );
       
       // 🎉 Powiadomienie o sukcesie
@@ -587,6 +862,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 _formatDateTime(user.updatedAt!),
               ),
             _buildInfoRow('Role', user.role.name.toUpperCase()),
+            if (user.country != null)
+              _buildInfoRow('Country', user.country!),
+            if (user.timezone != null)
+              _buildInfoRow('Timezone', user.timezone!),
           ],
         ),
       ),
@@ -928,6 +1207,90 @@ class _ProfilePageState extends State<ProfilePage> {
                               },
                             ),
                           ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 16),
+
+                      // 🌍 NOWE POLE: WYBÓR KRAJU (DLA STREFY CZASOWEJ)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 56,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey.shade300,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey[50],
+                            ),
+                            child: TextField(
+                              controller: _countryTimezoneSearchController,
+                              focusNode: _countryTimezoneFocusNode,
+                              decoration: InputDecoration(
+                                labelText: 'Country (for timezone)',
+                                hintText: 'Search country',
+                                prefixIcon: const Icon(Icons.map),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 16,
+                                ),
+                              ),
+                              onSubmitted: (value) {
+                                if (_filteredTimezoneCountries.isNotEmpty) {
+                                  _selectTimezoneCountry(_filteredTimezoneCountries.first);
+                                }
+                              },
+                            ),
+                          ),
+                          
+                          // Lista podpowiedzi
+                          if (_showTimezoneSuggestions && _filteredTimezoneCountries.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(top: 4),
+                              constraints: const BoxConstraints(
+                                maxHeight: 200,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: _filteredTimezoneCountries.length,
+                                itemBuilder: (context, index) {
+                                  final country = _filteredTimezoneCountries[index];
+                                  final isSelected = _selectedCountry == country.name;
+                                  
+                                  return ListTile(
+                                    title: Text(
+                                      country.name,
+                                      style: TextStyle(
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: isSelected
+                                            ? const Color(0xFF860E66)
+                                            : null,
+                                      ),
+                                    ),
+                                    onTap: () => _selectTimezoneCountry(country),
+                                  );
+                                },
+                              ),
+                            ),
                         ],
                       ),
                       

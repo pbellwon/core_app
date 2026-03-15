@@ -3,7 +3,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-
 /// 🏷️ TYP wyliczeniowy dla ról użytkownika (do rozbudowy)
 enum UserRole {
   user,     // zwykły użytkowni
@@ -54,6 +53,8 @@ class AppUser {
   // 📝 OPCJONALNE POLA (mogą być null)
   final String? displayName;   // Wyświetlana nazwa użytkownika
   final DateTime? dateOfBirth; // Data urodzenia
+  final String? country;       // Kraj użytkownika (do rozbudowy)
+  final String? timezone;      // Strefa czasowa użytkownika (do rozbudowy)
   final String? phoneNumber;   // Numer telefonu
   final String? photoURL;      // URL do zdjęcia profilowego
   final DateTime? updatedAt;   // Data ostatniej aktualizacji
@@ -67,6 +68,8 @@ class AppUser {
     required this.createdAt,
     this.displayName,
     this.dateOfBirth,
+    this.country,
+    this.timezone,
     this.phoneNumber,
     this.photoURL,
     this.updatedAt,
@@ -87,6 +90,8 @@ class AppUser {
       // 📝 Opcjonalne pola (zapisujemy tylko jeśli nie są null)
       if (displayName != null) 'displayName': displayName,
       if (dateOfBirth != null) 'dateOfBirth': dateOfBirth!.toIso8601String(),
+      if (country != null) 'country': country,
+      if (timezone != null) 'timezone': timezone,
       if (phoneNumber != null) 'phoneNumber': phoneNumber,
       if (photoURL != null) 'photoURL': photoURL,
       if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
@@ -154,6 +159,8 @@ class AppUser {
       email: data['email'] ?? '',
       displayName: data['displayName'],
       dateOfBirth: parseDate(data['dateOfBirth']),
+      country: data['country'],               // nowe pole
+      timezone: data['timezone'],             // nowe pole
       phoneNumber: data['phoneNumber'],
       photoURL: data['photoURL'],
       createdAt: parseDate(data['createdAt']) ?? DateTime.now(),
@@ -248,6 +255,8 @@ class AppUser {
     String? email,
     String? displayName,
     DateTime? dateOfBirth,
+    String? country,
+    String? timezone,
     String? phoneNumber,
     String? photoURL,
     DateTime? updatedAt,
@@ -260,6 +269,8 @@ class AppUser {
       createdAt: createdAt,
       displayName: displayName ?? this.displayName,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      country: country ?? this.country,
+      timezone: timezone ?? this.timezone,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       photoURL: photoURL ?? this.photoURL,
       updatedAt: updatedAt ?? this.updatedAt,
