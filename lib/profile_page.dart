@@ -1053,73 +1053,64 @@ class _ProfilePageState extends State<ProfilePage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 📱 NUMER TELEFONU (pole wyboru kraju obok numeru)
+                      // 📱 NUMER TELEFONU (pole wyboru kraju obok numeru) - styl jak pole Timezone
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 🌍 Pole wyszukiwarki kraju (po lewej)
+                          // 🌍 Pole wyboru kodu kraju
                           Expanded(
                             flex: 2,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  height: 56,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.grey.shade300,
+                                TextFormField(
+                                  controller: _countrySearchController,
+                                  focusNode: _countryFocusNode,
+                                  decoration: InputDecoration(
+                                    labelText: 'Country Code',
+                                    hintText: 'Search country',
+                                    prefixIcon: const Icon(Icons.public),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: Colors.grey[50],
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _countrySearchController,
-                                          focusNode: _countryFocusNode,
-                                          decoration: InputDecoration(
-                                            hintText: 'Country',
-                                            prefixIcon: const Icon(Icons.public),
-                                            border: InputBorder.none,
-                                            contentPadding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 16,
-                                            ),
-                                          ),
-                                          onSubmitted: (value) {
-                                            if (_filteredCountries.isNotEmpty) {
-                                              _selectCountry(_filteredCountries.first);
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                      if (_selectedCountryCode != null)
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 12),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF860E66).withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(16),
-                                            ),
-                                            child: Text(
-                                              _selectedCountryCode!.code,
-                                              style: const TextStyle(
-                                                color: Color(0xFF860E66),
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12,
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
+                                    suffixIcon: _selectedCountryCode != null
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(right: 8),
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 4,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFF860E66).withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(16),
+                                              ),
+                                              child: Text(
+                                                _selectedCountryCode!.code,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF860E66),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ),
-                                    ],
+                                          )
+                                        : null,
                                   ),
+                                  readOnly: false,
+                                  onTap: () {
+                                    setState(() {
+                                      _showCountrySuggestions = true;
+                                    });
+                                  },
+                                  onFieldSubmitted: (value) {
+                                    if (_filteredCountries.isNotEmpty) {
+                                      _selectCountry(_filteredCountries.first);
+                                    }
+                                  },
                                 ),
-                                
                                 // Lista podpowiedzi (pod polem kraju)
                                 if (_showCountrySuggestions && _filteredCountries.isNotEmpty)
                                   Container(
@@ -1147,7 +1138,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                       itemBuilder: (context, index) {
                                         final country = _filteredCountries[index];
                                         final isSelected = _selectedCountryCode?.name == country.name;
-                                        
                                         return ListTile(
                                           title: Text(
                                             country.name,
@@ -1169,9 +1159,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ],
                             ),
                           ),
-                          
                           const SizedBox(width: 12),
-                          
                           // 📱 Pole na numer telefonu (po prawej)
                           Expanded(
                             flex: 3,
@@ -1200,7 +1188,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 return null;
                               },
                               onTap: () {
-                                // Ukryj podpowiedzi gdy klikamy w pole numeru
                                 setState(() {
                                   _showCountrySuggestions = false;
                                 });
@@ -1212,40 +1199,35 @@ class _ProfilePageState extends State<ProfilePage> {
                       
                       const SizedBox(height: 16),
 
-                      // 🌍 NOWE POLE: WYBÓR KRAJU (DLA STREFY CZASOWEJ)
+                      // 🌍 NOWE POLE: WYBÓR KRAJU (DLA STREFY CZASOWEJ) - styl jak pole na numer telefonu
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            height: 56,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey.shade300,
+                          TextFormField(
+                            controller: _countryTimezoneSearchController,
+                            focusNode: _countryTimezoneFocusNode,
+                            decoration: InputDecoration(
+                              labelText: 'Timezone',
+                              hintText: 'Search country',
+                              prefixIcon: const Icon(Icons.timer),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.grey[50],
+                              filled: true,
+                              fillColor: Colors.grey[50],
                             ),
-                            child: TextField(
-                              controller: _countryTimezoneSearchController,
-                              focusNode: _countryTimezoneFocusNode,
-                              decoration: InputDecoration(
-                                labelText: 'Country (for timezone)',
-                                hintText: 'Search country',
-                                prefixIcon: const Icon(Icons.map),
-                                border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 16,
-                                ),
-                              ),
-                              onSubmitted: (value) {
-                                if (_filteredTimezoneCountries.isNotEmpty) {
-                                  _selectTimezoneCountry(_filteredTimezoneCountries.first);
-                                }
-                              },
-                            ),
+                            readOnly: false,
+                            onTap: () {
+                              setState(() {
+                                _showTimezoneSuggestions = true;
+                              });
+                            },
+                            onFieldSubmitted: (value) {
+                              if (_filteredTimezoneCountries.isNotEmpty) {
+                                _selectTimezoneCountry(_filteredTimezoneCountries.first);
+                              }
+                            },
                           ),
-                          
                           // Lista podpowiedzi
                           if (_showTimezoneSuggestions && _filteredTimezoneCountries.isNotEmpty)
                             Container(
@@ -1273,7 +1255,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 itemBuilder: (context, index) {
                                   final country = _filteredTimezoneCountries[index];
                                   final isSelected = _selectedCountry == country.name;
-                                  
                                   return ListTile(
                                     title: Text(
                                       country.name,
