@@ -428,7 +428,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _selectedCountry;
   // Dodajemy kontrolery i zmienne dla nowego pola
   final TextEditingController _countryTimezoneSearchController = TextEditingController();
-  List<CountryCode> _filteredTimezoneCountries = allCountryCodes;
+  List<String> _filteredTimezoneCountries = countryTimezoneMap.keys.toList();
   bool _showTimezoneSuggestions = false;
   final FocusNode _countryTimezoneFocusNode = FocusNode();
 
@@ -520,11 +520,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final query = _countryTimezoneSearchController.text.toLowerCase();
     setState(() {
       if (query.isEmpty) {
-        _filteredTimezoneCountries = allCountryCodes;
+        _filteredTimezoneCountries = countryTimezoneMap.keys.toList();
       } else {
-        _filteredTimezoneCountries = allCountryCodes.where((country) {
-          return country.name.toLowerCase().contains(query);
-        }).toList();
+        _filteredTimezoneCountries = countryTimezoneMap.keys
+            .where((name) => name.toLowerCase().contains(query))
+            .toList();
       }
     });
   }
@@ -548,7 +548,17 @@ class _ProfilePageState extends State<ProfilePage> {
       _countryTimezoneSearchController.text = country.name;
       _showTimezoneSuggestions = false;
     });
-    // Opcjonalnie: ukryj klawiaturę lub przenieś focus dalej
+    FocusScope.of(context).nextFocus();
+
+  }
+
+  // Nowa wersja wyboru kraju dla strefy czasowej (string zamiast CountryCode)
+  void _selectTimezoneCountryString(String countryName) {
+    setState(() {
+      _selectedCountry = countryName;
+      _countryTimezoneSearchController.text = countryName;
+      _showTimezoneSuggestions = false;
+    });
     FocusScope.of(context).nextFocus();
   }
 
@@ -1179,7 +1189,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             focusNode: _countryTimezoneFocusNode,
                             decoration: InputDecoration(
                               labelText: 'Timezone',
-                              hintText: 'Search country',
+                              hintText: 'Search timezone',
                               prefixIcon: const Icon(Icons.timer),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -1195,7 +1205,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             },
                             onFieldSubmitted: (value) {
                               if (_filteredTimezoneCountries.isNotEmpty) {
-                                _selectTimezoneCountry(_filteredTimezoneCountries.first);
+                                _selectTimezoneCountryString(_filteredTimezoneCountries.first);
                               }
                             },
                           ),
@@ -1224,11 +1234,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 shrinkWrap: true,
                                 itemCount: _filteredTimezoneCountries.length,
                                 itemBuilder: (context, index) {
-                                  final country = _filteredTimezoneCountries[index];
-                                  final isSelected = _selectedCountry == country.name;
+                                  final countryName = _filteredTimezoneCountries[index];
+                                  final isSelected = _selectedCountry == countryName;
                                   return ListTile(
                                     title: Text(
-                                      country.name,
+                                      countryName,
                                       style: TextStyle(
                                         fontWeight: isSelected
                                             ? FontWeight.bold
@@ -1238,7 +1248,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             : null,
                                       ),
                                     ),
-                                    onTap: () => _selectTimezoneCountry(country),
+                                    onTap: () => _selectTimezoneCountryString(countryName),
                                   );
                                 },
                               ),
