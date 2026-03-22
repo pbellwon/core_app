@@ -713,7 +713,7 @@ class _ProfilePageState extends State<ProfilePage> {
             : null,
         dateOfBirth: dateOfBirth,
         phoneNumber: fullPhoneNumber,
-        country: _selectedCountry,   // nowe pole
+        country: _selectedCountryCode?.name,   // kraj z CountryCode
         timezone: timezone,           // nowe pole
       );
       
