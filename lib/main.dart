@@ -1,4 +1,4 @@
-// lib/main.dart - LOGIKA POPRAWIONA, UI BEZ ZMIAN
+// lib/main.dart - LOGIKA POPRAWIONA + HOVER / PRESSED BUTTON COLOR
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -11,8 +11,8 @@ import 'about_page.dart';
 import 'help_page.dart';
 import 'settings_page.dart';
 import 'welcome_page.dart';
-import 'client_profile_quiz.dart'; // DODANY IMPORT - nowa strona quizu
-import 'proposals_page.dart'; // DODANY IMPORT - nowa strona propozycji
+import 'client_profile_quiz.dart';
+import 'proposals_page.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'widgets/main_app_bar.dart';
@@ -43,6 +43,8 @@ class MyApp extends StatelessWidget {
     const accentColor = Color(0xFFB31288);
     const headingTextColor = Color(0xFF860E66);
 
+    const hoverPressedColor = Color(0xFFCC5500); // 🔥 TWÓJ KOLOR
+
     final theme = ThemeData(
       useMaterial3: false,
       scaffoldBackgroundColor: backgroundColor,
@@ -56,18 +58,64 @@ class MyApp extends StatelessWidget {
         foregroundColor: headingTextColor,
         elevation: 0,
       ),
+
+      // 🔥 ELEVATED BUTTON
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: accentColor,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith<Color>(
+            (states) {
+              if (states.contains(WidgetState.hovered) ||
+                  states.contains(WidgetState.pressed)) {
+                return hoverPressedColor;
+              }
+              return accentColor;
+            },
+          ),
+          foregroundColor: WidgetStateProperty.all(Colors.white),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         ),
       ),
+
+      // 🔥 TEXT BUTTON
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: headingTextColor,
+        style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.resolveWith<Color>(
+            (states) {
+              if (states.contains(WidgetState.hovered) ||
+                  states.contains(WidgetState.pressed)) {
+                return hoverPressedColor;
+              }
+              return headingTextColor;
+            },
+          ),
+        ),
+      ),
+
+      // 🔥 OUTLINED BUTTON
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.resolveWith<Color>(
+            (states) {
+              if (states.contains(WidgetState.hovered) ||
+                  states.contains(WidgetState.pressed)) {
+                return hoverPressedColor;
+              }
+              return headingTextColor;
+            },
+          ),
+          side: WidgetStateProperty.resolveWith<BorderSide>(
+            (states) {
+              if (states.contains(WidgetState.hovered) ||
+                  states.contains(WidgetState.pressed)) {
+                return const BorderSide(color: hoverPressedColor);
+              }
+              return BorderSide(color: headingTextColor);
+            },
+          ),
         ),
       ),
     );
@@ -84,8 +132,6 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
         theme: theme,
-
-        // ⬇️ ROOT JAKO JEDYNE ŹRÓDŁO PRAWDY
         initialRoute: '/',
         routes: {
           '/': (_) => const RootPage(),
@@ -97,12 +143,9 @@ class MyApp extends StatelessWidget {
           '/about': (_) => const AboutPage(),
           '/get_started': (_) => const GetStartedPageWithAppBar(),
           '/dashboard': (_) => const AbCdPage(),
-          '/client_quiz': (_) => const ClientProfileQuizPage(), // DODANA TRASA
-          '/proposals': (_) => const ProposalsPage(), // DODANA TRASA dla propozycji
+          '/client_quiz': (_) => const ClientProfileQuizPage(),
+          '/proposals': (_) => const ProposalsPage(),
         },
-
-        // ⬇️ KLUCZOWE: jeśli Flutter Web trafi na „zły” URL
-        // (np. po logout z /profile), ZAWSZE wracamy do '/'
         onUnknownRoute: (_) {
           return MaterialPageRoute(
             builder: (_) => const RootPage(),
@@ -130,7 +173,6 @@ class RootPage extends StatelessWidget {
           );
         }
 
-        // ❗ JEDYNE MIEJSCE DECYZJI
         if (!authProvider.isLoggedIn) {
           return const LoginPage();
         }
@@ -149,7 +191,8 @@ class GetStartedPageWithAppBar extends StatefulWidget {
       _GetStartedPageWithAppBarState();
 }
 
-class _GetStartedPageWithAppBarState extends State<GetStartedPageWithAppBar> {
+class _GetStartedPageWithAppBarState
+    extends State<GetStartedPageWithAppBar> {
   @override
   void initState() {
     super.initState();

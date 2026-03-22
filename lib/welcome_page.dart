@@ -67,10 +67,6 @@ class _WelcomePageState extends State<WelcomePage> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                  foregroundColor: Colors.white,
-                ),
                 child: const Text('Go Back'),
               ),
             ],
@@ -92,12 +88,10 @@ class _WelcomeButton extends StatelessWidget {
       onPressed: () {
         debugPrint('Przycisk "$text" naciśnięty');
       },
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-        backgroundColor: const Color(0xFFB31288),
-        foregroundColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(),
+        child: Text(text),
       ),
-      child: Text(text),
     );
   }
 }

@@ -533,23 +533,11 @@ class _ProfilePageState extends State<ProfilePage> {
   void _selectCountry(CountryCode country) {
     setState(() {
       _selectedCountryCode = country;
-      _countrySearchController.text = country.name;
+      _countrySearchController.text = country.code;
       _showCountrySuggestions = false;
     });
-    
     // Przenieś focus na pole numeru telefonu
     FocusScope.of(context).nextFocus();
-  }
-
-  /// ✅ Wybór kraju dla strefy czasowej
-  void _selectTimezoneCountry(CountryCode country) {
-    setState(() {
-      _selectedCountry = country.name;
-      _countryTimezoneSearchController.text = country.name;
-      _showTimezoneSuggestions = false;
-    });
-    FocusScope.of(context).nextFocus();
-
   }
 
   // Nowa wersja wyboru kraju dla strefy czasowej (string zamiast CountryCode)
@@ -1056,29 +1044,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     filled: true,
                                     fillColor: Colors.grey[50],
-                                    suffixIcon: _selectedCountryCode != null
-                                        ? Padding(
-                                            padding: const EdgeInsets.only(right: 8),
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 4,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFF860E66).withOpacity(0.1),
-                                                borderRadius: BorderRadius.circular(16),
-                                              ),
-                                              child: Text(
-                                                _selectedCountryCode!.code,
-                                                style: const TextStyle(
-                                                  color: Color(0xFF860E66),
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        : null,
                                   ),
                                   readOnly: false,
                                   onTap: () {
