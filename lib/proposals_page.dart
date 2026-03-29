@@ -287,13 +287,6 @@ class _ProposalsPageState extends State<ProposalsPage> {
                   // Tutaj można dodać akcję dla przycisku
                   _showProposalDetails(letter);
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: const Color(0xFF860E66),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
                 child: const Text(
                   'View Details',
                   style: TextStyle(
@@ -385,9 +378,6 @@ class _ProposalsPageState extends State<ProposalsPage> {
                     onPressed: () {
                       Navigator.pushNamed(context, '/login');
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF860E66),
-                    ),
                     child: const Text('Go to Login'),
                   ),
                 ],

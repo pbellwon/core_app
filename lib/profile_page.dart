@@ -906,9 +906,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     onPressed: () {
                       Navigator.pushNamed(context, '/login');
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF860E66),
-                    ),
                     child: const Text('Go to Login'),
                   ),
                 ],
@@ -929,13 +926,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _navigateToClientQuiz,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: const Color(0xFF860E66),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -1228,13 +1218,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _saveProfile,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: const Color(0xFF860E66),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
                           child: const Text(
                             'Save Changes',
                             style: TextStyle(
