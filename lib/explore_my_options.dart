@@ -1,20 +1,20 @@
-// lib/proposals_page.dart
+// lib/explore_my_options.dart
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widgets/main_app_bar.dart';
 import 'providers/auth_provider.dart';
 
-/// 🎯 STRONA PROPOZYCJI
-/// Pokazuje propozycje na podstawie wyników quizu
-class ProposalsPage extends StatefulWidget {
-  const ProposalsPage({super.key});
+/// 🎯 STRONA EKSPLORACJI OPCJI
+/// Pokazuje opcje na podstawie wyników quizu
+class ExploreMyOptionsPage extends StatefulWidget {
+  const ExploreMyOptionsPage({super.key});
 
   @override
-  State<ProposalsPage> createState() => _ProposalsPageState();
+  State<ExploreMyOptionsPage> createState() => _ExploreMyOptionsPageState();
 }
 
-class _ProposalsPageState extends State<ProposalsPage> {
+class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
   Map<String, int> _answerCounts = {'A': 0, 'B': 0, 'C': 0};
   bool _isDataLoaded = false;
 
@@ -343,7 +343,7 @@ class _ProposalsPageState extends State<ProposalsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainAppBar(
-        title: 'Proposals',
+        title: '',
         showBackButton: true,
       ),
       body: Consumer<AppAuthProvider>(
@@ -423,25 +423,11 @@ class _ProposalsPageState extends State<ProposalsPage> {
                 // 🔙 Przycisk powrotu do quizu
                 SizedBox(
                   width: double.infinity,
-                  child: OutlinedButton(
+                  child: ElevatedButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/client_quiz');
                     },
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: Color(0xFF860E66)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Retake Quiz',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF860E66),
-                      ),
-                    ),
+                    child: const Text('Retake Quiz'),
                   ),
                 ),
                 

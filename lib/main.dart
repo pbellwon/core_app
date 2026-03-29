@@ -12,7 +12,7 @@ import 'help_page.dart';
 import 'settings_page.dart';
 import 'welcome_page.dart';
 import 'client_profile_quiz.dart';
-import 'proposals_page.dart';
+import 'explore_my_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'widgets/main_app_bar.dart';
@@ -144,7 +144,7 @@ class MyApp extends StatelessWidget {
           '/get_started': (_) => const GetStartedPageWithAppBar(),
           '/dashboard': (_) => const AbCdPage(),
           '/client_quiz': (_) => const ClientProfileQuizPage(),
-          '/proposals': (_) => const ProposalsPage(),
+          '/explore_my_options': (_) => const ExploreMyOptionsPage(),
         },
         onUnknownRoute: (_) {
           return MaterialPageRoute(

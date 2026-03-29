@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'widgets/main_app_bar.dart';
 import 'widgets/app_drawer.dart';
 import 'providers/menu_provider.dart';
+import 'explore_my_options.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -59,7 +60,17 @@ class _WelcomePageState extends State<WelcomePage> {
               const SizedBox(height: 32),
               _WelcomeButton(text: 'Help me reconnect'),
               const SizedBox(height: 20),
-              _WelcomeButton(text: "Show me what's possible"),
+              _WelcomeButton(
+                text: "Show me what's possible",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ExploreMyOptionsPage(),
+                    ),
+                  );
+                },
+              ),
               const SizedBox(height: 20),
               _WelcomeButton(text: 'Go to my favourites'),
               const SizedBox(height: 40),
@@ -79,13 +90,14 @@ class _WelcomePageState extends State<WelcomePage> {
 
 class _WelcomeButton extends StatelessWidget {
   final String text;
+  final VoidCallback? onPressed;
 
-  const _WelcomeButton({required this.text});
+  const _WelcomeButton({required this.text, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: onPressed ?? () {
         debugPrint('Przycisk "$text" naciśnięty');
       },
       child: Padding(
