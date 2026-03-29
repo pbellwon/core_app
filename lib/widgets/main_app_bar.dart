@@ -7,6 +7,7 @@ import '../models/user_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/menu_provider.dart';
 import '../main.dart'; // 🔑 navigatorKey
+import '../welcome_page.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -28,10 +29,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: title.isNotEmpty ? Text(title) : null,
       leading: showBackButton
-          ? IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => _handleBackButton(context),
-            )
+          ? null
           : Builder(
               builder: (context) => IconButton(
                 icon: const Icon(Icons.menu),
@@ -41,6 +39,16 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: false,
       titleSpacing: showBackButton ? 0 : 16,
       actions: [
+        IconButton(
+          icon: const Icon(Icons.home),
+          tooltip: 'Go to Home',
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const WelcomePage()),
+              (route) => false,
+            );
+          },
+        ),
         Consumer<AppAuthProvider>(
           builder: (context, authProvider, _) {
             if (!authProvider.isLoggedIn || authProvider.currentUser == null) {
