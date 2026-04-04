@@ -72,12 +72,6 @@ class _GetStartedPageState extends State<GetStartedPage> {
               const SizedBox(height: 20),
               _WelcomeButton(text: 'Go to my favourites'),
               const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Go Back'),
-              ),
             ],
           ),
         ),
