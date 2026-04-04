@@ -7,16 +7,15 @@ import 'firebase_options.dart';
 import 'login_page.dart';
 import 'profile_page.dart';
 import 'get_started.dart';
+import 'welcome_page.dart';
 import 'about_page.dart';
 import 'help_page.dart';
 import 'settings_page.dart';
-import 'welcome_page.dart';
 import 'client_profile_quiz.dart';
 import 'explore_my_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 import 'widgets/main_app_bar.dart';
-import 'widgets/app_drawer.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -43,7 +42,7 @@ class MyApp extends StatelessWidget {
     const accentColor = Color(0xFFB31288);
     const headingTextColor = Color(0xFF860E66);
 
-    const hoverPressedColor = Color(0xFFCC5500); // 🔥 TWÓJ KOLOR
+    const hoverPressedColor = Color(0xFFFF854D); // 🔥 TWÓJ KOLOR
 
     final theme = ThemeData(
       useMaterial3: false,
@@ -177,7 +176,7 @@ class RootPage extends StatelessWidget {
           return const LoginPage();
         }
 
-        return const GetStartedPageWithAppBar();
+        return const WelcomePage();
       },
     );
   }
@@ -206,7 +205,6 @@ class _GetStartedPageWithAppBarState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainAppBar(title: "", showBackButton: false),
-      drawer: const AppDrawer(),
       body: const GetStarted(),
     );
   }
@@ -233,7 +231,6 @@ class _AbCdPageState extends State<AbCdPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainAppBar(title: "AB CD Page", showBackButton: true),
-      drawer: const AppDrawer(),
       body: const Center(child: Text("Strona AB CD")),
     );
   }

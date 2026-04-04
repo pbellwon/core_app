@@ -1,8 +1,8 @@
-// lib/welcome_page.dart
+// lib/get_started.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widgets/main_app_bar.dart';
-import 'widgets/app_drawer.dart';
+// import 'widgets/app_drawer.dart';
 import 'providers/menu_provider.dart';
 import 'explore_my_options.dart';
 
@@ -32,7 +32,6 @@ class _WelcomePageState extends State<WelcomePage> {
         title: '',
         showBackButton: false,
       ),
-      drawer: const AppDrawer(),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -40,7 +39,7 @@ class _WelcomePageState extends State<WelcomePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Welcome Page Loaded Successfully! 🎉',
+                'Get Started Page Loaded Successfully! 🎉',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

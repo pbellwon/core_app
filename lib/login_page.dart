@@ -139,10 +139,9 @@ class LoginPageState extends State<LoginPage> {
           email: email,
           password: password,
         );
-        
-        // AuthProvider automatycznie wykryje zmianę i przejdzie do GetStarted
-        // Nie trzeba ręcznie nawigować!
-
+        // Po zalogowaniu przenosimy na welcome page
+        if (!mounted) return;
+        Navigator.of(context).pushReplacementNamed('/welcome');
       } else {
         // ===== REGISTER =====
         UserCredential userCredential =
@@ -163,17 +162,14 @@ class LoginPageState extends State<LoginPage> {
           }, SetOptions(merge: true));
         }
 
-        // 🔑 ZMIANA: NIE WYLOGOWUJEMY PO REJESTRACJI
-        // Pozostajemy zalogowani i AuthProvider automatycznie przejdzie do GetStarted
-        
-        // Pokaż komunikat o sukcesie
+        // Po rejestracji przenosimy na welcome page
         if (!mounted) return;
-        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Account created successfully!'),
           ),
         );
+        Navigator.of(context).pushReplacementNamed('/welcome');
       }
     } on FirebaseAuthException catch (e) {
       String message = 'Something went wrong. Please try again.';
