@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-
 import 'firebase_options.dart';
 import 'login_page.dart';
 import 'profile_page.dart';
@@ -140,7 +139,7 @@ class MyApp extends StatelessWidget {
           '/profile': (_) => const ProfilePage(),
           '/help': (_) => const HelpPage(),
           '/about': (_) => const AboutPage(),
-          '/get_started': (_) => const GetStartedPageWithAppBar(),
+          '/get_started': (_) => const GetStartedPage(),
           '/dashboard': (_) => const AbCdPage(),
           '/client_quiz': (_) => const ClientProfileQuizPage(),
           '/explore_my_options': (_) => const ExploreMyOptionsPage(),
@@ -154,6 +153,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
@@ -182,33 +182,6 @@ class RootPage extends StatelessWidget {
   }
 }
 
-class GetStartedPageWithAppBar extends StatefulWidget {
-  const GetStartedPageWithAppBar({super.key});
-
-  @override
-  State<GetStartedPageWithAppBar> createState() =>
-      _GetStartedPageWithAppBarState();
-}
-
-class _GetStartedPageWithAppBarState
-    extends State<GetStartedPageWithAppBar> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MenuProvider>(context, listen: false)
-          .setCurrentPage('get_started');
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MainAppBar(title: "", showBackButton: false),
-      body: const GetStarted(),
-    );
-  }
-}
 
 class AbCdPage extends StatefulWidget {
   const AbCdPage({super.key});

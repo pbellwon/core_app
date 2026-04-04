@@ -1,27 +1,26 @@
-// lib/welcome_page.dart
+// lib/get_started.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widgets/main_app_bar.dart';
-// import 'widgets/app_drawer.dart';
 import 'providers/menu_provider.dart';
 import 'explore_my_options.dart';
 
-class GetStarted extends StatefulWidget {
-  const GetStarted({super.key});
+class GetStartedPage extends StatefulWidget {
+  const GetStartedPage({super.key});
 
   @override
-  State<GetStarted> createState() => _GetStartedState();
+  State<GetStartedPage> createState() => _GetStartedPageState();
 }
 
-class _GetStartedState extends State<GetStarted> {
+class _GetStartedPageState extends State<GetStartedPage> {
   @override
   void initState() {
     super.initState();
     // Używamy addPostFrameCallback aby mieć pewność, że context jest dostępny
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final menuProvider = Provider.of<MenuProvider>(context, listen: false);
-      menuProvider.setCurrentPage('welcome');
-      debugPrint('✅ GetStarted: currentPage ustawione na "welcome"');
+      menuProvider.setCurrentPage('get_started');
+      debugPrint('✅ GetStartedPage: currentPage ustawione na "get_started"');
     });
   }
 
@@ -39,7 +38,7 @@ class _GetStartedState extends State<GetStarted> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Welcome Page Loaded Successfully! 🎉',
+                'Get Started Page Loaded Successfully! 🎉',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

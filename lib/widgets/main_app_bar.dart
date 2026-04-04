@@ -7,7 +7,6 @@ import '../models/user_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/menu_provider.dart';
 import '../main.dart'; // 🔑 navigatorKey
-import '../get_started.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -32,8 +31,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         icon: const Icon(Icons.home),
         tooltip: 'Go to Home',
         onPressed: () {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const GetStarted()),
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            '/get_started',
             (route) => false,
           );
         },
