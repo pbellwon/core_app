@@ -27,16 +27,18 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: title.isNotEmpty ? Text(title) : null,
-      leading: IconButton(
-        icon: const Icon(Icons.home),
-        tooltip: 'Go to Home',
-        onPressed: () {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            '/get_started',
-            (route) => false,
-          );
-        },
+
+      // 🔥 ZAMIANA HOME → HAMBURGER MENU
+      leading: Builder(
+        builder: (context) => IconButton(
+          icon: const Icon(Icons.menu),
+          tooltip: 'Menu',
+          onPressed: () {
+            _showMenu(context);
+          },
+        ),
       ),
+
       centerTitle: false,
       titleSpacing: showBackButton ? 0 : 16,
       actions: [
@@ -53,6 +55,25 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
+  void _showMenu(BuildContext context) async {
+    final selected = await showMenu<String>(
+      context: context,
+      position: const RelativeRect.fromLTRB(0, kToolbarHeight, 0, 0),
+      items: [
+        const PopupMenuItem<String>(
+          value: '/get_started',
+          child: Text('Home'),
+        ),
+      ],
+    );
+
+    if (selected != null) {
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        selected,
+        (route) => false,
+      );
+    }
+  }
 }
 
 // UserProfileButton pozostaje BEZ ZMIAN
@@ -149,8 +170,6 @@ class UserProfileButton extends StatelessWidget {
     return items;
   }
 
-
-
   Widget _buildProfileHeader() {
     return Container(
       height: kToolbarHeight,
@@ -201,10 +220,8 @@ class UserProfileButton extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     final auth = context.read<AppAuthProvider>();
 
-    // 1️⃣ Firebase logout
     await auth.signOut();
 
-    // 2️⃣ 🔥 WYMUŚ POWRÓT NA ROOT
     navigatorKey.currentState?.pushNamedAndRemoveUntil(
       '/',
       (route) => false,
