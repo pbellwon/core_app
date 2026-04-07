@@ -14,7 +14,6 @@ import 'client_profile_quiz.dart';
 import 'explore_my_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
-import 'widgets/main_app_bar.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -140,7 +139,6 @@ class MyApp extends StatelessWidget {
           '/help': (_) => const HelpPage(),
           '/about': (_) => const AboutPage(),
           '/get_started': (_) => const GetStartedPage(),
-          '/dashboard': (_) => const AbCdPage(),
           '/client_quiz': (_) => const ClientProfileQuizPage(),
           '/explore_my_options': (_) => const ExploreMyOptionsPage(),
         },
@@ -153,7 +151,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
@@ -178,33 +175,6 @@ class RootPage extends StatelessWidget {
 
         return const WelcomePage();
       },
-    );
-  }
-}
-
-
-class AbCdPage extends StatefulWidget {
-  const AbCdPage({super.key});
-
-  @override
-  State<AbCdPage> createState() => _AbCdPageState();
-}
-
-class _AbCdPageState extends State<AbCdPage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MenuProvider>(context, listen: false)
-          .setCurrentPage('ab_cd');
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MainAppBar(title: "AB CD Page", showBackButton: true),
-      body: const Center(child: Text("Strona AB CD")),
     );
   }
 }

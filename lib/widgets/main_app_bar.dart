@@ -28,15 +28,42 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: title.isNotEmpty ? Text(title) : null,
 
-      // 🔥 ZAMIANA HOME → HAMBURGER MENU
-      leading: Builder(
-        builder: (context) => IconButton(
-          icon: const Icon(Icons.menu),
-          tooltip: 'Menu',
-          onPressed: () {
-            _showMenu(context);
-          },
-        ),
+      // Dynamiczne menu po lewej stronie (jak UserProfileButton)
+      leading: Consumer<MenuProvider>(
+        builder: (context, menuProvider, _) {
+          final pageLinks = menuProvider.pageLinks;
+          final globalActions = menuProvider.globalActions;
+          final allMenuItems = [...pageLinks, ...globalActions];
+          if (allMenuItems.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          return PopupMenuButton<MenuItem>(
+            tooltip: 'Menu',
+            onSelected: (item) {
+              navigatorKey.currentState?.pushNamed(item.route);
+            },
+            itemBuilder: (context) => allMenuItems
+                .map((item) => PopupMenuItem<MenuItem>(
+                      value: item,
+                      child: Row(
+                        children: [
+                          if (item.icon != null)
+                            Icon(item.icon, size: 20, color: const Color(0xFF860E66)),
+                          if (item.icon != null) const SizedBox(width: 12),
+                          Text(
+                            item.title,
+                            style: const TextStyle(
+                              color: Color(0xFF860E66),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ))
+                .toList(),
+            child: const Icon(Icons.menu, color: Color(0xFF860E66)),
+          );
+        },
       ),
 
       centerTitle: false,
@@ -53,26 +80,6 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         ...?actions,
       ],
     );
-  }
-
-  void _showMenu(BuildContext context) async {
-    final selected = await showMenu<String>(
-      context: context,
-      position: const RelativeRect.fromLTRB(0, kToolbarHeight, 0, 0),
-      items: [
-        const PopupMenuItem<String>(
-          value: '/get_started',
-          child: Text('Home'),
-        ),
-      ],
-    );
-
-    if (selected != null) {
-      navigatorKey.currentState?.pushNamedAndRemoveUntil(
-        selected,
-        (route) => false,
-      );
-    }
   }
 }
 

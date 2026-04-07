@@ -17,23 +17,27 @@ class MenuOverlay extends StatelessWidget {
           builder: (context, menuProvider, _) {
             if (!menuProvider.isMenuOpen) return const SizedBox.shrink();
 
+            // Pobierz dynamiczne pozycje menu
+            final pageLinks = menuProvider.pageLinks;
+            final globalActions = menuProvider.globalActions;
+            final allMenuItems = [...pageLinks, ...globalActions];
+
             return Stack(
               children: [
-                // 🔴 TŁO – zamyka menu
+                // Tło zamykające menu
                 GestureDetector(
                   onTap: () => menuProvider.closeMenu(),
                   child: Container(
-                    color: const Color.fromRGBO(0, 0, 0, 0.3), // Zamiast withOpacity(0.3)
+                    color: const Color.fromRGBO(0, 0, 0, 0.3),
                   ),
                 ),
-
-                // 🟢 MENU – BLOKUJE PROPAGACJĘ TAPÓW
+                // Menu
                 SafeArea(
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
-                      onTap: () {}, // ⛔ blokuje tap dla tła
+                      onTap: () {},
                       child: Material(
                         color: Colors.transparent,
                         child: Container(
@@ -44,20 +48,26 @@ class MenuOverlay extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color.fromRGBO(0, 0, 0, 0.2), // Zamiast withOpacity(0.2)
+                                color: const Color.fromRGBO(0, 0, 0, 0.2),
                                 blurRadius: 10,
                                 spreadRadius: 2,
                               ),
                             ],
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // WELCOME PAGE
-                              ListTile(
-                                title: const Text(
-                                  'Welcome Page',
-                                  style: TextStyle(
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            itemCount: allMenuItems.length,
+                            separatorBuilder: (context, index) => const Divider(height: 1),
+                            itemBuilder: (context, index) {
+                              final item = allMenuItems[index];
+                              return ListTile(
+                                leading: item.icon != null
+                                    ? Icon(item.icon, color: const Color(0xFF860E66))
+                                    : null,
+                                title: Text(
+                                  item.title,
+                                  style: const TextStyle(
                                     color: Color(0xFF860E66),
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -67,42 +77,10 @@ class MenuOverlay extends StatelessWidget {
                                   Navigator.of(
                                     context,
                                     rootNavigator: true,
-                                  ).pushNamed('/welcome');
+                                  ).pushNamed(item.route);
                                 },
-                              ),
-
-                              const Divider(height: 1),
-
-                              ListTile(
-                                leading: const Icon(Icons.help, color: Colors.grey),
-                                title: const Text(
-                                  'Help',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                                onTap: () {
-                                  menuProvider.closeMenu();
-                                  Navigator.of(
-                                    context,
-                                    rootNavigator: true,
-                                  ).pushNamed('/help');
-                                },
-                              ),
-
-                              ListTile(
-                                leading: const Icon(Icons.info, color: Colors.grey),
-                                title: const Text(
-                                  'About',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                                onTap: () {
-                                  menuProvider.closeMenu();
-                                  Navigator.of(
-                                    context,
-                                    rootNavigator: true,
-                                  ).pushNamed('/about');
-                                },
-                              ),
-                            ],
+                              );
+                            },
                           ),
                         ),
                       ),

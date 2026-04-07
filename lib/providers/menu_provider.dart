@@ -45,45 +45,13 @@ class MenuProvider with ChangeNotifier {
   void _initializeMenuItems() {
     _allMenuItems = [
       // PAGE LINKS - pokazują się w hamburger menu
-      
-      // Welcome Page - TYLKO na Get Started Page
-      MenuItem(
-        title: 'Welcome Page',
-        icon: null,
-        route: '/welcome',
-        pageFilter: 'get_started',
-        type: MenuItemType.pageLink,
-      ),
 
-      // Get Started Page - TYLKO na Welcome Page
+      // Get Started Page - ZAWSZE widoczna
       MenuItem(
-        title: 'Get Started Page',
-        icon: null,
+        title: 'Home',
+        icon: Icons.home,
         route: '/get_started',
-        pageFilter: 'welcome',
-        type: MenuItemType.pageLink,
-      ),
-
-      // Dashboard, Reports, Analytics - TYLKO na stronie AB CD
-      MenuItem(
-        title: 'Dashboard',
-        icon: Icons.dashboard,
-        route: '/dashboard',
-        pageFilter: 'ab_cd',
-        type: MenuItemType.pageLink,
-      ),
-      MenuItem(
-        title: 'Reports',
-        icon: Icons.assessment,
-        route: '/reports',
-        pageFilter: 'ab_cd',
-        type: MenuItemType.pageLink,
-      ),
-      MenuItem(
-        title: 'Analytics',
-        icon: Icons.analytics,
-        route: '/analytics',
-        pageFilter: 'ab_cd',
+        pageFilter: null,
         type: MenuItemType.pageLink,
       ),
 
@@ -110,13 +78,12 @@ class MenuProvider with ChangeNotifier {
         type: MenuItemType.userAction,
       ),
 
-      // GLOBAL ACTIONS - pokazują się wszędzie
-      MenuItem(
+            MenuItem(
         title: 'Help',
         icon: Icons.help,
         route: '/help',
         pageFilter: null,
-        type: MenuItemType.global,
+        type: MenuItemType.userAction,
       ),
       
       MenuItem(
@@ -124,8 +91,17 @@ class MenuProvider with ChangeNotifier {
         icon: Icons.info,
         route: '/about',
         pageFilter: null,
-        type: MenuItemType.global,
+        type: MenuItemType.userAction,
       ),
+
+      // GLOBAL ACTIONS - pokazują się wszędzie
+     // MenuItem(
+       //title: 'Terms of Service',
+        //icon: Icons.help,
+        //route: '/terms_of_service',
+        //pageFilter: null,
+        //type: MenuItemType.global,
+      //),
     ];
   }
 
