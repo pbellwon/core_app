@@ -54,11 +54,38 @@ class MenuProvider with ChangeNotifier {
         pageFilter: null,
         type: MenuItemType.pageLink,
       ),
-
+      MenuItem(
+        title: 'In The Moment Support',
+        icon: Icons.favorite,
+        route: '/get_started',
+        pageFilter: null,
+        type: MenuItemType.pageLink,
+      ),
+      MenuItem(
+        title: 'Explore',
+        icon: Icons.nature,
+        route: '/get_started',
+        pageFilter: null,
+        type: MenuItemType.pageLink,
+      ),
+      MenuItem(
+        title: 'Favourites',
+        icon: Icons.star,
+        route: '/get_started',
+        pageFilter: null,
+        type: MenuItemType.pageLink,
+      ),
+      MenuItem(
+        title: 'My Program',
+        icon: Icons.check_box,
+        route: '/get_started',
+        pageFilter: null,
+        type: MenuItemType.pageLink,
+      ),      
       // USER ACTIONS - pokazują się w menu użytkownika (po prawej)
       MenuItem(
-        title: 'Settings',
-        icon: Icons.settings,
+        title: 'My Program',
+        icon: Icons.check_box,
         route: '/settings',
         pageFilter: null,
         type: MenuItemType.userAction,
@@ -77,15 +104,13 @@ class MenuProvider with ChangeNotifier {
         pageFilter: null,
         type: MenuItemType.userAction,
       ),
-
-            MenuItem(
+      MenuItem(
         title: 'Help',
         icon: Icons.help,
         route: '/help',
         pageFilter: null,
         type: MenuItemType.userAction,
-      ),
-      
+      ),     
       MenuItem(
         title: 'About',
         icon: Icons.info,
