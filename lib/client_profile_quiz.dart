@@ -128,7 +128,7 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
       if (mounted) {
         Navigator.pushNamed(
           context,
-          '/explore_my_options',
+          '/quiz_results',
           arguments: {
             'answerCounts': answerCounts,
             'totalQuestions': _questions.length,

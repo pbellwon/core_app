@@ -316,7 +316,7 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainAppBar(
-        title: 'Quiz Results',
+        title: '',
         showBackButton: true,
       ),
       body: Consumer<AppAuthProvider>(
