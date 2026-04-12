@@ -64,7 +64,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
               ),
               const SizedBox(height: 20),
               _WelcomeButton(
-                text: "Show me what's possible",
+                text: "Explore my options",
                 onPressed: () {
                   Navigator.push(
                     context,

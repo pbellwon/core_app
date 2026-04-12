@@ -11,7 +11,7 @@ import 'about_page.dart';
 import 'help_page.dart';
 import 'settings_page.dart';
 import 'client_profile_quiz.dart';
-import 'explore_my_options.dart';
+import 'quiz_results.dart';
 import 'help_me_reconnect.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
@@ -141,7 +141,7 @@ class MyApp extends StatelessWidget {
           '/about': (_) => const AboutPage(),
           '/get_started': (_) => const GetStartedPage(),
           '/client_quiz': (_) => const ClientProfileQuizPage(),
-          '/explore_my_options': (_) => const ExploreMyOptionsPage(),
+          '/quiz_results': (_) => const QuizResultsPage(),
           '/help_me_reconnect': (_) => const HelpMeReconnectPage(),
         },
         onUnknownRoute: (_) {

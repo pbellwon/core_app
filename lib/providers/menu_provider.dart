@@ -62,9 +62,9 @@ class MenuProvider with ChangeNotifier {
         type: MenuItemType.pageLink,
       ),
       MenuItem(
-        title: 'Explore',
-        icon: Icons.nature,
-        route: '/get_started',
+        title: 'Explore My Options',
+        icon: Icons.explore,
+        route: '/explore_my_options',
         pageFilter: null,
         type: MenuItemType.pageLink,
       ),
@@ -84,8 +84,8 @@ class MenuProvider with ChangeNotifier {
       ),      
       // USER ACTIONS - pokazują się w menu użytkownika (po prawej)
       MenuItem(
-        title: 'My Program',
-        icon: Icons.check_box,
+        title: 'Settings',
+        icon: Icons.settings,
         route: '/settings',
         pageFilter: null,
         type: MenuItemType.userAction,
