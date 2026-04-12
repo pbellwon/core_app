@@ -56,7 +56,12 @@ class _GetStartedPageState extends State<GetStartedPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              _WelcomeButton(text: 'Help me reconnect'),
+              _WelcomeButton(
+                text: 'Help me reconnect',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/help_me_reconnect');
+                },
+              ),
               const SizedBox(height: 20),
               _WelcomeButton(
                 text: "Show me what's possible",
