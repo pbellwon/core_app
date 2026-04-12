@@ -43,12 +43,16 @@ dependencies:
   
   # State Management
   provider: ^6.1.1
+  matcher: any
+  meta: any
+  vector_math: any
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   shared_preferences: ^2.2.2
   video_player: ^2.7.0
+  test_api: any
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
