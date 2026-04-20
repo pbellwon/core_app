@@ -1,5 +1,9 @@
 // lib/main.dart - LOGIKA POPRAWIONA + HOVER / PRESSED BUTTON COLOR
 import 'package:flutter/material.dart';
+// import 'package:flutter/foundation.dart';
+// (usunięto importy webowe)
+import 'package:flutter/foundation.dart';
+// Removed conditional import for dart.library.html
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -21,6 +25,7 @@ import 'providers/menu_provider.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
+  // (usunięto rejestrację iframe)
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
