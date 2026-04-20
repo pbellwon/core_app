@@ -3,7 +3,7 @@ import 'widgets/main_app_bar.dart';
 import 'widgets/menu_overlay.dart';
 
 class MyFavouritesPage extends StatelessWidget {
-  const MyFavouritesPage({Key? key}) : super(key: key);
+  const MyFavouritesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
