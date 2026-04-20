@@ -2,11 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'widgets/main_app_bar.dart';
-
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/link.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
 
 
 
@@ -33,8 +34,6 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     ),
   ];
 
-  final Set<int> _favourites = {};
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,53 +41,28 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
         title: '',
         showBackButton: true,
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: _videos.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 20),
-        itemBuilder: (context, index) {
-          final video = _videos[index];
-          final isFav = _favourites.contains(index);
-          return _buildVideoCard(video, index, isFav);
+      body: Consumer<AppAuthProvider>(
+        builder: (context, authProvider, child) {
+          return ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: _videos.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 20),
+            itemBuilder: (context, index) {
+              final video = _videos[index];
+              final videoId = video.url; // lub YoutubePlayer.convertUrlToId(video.url) ?? video.url
+              final isFav = authProvider.isFavourite(videoId);
+              return _buildVideoCard(video, isFav, () {
+                authProvider.toggleFavouriteVideo(videoId);
+              });
+            },
+          );
         },
       ),
     );
   }
 
-  void _openVideoPage(String url) async {
-    final uri = Uri.parse(url);
-    // Na webie i desktopie otwieraj w przeglądarce, na Android/iOS player
-    if (kIsWeb) {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nie można otworzyć linku.')),
-        );
-      }
-      return;
-    }
-    // Rozpoznanie platformy mobilnej przez Theme.of(context).platform
-    final platform = Theme.of(context).platform;
-    if (platform == TargetPlatform.android || platform == TargetPlatform.iOS) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => YoutubePlayerScreen(videoUrl: url),
-        ),
-      );
-    } else {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nie można otworzyć linku.')),
-        );
-      }
-    }
-  }
-
-  Widget _buildVideoCard(_VideoData video, int index, bool isFav) {
+  // Zmieniam sygnaturę _buildVideoCard
+  Widget _buildVideoCard(_VideoData video, bool isFav, VoidCallback onFavToggle) {
     return Center(
       child: FractionallySizedBox(
         widthFactor: 0.5,
@@ -116,15 +90,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                         isFav ? Icons.star : Icons.star_border,
                         color: isFav ? Colors.amber : Colors.grey,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          if (isFav) {
-                            _favourites.remove(index);
-                          } else {
-                            _favourites.add(index);
-                          }
-                        });
-                      },
+                      onPressed: onFavToggle,
                     ),
                   ],
                 ),
@@ -202,6 +168,39 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
         ),
       ),
     );
+  }
+
+  void _openVideoPage(String url) async {
+    final uri = Uri.parse(url);
+    // Na webie i desktopie otwieraj w przeglądarce, na Android/iOS player
+    if (kIsWeb) {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nie można otworzyć linku.')),
+        );
+      }
+      return;
+    }
+    // Rozpoznanie platformy mobilnej przez Theme.of(context).platform
+    final platform = Theme.of(context).platform;
+    if (platform == TargetPlatform.android || platform == TargetPlatform.iOS) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => YoutubePlayerScreen(videoUrl: url),
+        ),
+      );
+    } else {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nie można otworzyć linku.')),
+        );
+      }
+    }
   }
 }
 
