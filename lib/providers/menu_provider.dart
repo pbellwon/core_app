@@ -71,7 +71,7 @@ class MenuProvider with ChangeNotifier {
       MenuItem(
         title: 'Favourites',
         icon: Icons.star,
-        route: '/get_started',
+        route: '/my_favourites',
         pageFilter: null,
         type: MenuItemType.pageLink,
       ),
