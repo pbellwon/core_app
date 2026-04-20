@@ -44,6 +44,7 @@ class QuizAnswer {
 
 /// 👤 GŁÓWNA KLASA MODELU UŻYTKOWNIKA
 /// Przechowuje wszystkie dane profilu użytkownika
+
 class AppUser {
   // 🔐 WYMAGANE POLA (nie mogą być null)
   final String uid;          // Unikalny ID z Firebase Auth
@@ -60,6 +61,7 @@ class AppUser {
   final DateTime? updatedAt;   // Data ostatniej aktualizacji
   final UserRole role;         // Rola użytkownika
   final List<QuizAnswer>? quizAnswers; // Odpowiedzi na quiz profilowy
+  final List<String>? favouriteVideos; // Lista ulubionych videoId
 
   /// 🏗️ KONSTRUKTOR
   AppUser({
@@ -75,6 +77,7 @@ class AppUser {
     this.updatedAt,
     this.role = UserRole.user, // Domyślnie zwykły użytkownik
     this.quizAnswers,
+    this.favouriteVideos,
   });
 
   /// 🔄 KONWERSJA NA MAP (dla Firestore)
@@ -86,7 +89,7 @@ class AppUser {
       'email': email,
       'createdAt': createdAt.toIso8601String(),
       'role': role.name, // Zapisujemy nazwę enuma jako string
-      
+
       // 📝 Opcjonalne pola (zapisujemy tylko jeśli nie są null)
       if (displayName != null) 'displayName': displayName,
       if (dateOfBirth != null) 'dateOfBirth': dateOfBirth!.toIso8601String(),
@@ -97,6 +100,8 @@ class AppUser {
       if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
       if (quizAnswers != null && quizAnswers!.isNotEmpty)
         'quizAnswers': quizAnswers!.map((answer) => answer.toMap()).toList(),
+      if (favouriteVideos != null && favouriteVideos!.isNotEmpty)
+        'favouriteVideos': favouriteVideos,
     };
   }
 
@@ -167,6 +172,7 @@ class AppUser {
       updatedAt: parseDate(data['updatedAt']),
       role: parseRole(data['role']),
       quizAnswers: parseQuizAnswers(data['quizAnswers']),
+      favouriteVideos: (data['favouriteVideos'] as List?)?.map((e) => e.toString()).toList(),
     );
   }
 
@@ -262,6 +268,7 @@ class AppUser {
     DateTime? updatedAt,
     UserRole? role,
     List<QuizAnswer>? quizAnswers,
+    List<String>? favouriteVideos,
   }) {
     return AppUser(
       uid: uid ?? this.uid,
@@ -276,6 +283,7 @@ class AppUser {
       updatedAt: updatedAt ?? this.updatedAt,
       role: role ?? this.role,
       quizAnswers: quizAnswers ?? this.quizAnswers,
+      favouriteVideos: favouriteVideos ?? this.favouriteVideos,
     );
   }
 }
