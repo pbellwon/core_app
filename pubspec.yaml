@@ -47,6 +47,8 @@ dependencies:
   matcher: any
   meta: any
   vector_math: any
+  youtube_player_flutter: ^9.1.3
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
