@@ -22,6 +22,7 @@ import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 void main() async {
   // (usunięto rejestrację iframe)
@@ -135,6 +136,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
+        navigatorObservers: [routeObserver],
         theme: theme,
         initialRoute: '/',
         routes: {

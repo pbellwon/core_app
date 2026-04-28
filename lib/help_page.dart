@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:html' as html;
 
+import 'main.dart' show routeObserver;
 import 'widgets/main_app_bar.dart';
 import 'providers/menu_provider.dart';
 
@@ -15,21 +16,40 @@ class HelpPage extends StatefulWidget {
   State<HelpPage> createState() => _HelpPageState();
 }
 
-class _HelpPageState extends State<HelpPage> {
-  static bool _kartraInjected = false;
-
+class _HelpPageState extends State<HelpPage> with RouteAware {
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<MenuProvider>(context, listen: false).setCurrentPage('Help');
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
     });
 
-    if (kIsWeb && !_kartraInjected) {
-      _kartraInjected = true;
+    if (kIsWeb) {
       _injectKartra();
     }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    if (kIsWeb) {
+      _removeKartra();
+    }
+    super.dispose();
+  }
+
+  /// Użytkownik opuścił stronę (weszła nowa trasa na stos)
+  @override
+  void didPushNext() {
+    if (kIsWeb) _removeKartra();
+  }
+
+  /// Użytkownik wrócił na tę stronę (pop z następnej trasy)
+  @override
+  void didPopNext() {
+    if (kIsWeb) _injectKartra();
   }
 
   void _injectKartra() {
@@ -68,6 +88,14 @@ class _HelpPageState extends State<HelpPage> {
 
       html.document.body!.append(container);
     }
+  }
+
+  void _removeKartra() {
+    html.document.getElementById('kartra_live_chat')?.remove();
+    html.document.getElementById('kartra-css')?.remove();
+    // Usuń też wszelkie sidebary które Kartra mogła wstrzyknąć dynamicznie
+    html.document.querySelectorAll('.kartra_helpdesk_sidebar_wrapper')
+        .forEach((el) => el.remove());
   }
 
   @override
