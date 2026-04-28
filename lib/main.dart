@@ -1,8 +1,8 @@
 // lib/main.dart - LOGIKA POPRAWIONA + HOVER / PRESSED BUTTON COLOR
 import 'package:flutter/material.dart';
-// import 'package:flutter/foundation.dart';
-// (usunięto importy webowe)
-// Removed conditional import for dart.library.html
+import 'package:flutter/foundation.dart';
+// ignore: avoid_web_libraries_in_flutter, deprecated_member_use
+import 'dart:html' as html;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -23,6 +23,7 @@ import 'providers/menu_provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+final KartraRouteObserver kartraRouteObserver = KartraRouteObserver();
 
 void main() async {
   // (usunięto rejestrację iframe)
@@ -37,6 +38,35 @@ void main() async {
   };
 
   runApp(const MyApp());
+}
+
+class KartraRouteObserver extends NavigatorObserver {
+  void _update(Route<dynamic> route) {
+    if (!kIsWeb) return;
+    // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
+    final el = html.document.getElementById('kartra_live_chat');
+    if (el == null) return;
+    final routeName = route.settings.name;
+    el.style.display = (routeName == '/help') ? '' : 'none';
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) => _update(route);
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (previousRoute != null) _update(previousRoute);
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    if (newRoute != null) _update(newRoute);
+  }
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (previousRoute != null) _update(previousRoute);
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -136,7 +166,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
-        navigatorObservers: [routeObserver],
+        navigatorObservers: [routeObserver, kartraRouteObserver],
         theme: theme,
         initialRoute: '/',
         routes: {

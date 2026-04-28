@@ -27,33 +27,32 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
     });
 
     if (kIsWeb) {
-      _injectKartra();
+      _injectKartraIfNeeded();
+      _showKartra();
     }
   }
 
   @override
   void dispose() {
     routeObserver.unsubscribe(this);
-    if (kIsWeb) {
-      _removeKartra();
-    }
+    if (kIsWeb) _hideKartra();
     super.dispose();
   }
 
-  /// Użytkownik opuścił stronę (weszła nowa trasa na stos)
   @override
   void didPushNext() {
-    if (kIsWeb) _removeKartra();
+    if (kIsWeb) _hideKartra();
   }
 
-  /// Użytkownik wrócił na tę stronę (pop z następnej trasy)
   @override
   void didPopNext() {
-    if (kIsWeb) _injectKartra();
+    if (kIsWeb) _showKartra();
   }
 
-  void _injectKartra() {
-    // 1. CSS do <head>
+  void _injectKartraIfNeeded() {
+    if (html.document.getElementById('kartra_live_chat') != null) return;
+
+    // CSS do <head>
     if (html.document.head!.querySelector('#kartra-css') == null) {
       final link = html.LinkElement()
         ..id = 'kartra-css'
@@ -63,39 +62,41 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
       html.document.head!.append(link);
     }
 
-    // 2. Kontener + skrypt + przycisk – dokładnie jak w oryginalnym kodzie Kartra
-    if (html.document.getElementById('kartra_live_chat') == null) {
-      final container = html.DivElement()
-        ..setAttribute('rel', 'JI7Z4DfvsCZa')
-        ..setAttribute('article', '')
-        ..setAttribute('product', '')
-        ..setAttribute('embedded', '1')
-        ..id = 'kartra_live_chat'
-        ..className = 'kartra_helpdesk_sidebar js_kartra_trackable_object';
+    // Kontener + skrypt + przycisk
+    final container = html.DivElement()
+      ..setAttribute('rel', 'JI7Z4DfvsCZa')
+      ..setAttribute('article', '')
+      ..setAttribute('product', '')
+      ..setAttribute('embedded', '1')
+      ..id = 'kartra_live_chat'
+      ..className = 'kartra_helpdesk_sidebar js_kartra_trackable_object'
+      ..style.display = 'none'; // domyślnie ukryty
 
-      // Skrypt WEWNĄTRZ kontenera (wymagane przez Kartra)
-      final script = html.ScriptElement()
-        ..type = 'text/javascript'
-        ..src = 'https://app.kartra.com/resources/js/helpdesk_frame';
-      container.append(script);
+    final script = html.ScriptElement()
+      ..type = 'text/javascript'
+      ..src = 'https://app.kartra.com/resources/js/helpdesk_frame';
+    container.append(script);
 
-      // Przycisk helpdesku
-      final button = html.DivElement()
-        ..setAttribute('rel', 'JI7Z4DfvsCZa')
-        ..id = 'display_kartra_helpdesk'
-        ..className = 'kartra_helpdesk_sidebar_button open';
-      container.append(button);
+    final button = html.DivElement()
+      ..setAttribute('rel', 'JI7Z4DfvsCZa')
+      ..id = 'display_kartra_helpdesk'
+      ..className = 'kartra_helpdesk_sidebar_button open';
+    container.append(button);
 
-      html.document.body!.append(container);
-    }
+    html.document.body!.append(container);
   }
 
-  void _removeKartra() {
-    html.document.getElementById('kartra_live_chat')?.remove();
-    html.document.getElementById('kartra-css')?.remove();
-    // Usuń też wszelkie sidebary które Kartra mogła wstrzyknąć dynamicznie
+  void _showKartra() {
+    html.document.getElementById('kartra_live_chat')?.style.display = '';
+    // Ukryty wrapper który Kartra mogła dynamicznie wstrzyknąć
     html.document.querySelectorAll('.kartra_helpdesk_sidebar_wrapper')
-        .forEach((el) => el.remove());
+        .forEach((el) => (el as html.HtmlElement).style.display = '');
+  }
+
+  void _hideKartra() {
+    html.document.getElementById('kartra_live_chat')?.style.display = 'none';
+    html.document.querySelectorAll('.kartra_helpdesk_sidebar_wrapper')
+        .forEach((el) => (el as html.HtmlElement).style.display = 'none');
   }
 
   @override
