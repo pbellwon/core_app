@@ -46,7 +46,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: _videos.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 20),
+            separatorBuilder: (_, _) => const SizedBox(height: 20),
             itemBuilder: (context, index) {
               final video = _videos[index];
               final videoId = video.url; // lub YoutubePlayer.convertUrlToId(video.url) ?? video.url
@@ -177,6 +177,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Nie można otworzyć linku.')),
         );
@@ -196,6 +197,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Nie można otworzyć linku.')),
         );
@@ -212,7 +214,7 @@ class _VideoData {
 
 class YoutubePlayerScreen extends StatefulWidget {
   final String videoUrl;
-  const YoutubePlayerScreen({Key? key, required this.videoUrl}) : super(key: key);
+  const YoutubePlayerScreen({super.key, required this.videoUrl});
 
   @override
   State<YoutubePlayerScreen> createState() => _YoutubePlayerScreenState();

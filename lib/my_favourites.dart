@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'providers/auth_provider.dart';
 import 'widgets/main_app_bar.dart';
@@ -48,7 +47,7 @@ class MyFavouritesPage extends StatelessWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: favVideos.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 20),
+              separatorBuilder: (_, _) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
                 final video = favVideos[index];
                 final videoId = YoutubePlayer.convertUrlToId(video.url);

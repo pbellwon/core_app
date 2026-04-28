@@ -170,12 +170,12 @@ class AppAuthProvider with ChangeNotifier {
       
       if (displayName != null) {
         updateData['displayName'] = displayName;
-        debugPrint('📝 Setting displayName: \\${displayName}');
+        debugPrint('📝 Setting displayName: \\$displayName');
       }
       
       if (photoURL != null) {
         updateData['photoURL'] = photoURL;
-        debugPrint('🖼️ Setting photoURL: \\${photoURL}');
+        debugPrint('🖼️ Setting photoURL: \\$photoURL');
       }
 
       if (dateOfBirth != null) {
@@ -185,17 +185,17 @@ class AppAuthProvider with ChangeNotifier {
 
       if (phoneNumber != null) {
         updateData['phoneNumber'] = phoneNumber;
-        debugPrint('📱 Setting phoneNumber: \\${phoneNumber}');
+        debugPrint('📱 Setting phoneNumber: \\$phoneNumber');
       }
 
       if (country != null) {
         updateData['country'] = country;
-        debugPrint('🌍 Setting country: \\${country}');
+        debugPrint('🌍 Setting country: \\$country');
       }
 
       if (timezone != null) {
         updateData['timezone'] = timezone;
-        debugPrint('🕒 Setting timezone: \\${timezone}');
+        debugPrint('🕒 Setting timezone: \\$timezone');
       }
 
       // 3️⃣ ZAPISZ DO FIRESTORE
@@ -220,7 +220,7 @@ class AppAuthProvider with ChangeNotifier {
       debugPrint('✅ Local user state updated');
       
     } catch (e) {
-      debugPrint('❌ Error updating profile: \\${e}');
+      debugPrint('❌ Error updating profile: \\$e');
       rethrow;
     } finally {
       _isLoading = false;
@@ -240,7 +240,7 @@ class AppAuthProvider with ChangeNotifier {
       notifyListeners();
       debugPrint('✅ User signed out successfully');
     } catch (e) {
-      debugPrint('❌ Error signing out: \\${e}');
+      debugPrint('❌ Error signing out: \\$e');
       rethrow;
     }
   }
@@ -256,7 +256,7 @@ class AppAuthProvider with ChangeNotifier {
       await _firebaseUser!.sendEmailVerification();
       debugPrint('✅ Email verification sent');
     } catch (e) {
-      debugPrint('❌ Error sending email verification: \\${e}');
+      debugPrint('❌ Error sending email verification: \\$e');
       rethrow;
     }
   }
@@ -264,11 +264,11 @@ class AppAuthProvider with ChangeNotifier {
   /// 🔐 WYSYŁANIE RESETU HASŁA
   Future<void> sendPasswordResetEmail(String email) async {
     try {
-      debugPrint('🔐 Sending password reset to: \\${email}');
+      debugPrint('🔐 Sending password reset to: \\$email');
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       debugPrint('✅ Password reset email sent');
     } catch (e) {
-      debugPrint('❌ Error sending password reset: \\${e}');
+      debugPrint('❌ Error sending password reset: \\$e');
       rethrow;
     }
   }
@@ -299,7 +299,7 @@ class AppAuthProvider with ChangeNotifier {
       notifyListeners();
       debugPrint('✅ Terms accepted');
     } catch (e) {
-      debugPrint('❌ Error accepting terms: \\${e}');
+      debugPrint('❌ Error accepting terms: \\$e');
       rethrow;
     }
   }
@@ -333,7 +333,7 @@ class AppAuthProvider with ChangeNotifier {
       notifyListeners();
       debugPrint('✅ Account deleted successfully');
     } catch (e) {
-      debugPrint('❌ Error deleting account: \\${e}');
+      debugPrint('❌ Error deleting account: \\$e');
       rethrow;
     }
   }
@@ -368,14 +368,14 @@ class AppAuthProvider with ChangeNotifier {
       
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ Error refreshing user data: \\${e}');
+      debugPrint('❌ Error refreshing user data: \\$e');
     }
   }
 
   /// 📧 CZY EMAIL JEST ZWERYFIKOWANY
   bool get isEmailVerified {
     final verified = _firebaseUser?.emailVerified ?? false;
-    debugPrint('📧 Email verified: \\${verified}');
+    debugPrint('📧 Email verified: \\$verified');
     return verified;
   }
 
@@ -393,8 +393,8 @@ class AppAuthProvider with ChangeNotifier {
   /// 🐛 DEBUG: POKAŻ INFO O UŻYTKOWNIKU
   void debugUserInfo() {
     debugPrint('=== DEBUG USER INFO ===');
-    debugPrint('Logged in: \\${isLoggedIn}');
-    debugPrint('Loading: \\${_isLoading}');
+    debugPrint('Logged in: \\$isLoggedIn');
+    debugPrint('Loading: \\$_isLoading');
     if (_currentUser != null) {
       debugPrint('UID: \\${_currentUser!.uid}');
       debugPrint('Email: \\${_currentUser!.email}');

@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 // import 'package:flutter/foundation.dart';
 // (usunięto importy webowe)
-import 'package:flutter/foundation.dart';
 // Removed conditional import for dart.library.html
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';

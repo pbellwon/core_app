@@ -120,7 +120,7 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
           height: 60,
           decoration: BoxDecoration(
             color: isActive 
-                ? const Color(0xFF860E66).withOpacity(0.1)
+                ? const Color(0xFF860E66).withValues(alpha: 0.1)
                 : Colors.grey[100],
             borderRadius: BorderRadius.circular(30),
             border: Border.all(
