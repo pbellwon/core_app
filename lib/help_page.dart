@@ -106,17 +106,17 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
       ..className = 'kartra_helpdesk_sidebar js_kartra_trackable_object'
       ..style.display = 'none';
 
-    final script = html.ScriptElement()
-      ..type = 'text/javascript'
-      ..src = 'https://app.kartra.com/resources/js/helpdesk_frame';
-    container.append(script);
-
     final button = html.DivElement()
       ..setAttribute('rel', 'JI7Z4DfvsCZa')
       ..id = 'display_kartra_helpdesk'
       ..className = 'kartra_helpdesk_sidebar_button open';
     container.append(button);
 
+    final script = html.ScriptElement()
+      ..type = 'text/javascript'
+      ..src = 'https://app.kartra.com/resources/js/helpdesk_frame';
+
+    container.append(script);
     html.document.body!.append(container);
   }
 
@@ -126,18 +126,18 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
     html.document.querySelectorAll('.kartra_helpdesk_sidebar_wrapper')
         .forEach((el) => (el as html.HtmlElement).style.display = '');
 
+    // Przy kolejnych wejściach skrypt jest już załadowany – kliknij od razu
     _autoOpenKartra(attempt: 0);
   }
 
   void _autoOpenKartra({required int attempt}) {
     if (_cancelled) return;
-    if (attempt > 40) return;
-    Future.delayed(const Duration(milliseconds: 100), () {
+    if (attempt > 60) return; // max 30 sekund (60 x 500ms)
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (_cancelled || !mounted) return;
 
       final btn = html.document.getElementById('display_kartra_helpdesk');
       if (btn == null) {
-        // Skrypt Kartra jeszcze się ładuje – czekaj dalej
         _autoOpenKartra(attempt: attempt + 1);
         return;
       }
