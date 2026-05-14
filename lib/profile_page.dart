@@ -12,10 +12,7 @@ class CountryCode {
   final String name;
   final String code;
 
-  CountryCode({
-    required this.name,
-    required this.code,
-  });
+  CountryCode({required this.name, required this.code});
 }
 
 /// 🗺️ Mapa krajów do stref czasowych (UTC)
@@ -219,7 +216,10 @@ final List<CountryCode> allCountryCodes = [
   CountryCode(name: 'Croatia', code: '+385'),
   CountryCode(name: 'Cuba', code: '+53'),
   CountryCode(name: 'Cyprus', code: '+357'),
-  CountryCode(name: 'Cyprus - Turkish Republic of Northern Cyprus', code: '+90'),
+  CountryCode(
+    name: 'Cyprus - Turkish Republic of Northern Cyprus',
+    code: '+90',
+  ),
   CountryCode(name: 'Czech Republic', code: '+420'),
   CountryCode(name: 'Denmark', code: '+45'),
   CountryCode(name: 'Dhekelia', code: '+357'),
@@ -271,7 +271,10 @@ final List<CountryCode> allCountryCodes = [
   CountryCode(name: 'Kazakhstan', code: '+7'),
   CountryCode(name: 'Kenya', code: '+254'),
   CountryCode(name: 'Kiribati', code: '+686'),
-  CountryCode(name: 'Korea, Democratic People\'s Republic of Korea', code: '+850'),
+  CountryCode(
+    name: 'Korea, Democratic People\'s Republic of Korea',
+    code: '+850',
+  ),
   CountryCode(name: 'Korea, Republic of Korea', code: '+82'),
   CountryCode(name: 'Kosovo', code: '+383'),
   CountryCode(name: 'Kuwait', code: '+965'),
@@ -386,7 +389,10 @@ final List<CountryCode> allCountryCodes = [
   CountryCode(name: 'Uruguay', code: '+598'),
   CountryCode(name: 'Uzbekistan', code: '+998'),
   CountryCode(name: 'Vanuatu', code: '+678'),
-  CountryCode(name: 'Vatican City State', code: '+39'), // duplikat Holy See, ale zostawiam
+  CountryCode(
+    name: 'Vatican City State',
+    code: '+39',
+  ), // duplikat Holy See, ale zostawiam
   CountryCode(name: 'Venezuela', code: '+58'),
   CountryCode(name: 'Viet Nam', code: '+84'),
   CountryCode(name: 'Wallis and Futuna Islands', code: '+681'),
@@ -408,26 +414,28 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   // 🗝️ Klucz do formularza
   final _formKey = GlobalKey<FormState>();
-  
+
   // 📝 Kontrolery pól tekstowych
   late TextEditingController _displayNameController;
   late TextEditingController _dateOfBirthController;
   late TextEditingController _phoneNumberController;
-  
+
   // 🌍 Zmienne dla wyszukiwarki kraju (dla numeru telefonu)
   CountryCode? _selectedCountryCode;
-  final TextEditingController _countrySearchController = TextEditingController();
+  final TextEditingController _countrySearchController =
+      TextEditingController();
   List<CountryCode> _filteredCountries = allCountryCodes;
   bool _showCountrySuggestions = false;
   final FocusNode _countryFocusNode = FocusNode();
-  
+
   // 📱 Kontroler dla samego numeru telefonu (bez kodu)
   late TextEditingController _phoneNumberOnlyController;
 
   // 🌍 Nowe pole: wybrany kraj (dla strefy czasowej)
   String? _selectedCountry;
   // Dodajemy kontrolery i zmienne dla nowego pola
-  final TextEditingController _countryTimezoneSearchController = TextEditingController();
+  final TextEditingController _countryTimezoneSearchController =
+      TextEditingController();
   List<String> _filteredTimezoneCountries = countryTimezoneMap.keys.toList();
   bool _showTimezoneSuggestions = false;
   final FocusNode _countryTimezoneFocusNode = FocusNode();
@@ -435,13 +443,13 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    
+
     // 🔄 Inicjalizacja kontrolerów z aktualnymi danymi użytkownika
     _initializeControllers();
-    
+
     // Dodajemy listener do wyszukiwarki kraju telefonu
     _countrySearchController.addListener(_filterCountries);
-    
+
     // Listener do focus node kraju telefonu
     _countryFocusNode.addListener(() {
       if (_countryFocusNode.hasFocus) {
@@ -466,24 +474,22 @@ class _ProfilePageState extends State<ProfilePage> {
   void _initializeControllers() {
     final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
     final user = authProvider.currentUser;
-    
+
     _displayNameController = TextEditingController(
-      text: user?.displayName ?? ''
+      text: user?.displayName ?? '',
     );
-    
+
     _dateOfBirthController = TextEditingController(
-      text: user?.dateOfBirth != null
-          ? _formatDate(user!.dateOfBirth!)
-          : ''
+      text: user?.dateOfBirth != null ? _formatDate(user!.dateOfBirth!) : '',
     );
-    
+
     // 📱 Rozdzielenie numeru telefonu na kod i numer właściwy
     _phoneNumberController = TextEditingController(
-      text: user?.phoneNumber ?? ''
+      text: user?.phoneNumber ?? '',
     );
-    
+
     _phoneNumberOnlyController = TextEditingController();
-    
+
     if (user?.phoneNumber != null && user!.phoneNumber!.isNotEmpty) {
       _parsePhoneNumber(user.phoneNumber!);
     } else {
@@ -509,7 +515,9 @@ class _ProfilePageState extends State<ProfilePage> {
         _filteredCountries = allCountryCodes;
       } else {
         _filteredCountries = allCountryCodes.where((country) {
-          return country.name.toLowerCase().contains(query);
+          final name = country.name.toLowerCase();
+          final code = country.code.toLowerCase();
+          return name.contains(query) || code.contains(query);
         }).toList();
       }
     });
@@ -554,22 +562,23 @@ class _ProfilePageState extends State<ProfilePage> {
   void _parsePhoneNumber(String fullPhoneNumber) {
     // Szukamy dopasowania kodu kierunkowego
     for (var country in allCountryCodes) {
-      if (fullPhoneNumber.startsWith(country.code.substring(1))) { // bez '+'
+      if (fullPhoneNumber.startsWith(country.code.substring(1))) {
+        // bez '+'
         _selectedCountryCode = country;
-        _countrySearchController.text = country.name;
+        _countrySearchController.text = country.code;
         _phoneNumberOnlyController.text = fullPhoneNumber.substring(
-          country.code.length - 1
+          country.code.length - 1,
         );
         return;
       }
     }
-    
+
     // Jeśli nie znaleziono kodu, użyj domyślnego
     _selectedCountryCode = allCountryCodes.firstWhere(
       (code) => code.code == '+48',
       orElse: () => allCountryCodes.first,
     );
-    _countrySearchController.text = '';
+    _countrySearchController.text = _selectedCountryCode!.code;
     _phoneNumberOnlyController.text = fullPhoneNumber;
   }
 
@@ -600,8 +609,18 @@ class _ProfilePageState extends State<ProfilePage> {
   /// 📅 FORMATOWANIE DATY DO WYŚWIETLANIA (dd MMM yyyy)
   String _formatDisplayDate(DateTime date) {
     const monthNames = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final day = date.day.toString().padLeft(2, '0');
     final month = monthNames[date.month - 1];
@@ -612,8 +631,18 @@ class _ProfilePageState extends State<ProfilePage> {
   /// 📅 FORMATOWANIE DATY Z GODZINĄ (dd MMM yyyy, HH:mm)
   String _formatDateTime(DateTime date) {
     const monthNames = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final day = date.day.toString().padLeft(2, '0');
     final month = monthNames[date.month - 1];
@@ -646,7 +675,7 @@ class _ProfilePageState extends State<ProfilePage> {
       lastDate: DateTime.now(),
       initialEntryMode: DatePickerEntryMode.calendarOnly,
     );
-    
+
     if (pickedDate != null && mounted) {
       setState(() {
         _dateOfBirthController.text = _formatDate(pickedDate);
@@ -660,7 +689,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    
+
     // Sprawdź czy kraj został wybrany (dla numeru telefonu)
     if (_selectedCountryCode == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -684,26 +713,29 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       return;
     }
-    
+
     try {
       final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
-      
+
       // 📅 Parsowanie daty urodzenia
       DateTime? dateOfBirth;
       if (_dateOfBirthController.text.isNotEmpty) {
         dateOfBirth = _parseDate(_dateOfBirthController.text);
       }
-      
+
       // 📱 Połączenie kodu kierunkowego z numerem telefonu
       String? fullPhoneNumber;
-      if (_phoneNumberOnlyController.text.isNotEmpty && _selectedCountryCode != null) {
-        fullPhoneNumber = '${_selectedCountryCode!.code.substring(1)}${_phoneNumberOnlyController.text}';
+      if (_phoneNumberOnlyController.text.isNotEmpty &&
+          _selectedCountryCode != null) {
+        fullPhoneNumber =
+            '${_selectedCountryCode!.code.substring(1)}${_phoneNumberOnlyController.text}';
       }
-      
+
       // 🌍 Pobranie strefy czasowej na podstawie wybranego kraju
       String? timezone;
       if (_selectedCountry != null) {
-        timezone = countryTimezoneMap[_selectedCountry] ?? 'UTC+0'; // domyślnie UTC+0
+        timezone =
+            countryTimezoneMap[_selectedCountry] ?? 'UTC+0'; // domyślnie UTC+0
       }
 
       // ✏️ Aktualizacja profilu (wraz z nowymi polami)
@@ -713,10 +745,10 @@ class _ProfilePageState extends State<ProfilePage> {
             : null,
         dateOfBirth: dateOfBirth,
         phoneNumber: fullPhoneNumber,
-        country: _selectedCountryCode?.name,   // kraj z CountryCode
-        timezone: timezone,           // nowe pole
+        country: _selectedCountryCode?.name, // kraj z CountryCode
+        timezone: timezone, // nowe pole
       );
-      
+
       // 🎉 Powiadomienie o sukcesie
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -744,9 +776,7 @@ class _ProfilePageState extends State<ProfilePage> {
   /// 🎯 NAWIGACJA DO QUIZU PROFILU KLIENTA
   void _navigateToClientQuiz() {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const ClientProfileQuizPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const ClientProfileQuizPage()),
     );
   }
 
@@ -785,16 +815,10 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          user.email,
-          style: const TextStyle(color: Colors.grey),
-        ),
+        Text(user.email, style: const TextStyle(color: Colors.grey)),
         if (user.age != null) ...[
           const SizedBox(height: 4),
-          Text(
-            'Age: ${user.age}',
-            style: const TextStyle(color: Colors.grey),
-          ),
+          Text('Age: ${user.age}', style: const TextStyle(color: Colors.grey)),
         ],
       ],
     );
@@ -821,18 +845,11 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 12),
             _buildInfoRow('User ID', user.uid),
             _buildInfoRow('Email', user.email),
-            _buildInfoRow(
-              'Member since',
-              _formatDisplayDate(user.createdAt),
-            ),
+            _buildInfoRow('Member since', _formatDisplayDate(user.createdAt)),
             if (user.updatedAt != null)
-              _buildInfoRow(
-                'Last updated',
-                _formatDateTime(user.updatedAt!),
-              ),
+              _buildInfoRow('Last updated', _formatDateTime(user.updatedAt!)),
             _buildInfoRow('Role', user.role.name.toUpperCase()),
-            if (user.country != null)
-              _buildInfoRow('Country', user.country!),
+            if (user.country != null) _buildInfoRow('Country', user.country!),
             if (user.timezone != null)
               _buildInfoRow('Timezone', user.timezone!),
           ],
@@ -857,10 +874,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: Colors.grey),
-            ),
+            child: Text(value, style: const TextStyle(color: Colors.grey)),
           ),
         ],
       ),
@@ -870,32 +884,23 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainAppBar(
-        title: '',
-        showBackButton: true,
-      ),
+      appBar: const MainAppBar(title: '', showBackButton: true),
       body: Consumer<AppAuthProvider>(
         builder: (context, authProvider, child) {
           // ⏳ Ładowanie
           if (authProvider.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFF860E66),
-              ),
+              child: CircularProgressIndicator(color: Color(0xFF860E66)),
             );
           }
-          
+
           // ❌ Nie zalogowany
           if (!authProvider.isLoggedIn || authProvider.currentUser == null) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.person_off,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
+                  const Icon(Icons.person_off, size: 80, color: Colors.grey),
                   const SizedBox(height: 16),
                   const Text(
                     'Please log in to view your profile',
@@ -912,9 +917,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             );
           }
-          
+
           final user = authProvider.currentUser!;
-          
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -943,17 +948,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // 👤 AWATAR I PODSTAWOWE INFO
                 Center(child: _buildUserAvatar(user)),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // ✏️ FORMULARZ EDYCJI
                 const Text(
-                  'Edit Profile',
+                  'Update my details',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -961,7 +966,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 Form(
                   key: _formKey,
                   child: Column(
@@ -970,7 +975,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       TextFormField(
                         controller: _displayNameController,
                         decoration: InputDecoration(
-                          labelText: 'Display Name',
+                          labelText: 'Name',
                           hintText: 'Enter your name',
                           prefixIcon: const Icon(Icons.person_outline),
                           border: OutlineInputBorder(
@@ -986,156 +991,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           return null;
                         },
                       ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // 📅 DATA URODZENIA
-                      TextFormField(
-                        controller: _dateOfBirthController,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'Date of Birth',
-                          hintText: 'Select your birth date',
-                          prefixIcon: const Icon(Icons.cake),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_today),
-                            onPressed: () => _selectDate(context),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[50],
-                        ),
-                        onTap: () => _selectDate(context),
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // 📱 NUMER TELEFONU (pole wyboru kraju obok numeru) - styl jak pole Timezone
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 🌍 Pole wyboru kodu kraju
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextFormField(
-                                  controller: _countrySearchController,
-                                  focusNode: _countryFocusNode,
-                                  decoration: InputDecoration(
-                                    labelText: 'Country Code',
-                                    hintText: 'Search country',
-                                    prefixIcon: const Icon(Icons.public),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.grey[50],
-                                  ),
-                                  readOnly: false,
-                                  onTap: () {
-                                    setState(() {
-                                      _showCountrySuggestions = true;
-                                    });
-                                  },
-                                  onFieldSubmitted: (value) {
-                                    if (_filteredCountries.isNotEmpty) {
-                                      _selectCountry(_filteredCountries.first);
-                                    }
-                                  },
-                                ),
-                                // Lista podpowiedzi (pod polem kraju)
-                                if (_showCountrySuggestions && _filteredCountries.isNotEmpty)
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 4),
-                                    constraints: const BoxConstraints(
-                                      maxHeight: 200,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey.shade300,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withValues(alpha: 0.2),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: _filteredCountries.length,
-                                      itemBuilder: (context, index) {
-                                        final country = _filteredCountries[index];
-                                        final isSelected = _selectedCountryCode?.name == country.name;
-                                        return ListTile(
-                                          title: Text(
-                                            country.name,
-                                            style: TextStyle(
-                                              fontWeight: isSelected
-                                                  ? FontWeight.bold
-                                                  : FontWeight.normal,
-                                              color: isSelected
-                                                  ? const Color(0xFF860E66)
-                                                  : null,
-                                            ),
-                                          ),
-                                          subtitle: Text(country.code),
-                                          onTap: () => _selectCountry(country),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          // 📱 Pole na numer telefonu (po prawej)
-                          Expanded(
-                            flex: 3,
-                            child: TextFormField(
-                              controller: _phoneNumberOnlyController,
-                              decoration: InputDecoration(
-                                labelText: 'Phone Number',
-                                hintText: 'Enter number',
-                                prefixIcon: const Icon(Icons.phone),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[50],
-                              ),
-                              keyboardType: TextInputType.phone,
-                              validator: (value) {
-                                if (value != null && value.isNotEmpty) {
-                                  if (value.length < 6) {
-                                    return 'Too short';
-                                  }
-                                  if (!RegExp(r'^[0-9\s\-]+$').hasMatch(value)) {
-                                    return 'Only numbers, spaces and hyphens';
-                                  }
-                                }
-                                return null;
-                              },
-                              onTap: () {
-                                setState(() {
-                                  _showCountrySuggestions = false;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      
+
                       const SizedBox(height: 16),
 
-                      // 🌍 NOWE POLE: WYBÓR KRAJU (DLA STREFY CZASOWEJ) - styl jak pole na numer telefonu
+                      // 🌍 TIMEZONE
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -1160,21 +1019,19 @@ class _ProfilePageState extends State<ProfilePage> {
                             },
                             onFieldSubmitted: (value) {
                               if (_filteredTimezoneCountries.isNotEmpty) {
-                                _selectTimezoneCountryString(_filteredTimezoneCountries.first);
+                                _selectTimezoneCountryString(
+                                  _filteredTimezoneCountries.first,
+                                );
                               }
                             },
                           ),
-                          // Lista podpowiedzi
-                          if (_showTimezoneSuggestions && _filteredTimezoneCountries.isNotEmpty)
+                          if (_showTimezoneSuggestions &&
+                              _filteredTimezoneCountries.isNotEmpty)
                             Container(
                               margin: const EdgeInsets.only(top: 4),
-                              constraints: const BoxConstraints(
-                                maxHeight: 200,
-                              ),
+                              constraints: const BoxConstraints(maxHeight: 200),
                               decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey.shade300,
-                                ),
+                                border: Border.all(color: Colors.grey.shade300),
                                 borderRadius: BorderRadius.circular(12),
                                 color: Colors.white,
                                 boxShadow: [
@@ -1189,8 +1046,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 shrinkWrap: true,
                                 itemCount: _filteredTimezoneCountries.length,
                                 itemBuilder: (context, index) {
-                                  final countryName = _filteredTimezoneCountries[index];
-                                  final isSelected = _selectedCountry == countryName;
+                                  final countryName =
+                                      _filteredTimezoneCountries[index];
+                                  final isSelected =
+                                      _selectedCountry == countryName;
                                   return ListTile(
                                     title: Text(
                                       countryName,
@@ -1203,16 +1062,171 @@ class _ProfilePageState extends State<ProfilePage> {
                                             : null,
                                       ),
                                     ),
-                                    onTap: () => _selectTimezoneCountryString(countryName),
+                                    onTap: () => _selectTimezoneCountryString(
+                                      countryName,
+                                    ),
                                   );
                                 },
                               ),
                             ),
                         ],
                       ),
-                      
+
+                      const SizedBox(height: 16),
+
+                      // 📅 DATA URODZENIA
+                      TextFormField(
+                        controller: _dateOfBirthController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'Birth Date',
+                          hintText: 'Select your birth date',
+                          prefixIcon: const Icon(Icons.cake),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.calendar_today),
+                            onPressed: () => _selectDate(context),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                        ),
+                        onTap: () => _selectDate(context),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // 📱 PHONE (COUNTRY CODE + NUMBER IN ONE ROW)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 🌍 COUNTRY CODE
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextFormField(
+                                  controller: _countrySearchController,
+                                  focusNode: _countryFocusNode,
+                                  decoration: InputDecoration(
+                                    labelText: 'Country Code',
+                                    hintText: 'Search country or code',
+                                    prefixIcon: const Icon(Icons.public),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[50],
+                                  ),
+                                  readOnly: false,
+                                  onTap: () {
+                                    setState(() {
+                                      _showCountrySuggestions = true;
+                                    });
+                                  },
+                                  onFieldSubmitted: (value) {
+                                    if (_filteredCountries.isNotEmpty) {
+                                      _selectCountry(_filteredCountries.first);
+                                    }
+                                  },
+                                ),
+                                if (_showCountrySuggestions &&
+                                    _filteredCountries.isNotEmpty)
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 4),
+                                    constraints: const BoxConstraints(
+                                      maxHeight: 200,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: _filteredCountries.length,
+                                      itemBuilder: (context, index) {
+                                        final country =
+                                            _filteredCountries[index];
+                                        final isSelected =
+                                            _selectedCountryCode?.name ==
+                                            country.name;
+                                        return ListTile(
+                                          title: Text(
+                                            country.name,
+                                            style: TextStyle(
+                                              fontWeight: isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
+                                              color: isSelected
+                                                  ? const Color(0xFF860E66)
+                                                  : null,
+                                            ),
+                                          ),
+                                          subtitle: Text(country.code),
+                                          onTap: () => _selectCountry(country),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // 📱 PHONE NUMBER
+                          Expanded(
+                            flex: 3,
+                            child: TextFormField(
+                              controller: _phoneNumberOnlyController,
+                              decoration: InputDecoration(
+                                labelText: 'Phone Number',
+                                hintText: 'Enter number',
+                                prefixIcon: const Icon(Icons.phone),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                              ),
+                              keyboardType: TextInputType.phone,
+                              validator: (value) {
+                                if (value != null && value.isNotEmpty) {
+                                  if (value.length < 6) {
+                                    return 'Too short';
+                                  }
+                                  if (!RegExp(
+                                    r'^[0-9\s\-]+$',
+                                  ).hasMatch(value)) {
+                                    return 'Only numbers, spaces and hyphens';
+                                  }
+                                }
+                                return null;
+                              },
+                              onTap: () {
+                                setState(() {
+                                  _showCountrySuggestions = false;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+
                       const SizedBox(height: 32),
-                      
+
                       // 💾 PRZYCISK ZAPISU
                       SizedBox(
                         width: double.infinity,
@@ -1230,7 +1244,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 ),
-                
+
                 // 📋 INFORMACJE O KONCIE
                 _buildAccountInfo(user),
               ],
