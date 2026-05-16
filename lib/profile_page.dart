@@ -418,6 +418,15 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isAccountInfoExpanded = false;
   final Set<String> _selectedInjuryButtons = <String>{};
 
+  static const List<String> _movementConsiderationLabels = <String>[
+    'Knee injury/pain',
+    'Wrist injury/pain',
+    'Shoulder injury/pain',
+    'Lower-back injury/pain',
+    'Upper back/neck injury/pain',
+    'POTS / Blood pressure related dizziness',
+  ];
+
   Widget _buildInjuryToggleButton(String label) {
     final isSelected = _selectedInjuryButtons.contains(label);
     final onPressed = () {
@@ -456,6 +465,57 @@ class _ProfilePageState extends State<ProfilePage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: buttonChild,
+    );
+  }
+
+  Widget _buildMovementConsiderationsButtons() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 520;
+
+        if (isNarrow) {
+          return Column(
+            children: [
+              for (final label in _movementConsiderationLabels) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: _buildInjuryToggleButton(label),
+                ),
+                if (label != _movementConsiderationLabels.last)
+                  const SizedBox(height: 12),
+              ],
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            for (
+              var i = 0;
+              i < _movementConsiderationLabels.length;
+              i += 2
+            ) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildInjuryToggleButton(
+                      _movementConsiderationLabels[i],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildInjuryToggleButton(
+                      _movementConsiderationLabels[i + 1],
+                    ),
+                  ),
+                ],
+              ),
+              if (i + 2 < _movementConsiderationLabels.length)
+                const SizedBox(height: 12),
+            ],
+          ],
+        );
+      },
     );
   }
 
@@ -1313,51 +1373,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const SizedBox(height: 16),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildInjuryToggleButton('Knee injury/pain'),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildInjuryToggleButton(
-                              'Wrist injury/pain',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildInjuryToggleButton(
-                              'Shoulder injury/pain',
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildInjuryToggleButton(
-                              'Lower-back injury/pain',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildInjuryToggleButton(
-                              'Upper back/neck injury/pain',
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildInjuryToggleButton(
-                              'POTS / Blood pressure related dizziness',
-                            ),
-                          ),
-                        ],
-                      ),
+                      _buildMovementConsiderationsButtons(),
 
                       const SizedBox(height: 32),
 
