@@ -416,6 +416,48 @@ class _ProfilePageState extends State<ProfilePage> {
   final _formKey = GlobalKey<FormState>();
 
   bool _isAccountInfoExpanded = false;
+  final Set<String> _selectedInjuryButtons = <String>{};
+
+  Widget _buildInjuryToggleButton(String label) {
+    final isSelected = _selectedInjuryButtons.contains(label);
+    final onPressed = () {
+      setState(() {
+        if (isSelected) {
+          _selectedInjuryButtons.remove(label);
+        } else {
+          _selectedInjuryButtons.add(label);
+        }
+      });
+    };
+
+    final buttonChild = Text(
+      label,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+      textAlign: TextAlign.center,
+    );
+
+    if (isSelected) {
+      return ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: buttonChild,
+      );
+    }
+
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: const Color(0xFF860E66),
+        side: const BorderSide(color: Color(0xFF860E66)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: buttonChild,
+    );
+  }
 
   // 📝 Kontrolery pól tekstowych
   late TextEditingController _displayNameController;
@@ -507,6 +549,10 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_selectedCountry != null) {
       _countryTimezoneSearchController.text = _selectedCountry!;
     }
+
+    _selectedInjuryButtons
+      ..clear()
+      ..addAll(user?.movementConsiderations ?? const <String>[]);
   }
 
   /// 🔍 Filtrowanie krajów na podstawie wpisanej nazwy (dla telefonu)
@@ -741,6 +787,7 @@ class _ProfilePageState extends State<ProfilePage> {
       }
 
       // ✏️ Aktualizacja profilu (wraz z nowymi polami)
+      final movementConsiderations = _selectedInjuryButtons.toList()..sort();
       await authProvider.updateUserProfile(
         displayName: _displayNameController.text.isNotEmpty
             ? _displayNameController.text.trim()
@@ -749,6 +796,7 @@ class _ProfilePageState extends State<ProfilePage> {
         phoneNumber: fullPhoneNumber,
         country: _selectedCountryCode?.name, // kraj z CountryCode
         timezone: timezone, // nowe pole
+        movementConsiderations: movementConsiderations,
       );
 
       // 🎉 Powiadomienie o sukcesie
@@ -1250,6 +1298,67 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
 
+                      const SizedBox(height: 16),
+
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Movement Considerations',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF860E66),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildInjuryToggleButton('Knee injury/pain'),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildInjuryToggleButton(
+                              'Wrist injury/pain',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildInjuryToggleButton(
+                              'Shoulder injury/pain',
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildInjuryToggleButton(
+                              'Lower-back injury/pain',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildInjuryToggleButton(
+                              'Upper back/neck injury/pain',
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildInjuryToggleButton(
+                              'POTS / Blood pressure related dizziness',
+                            ),
+                          ),
+                        ],
+                      ),
+
                       const SizedBox(height: 32),
 
                       // 💾 PRZYCISK ZAPISU
@@ -1257,6 +1366,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _saveProfile,
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(48),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 20,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           child: const Text(
                             'Save Changes',
                             style: TextStyle(

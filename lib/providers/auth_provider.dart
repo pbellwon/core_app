@@ -4,34 +4,34 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 
 class AppAuthProvider with ChangeNotifier {
-
-    /// 💾 ZAPISZ WSZYSTKIE ODPOWIEDZI QUIZU DO FIRESTORE
-    Future<void> saveAllQuizAnswers(List<QuizAnswer> answers) async {
-      if (_currentUser == null || _firebaseUser == null) {
-        debugPrint('❌ Cannot save quiz answers: no user logged in');
-        throw Exception('User is not logged in');
-      }
-      try {
-        // Aktualizuj lokalnie
-        _currentUser = _currentUser!.copyWith(quizAnswers: answers);
-        notifyListeners();
-
-        // Przygotuj dane do zapisu
-        final updateData = {
-          'quizAnswers': answers.map((a) => a.toMap()).toList(),
-          'updatedAt': DateTime.now().toIso8601String(),
-        };
-
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(_currentUser!.uid)
-            .update(updateData);
-        debugPrint('✅ Quiz answers saved to Firestore');
-      } catch (e) {
-        debugPrint('❌ Error saving quiz answers: $e');
-        rethrow;
-      }
+  /// 💾 ZAPISZ WSZYSTKIE ODPOWIEDZI QUIZU DO FIRESTORE
+  Future<void> saveAllQuizAnswers(List<QuizAnswer> answers) async {
+    if (_currentUser == null || _firebaseUser == null) {
+      debugPrint('❌ Cannot save quiz answers: no user logged in');
+      throw Exception('User is not logged in');
     }
+    try {
+      // Aktualizuj lokalnie
+      _currentUser = _currentUser!.copyWith(quizAnswers: answers);
+      notifyListeners();
+
+      // Przygotuj dane do zapisu
+      final updateData = {
+        'quizAnswers': answers.map((a) => a.toMap()).toList(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      };
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update(updateData);
+      debugPrint('✅ Quiz answers saved to Firestore');
+    } catch (e) {
+      debugPrint('❌ Error saving quiz answers: $e');
+      rethrow;
+    }
+  }
+
   AppUser? _currentUser;
   User? _firebaseUser;
   bool _isLoading = false;
@@ -138,8 +138,9 @@ class AppAuthProvider with ChangeNotifier {
     String? photoURL,
     DateTime? dateOfBirth,
     String? phoneNumber,
-    String? country,        // nowe pole
-    String? timezone,       // nowe pole
+    String? country, // nowe pole
+    String? timezone, // nowe pole
+    List<String>? movementConsiderations,
   }) async {
     if (_currentUser == null || _firebaseUser == null) {
       debugPrint('❌ Cannot update profile: no user logged in');
@@ -167,12 +168,12 @@ class AppAuthProvider with ChangeNotifier {
       final updateData = <String, dynamic>{
         'updatedAt': DateTime.now().toIso8601String(),
       };
-      
+
       if (displayName != null) {
         updateData['displayName'] = displayName;
         debugPrint('📝 Setting displayName: \\$displayName');
       }
-      
+
       if (photoURL != null) {
         updateData['photoURL'] = photoURL;
         debugPrint('🖼️ Setting photoURL: \\$photoURL');
@@ -180,7 +181,9 @@ class AppAuthProvider with ChangeNotifier {
 
       if (dateOfBirth != null) {
         updateData['dateOfBirth'] = dateOfBirth.toIso8601String();
-        debugPrint('📅 Setting dateOfBirth: \\${dateOfBirth.toIso8601String()}');
+        debugPrint(
+          '📅 Setting dateOfBirth: \\${dateOfBirth.toIso8601String()}',
+        );
       }
 
       if (phoneNumber != null) {
@@ -198,6 +201,13 @@ class AppAuthProvider with ChangeNotifier {
         debugPrint('🕒 Setting timezone: \\$timezone');
       }
 
+      if (movementConsiderations != null) {
+        updateData['movementConsiderations'] = movementConsiderations;
+        debugPrint(
+          "🏃 Setting movementConsiderations: \\${movementConsiderations.join(', ')}",
+        );
+      }
+
       // 3️⃣ ZAPISZ DO FIRESTORE
       debugPrint('💾 Saving to Firestore...');
       await FirebaseFirestore.instance
@@ -212,13 +222,14 @@ class AppAuthProvider with ChangeNotifier {
         photoURL: photoURL ?? _currentUser!.photoURL,
         dateOfBirth: dateOfBirth ?? _currentUser!.dateOfBirth,
         phoneNumber: phoneNumber ?? _currentUser!.phoneNumber,
-        country: country ?? _currentUser!.country,          // nowe
-        timezone: timezone ?? _currentUser!.timezone,       // nowe
+        country: country ?? _currentUser!.country, // nowe
+        timezone: timezone ?? _currentUser!.timezone, // nowe
+        movementConsiderations:
+            movementConsiderations ?? _currentUser!.movementConsiderations,
         updatedAt: DateTime.now(),
       );
 
       debugPrint('✅ Local user state updated');
-      
     } catch (e) {
       debugPrint('❌ Error updating profile: \\$e');
       rethrow;
@@ -282,7 +293,7 @@ class AppAuthProvider with ChangeNotifier {
 
     debugPrint('📝 Accepting terms for: \\${_currentUser!.email}');
     final now = DateTime.now();
-    
+
     try {
       await FirebaseFirestore.instance
           .collection('users')
@@ -292,9 +303,7 @@ class AppAuthProvider with ChangeNotifier {
             'acceptedTermsAt': now.toIso8601String(),
           });
 
-      _currentUser = _currentUser!.copyWith(
-        updatedAt: now,
-      );
+      _currentUser = _currentUser!.copyWith(updatedAt: now);
 
       notifyListeners();
       debugPrint('✅ Terms accepted');
@@ -311,25 +320,22 @@ class AppAuthProvider with ChangeNotifier {
     }
 
     debugPrint('🗑️ Deleting account: \\${_firebaseUser!.email}');
-    
+
     try {
       final userId = _firebaseUser!.uid;
-      
+
       // 1. USUŃ Z FIRESTORE
       debugPrint('🗑️ Deleting from Firestore...');
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .delete();
-      
+      await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+
       // 2. USUŃ Z FIREBASE AUTHENTICATION
       debugPrint('🗑️ Deleting from Firebase Auth...');
       await _firebaseUser!.delete();
-      
+
       // 3. WYCZYŚĆ LOKALNY STAN
       _currentUser = null;
       _firebaseUser = null;
-      
+
       notifyListeners();
       debugPrint('✅ Account deleted successfully');
     } catch (e) {
@@ -346,7 +352,7 @@ class AppAuthProvider with ChangeNotifier {
     }
 
     debugPrint('🔄 Refreshing user data for: \\${_firebaseUser!.email}');
-    
+
     try {
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
@@ -365,7 +371,7 @@ class AppAuthProvider with ChangeNotifier {
           role: UserRole.user,
         );
       }
-      
+
       notifyListeners();
     } catch (e) {
       debugPrint('❌ Error refreshing user data: \\$e');
@@ -410,7 +416,6 @@ class AppAuthProvider with ChangeNotifier {
     }
     debugPrint('=======================');
   }
-
 
   // (usunięto zduplikowane metody i gettery)
 }

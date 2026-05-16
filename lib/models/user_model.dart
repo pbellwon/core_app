@@ -5,9 +5,9 @@ import 'package:flutter/foundation.dart';
 
 /// 🏷️ TYP wyliczeniowy dla ról użytkownika (do rozbudowy)
 enum UserRole {
-  user,     // zwykły użytkowni
-  admin,    // administrator
-  moderator // moderator
+  user, // zwykły użytkowni
+  admin, // administrator
+  moderator, // moderator
 }
 
 /// 📊 MODEL ODPOWIEDZI QUIZU
@@ -47,21 +47,23 @@ class QuizAnswer {
 
 class AppUser {
   // 🔐 WYMAGANE POLA (nie mogą być null)
-  final String uid;          // Unikalny ID z Firebase Auth
-  final String email;        // Email użytkownika
-  final DateTime createdAt;  // Data utworzenia konta
+  final String uid; // Unikalny ID z Firebase Auth
+  final String email; // Email użytkownika
+  final DateTime createdAt; // Data utworzenia konta
 
   // 📝 OPCJONALNE POLA (mogą być null)
-  final String? displayName;   // Wyświetlana nazwa użytkownika
+  final String? displayName; // Wyświetlana nazwa użytkownika
   final DateTime? dateOfBirth; // Data urodzenia
-  final String? country;       // Kraj użytkownika (do rozbudowy)
-  final String? timezone;      // Strefa czasowa użytkownika (do rozbudowy)
-  final String? phoneNumber;   // Numer telefonu
-  final String? photoURL;      // URL do zdjęcia profilowego
-  final DateTime? updatedAt;   // Data ostatniej aktualizacji
-  final UserRole role;         // Rola użytkownika
+  final String? country; // Kraj użytkownika (do rozbudowy)
+  final String? timezone; // Strefa czasowa użytkownika (do rozbudowy)
+  final String? phoneNumber; // Numer telefonu
+  final String? photoURL; // URL do zdjęcia profilowego
+  final DateTime? updatedAt; // Data ostatniej aktualizacji
+  final UserRole role; // Rola użytkownika
   final List<QuizAnswer>? quizAnswers; // Odpowiedzi na quiz profilowy
   final List<String>? favouriteVideos; // Lista ulubionych videoId
+  final List<String>?
+  movementConsiderations; // Wybór z sekcji "Movement Considerations"
 
   /// 🏗️ KONSTRUKTOR
   AppUser({
@@ -78,6 +80,7 @@ class AppUser {
     this.role = UserRole.user, // Domyślnie zwykły użytkownik
     this.quizAnswers,
     this.favouriteVideos,
+    this.movementConsiderations,
   });
 
   /// 🔄 KONWERSJA NA MAP (dla Firestore)
@@ -89,7 +92,6 @@ class AppUser {
       'email': email,
       'createdAt': createdAt.toIso8601String(),
       'role': role.name, // Zapisujemy nazwę enuma jako string
-
       // 📝 Opcjonalne pola (zapisujemy tylko jeśli nie są null)
       if (displayName != null) 'displayName': displayName,
       if (dateOfBirth != null) 'dateOfBirth': dateOfBirth!.toIso8601String(),
@@ -102,6 +104,8 @@ class AppUser {
         'quizAnswers': quizAnswers!.map((answer) => answer.toMap()).toList(),
       if (favouriteVideos != null && favouriteVideos!.isNotEmpty)
         'favouriteVideos': favouriteVideos,
+      if (movementConsiderations != null)
+        'movementConsiderations': movementConsiderations,
     };
   }
 
@@ -109,7 +113,7 @@ class AppUser {
   /// Tworzy obiekt AppUser z danych pobranych z Firestore
   factory AppUser.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
+
     // 🔍 Parsowanie dat (ważne: mogą być null lub w złym formacie)
     DateTime? parseDate(String? dateString) {
       if (dateString == null || dateString.isEmpty) return null;
@@ -124,7 +128,7 @@ class AppUser {
         return null;
       }
     }
-    
+
     // 🔍 Parsowanie roli użytkownika
     UserRole parseRole(String? roleString) {
       if (roleString == null) return UserRole.user;
@@ -141,7 +145,7 @@ class AppUser {
     // 🔍 Parsowanie odpowiedzi quizu
     List<QuizAnswer>? parseQuizAnswers(List<dynamic>? answersList) {
       if (answersList == null || answersList.isEmpty) return null;
-      
+
       try {
         return answersList.map((answerData) {
           if (answerData is Map<String, dynamic>) {
@@ -158,21 +162,26 @@ class AppUser {
         return null;
       }
     }
-    
+
     return AppUser(
       uid: data['uid'] ?? doc.id, // Używamy doc.id jeśli uid brak
       email: data['email'] ?? '',
       displayName: data['displayName'],
       dateOfBirth: parseDate(data['dateOfBirth']),
-      country: data['country'],               // nowe pole
-      timezone: data['timezone'],             // nowe pole
+      country: data['country'], // nowe pole
+      timezone: data['timezone'], // nowe pole
       phoneNumber: data['phoneNumber'],
       photoURL: data['photoURL'],
       createdAt: parseDate(data['createdAt']) ?? DateTime.now(),
       updatedAt: parseDate(data['updatedAt']),
       role: parseRole(data['role']),
       quizAnswers: parseQuizAnswers(data['quizAnswers']),
-      favouriteVideos: (data['favouriteVideos'] as List?)?.map((e) => e.toString()).toList(),
+      favouriteVideos: (data['favouriteVideos'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
+      movementConsiderations: (data['movementConsiderations'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
     );
   }
 
@@ -180,12 +189,13 @@ class AppUser {
   /// Zwraca odpowiedź na konkretne pytanie lub null jeśli nie odpowiedziano
   String? getAnswerForQuestion(int questionId) {
     if (quizAnswers == null || quizAnswers!.isEmpty) return null;
-    
+
     final answer = quizAnswers!.firstWhere(
       (answer) => answer.questionId == questionId,
-      orElse: () => QuizAnswer(questionId: 0, answer: '', answeredAt: DateTime.now()),
+      orElse: () =>
+          QuizAnswer(questionId: 0, answer: '', answeredAt: DateTime.now()),
     );
-    
+
     return answer.questionId == questionId ? answer.answer : null;
   }
 
@@ -193,15 +203,15 @@ class AppUser {
   /// Zwraca nowy obiekt użytkownika z zaktualizowaną odpowiedzią
   AppUser withQuizAnswer(QuizAnswer newAnswer) {
     final currentAnswers = quizAnswers ?? [];
-    
+
     // Usuń starą odpowiedź na to pytanie jeśli istnieje
-    final filteredAnswers = currentAnswers.where(
-      (answer) => answer.questionId != newAnswer.questionId
-    ).toList();
-    
+    final filteredAnswers = currentAnswers
+        .where((answer) => answer.questionId != newAnswer.questionId)
+        .toList();
+
     // Dodaj nową odpowiedź
     final updatedAnswers = [...filteredAnswers, newAnswer];
-    
+
     return copyWith(quizAnswers: updatedAnswers);
   }
 
@@ -209,16 +219,16 @@ class AppUser {
   /// Automatycznie oblicza wiek na podstawie dateOfBirth
   int? get age {
     if (dateOfBirth == null) return null;
-    
+
     final now = DateTime.now();
     int calculatedAge = now.year - dateOfBirth!.year;
-    
+
     // Korekta jeśli urodziny w tym roku jeszcze nie były
-    if (now.month < dateOfBirth!.month || 
+    if (now.month < dateOfBirth!.month ||
         (now.month == dateOfBirth!.month && now.day < dateOfBirth!.day)) {
       calculatedAge--;
     }
-    
+
     return calculatedAge;
   }
 
@@ -244,7 +254,7 @@ class AppUser {
 
   /// 🔍 CZY JEST ADMINEM (getter)
   bool get isAdmin => role == UserRole.admin;
-  
+
   /// 🔍 CZY JEST MODERATOREM (getter)
   bool get isModerator => role == UserRole.moderator;
 
@@ -269,6 +279,7 @@ class AppUser {
     UserRole? role,
     List<QuizAnswer>? quizAnswers,
     List<String>? favouriteVideos,
+    List<String>? movementConsiderations,
   }) {
     return AppUser(
       uid: uid ?? this.uid,
@@ -284,6 +295,8 @@ class AppUser {
       role: role ?? this.role,
       quizAnswers: quizAnswers ?? this.quizAnswers,
       favouriteVideos: favouriteVideos ?? this.favouriteVideos,
+      movementConsiderations:
+          movementConsiderations ?? this.movementConsiderations,
     );
   }
 }
