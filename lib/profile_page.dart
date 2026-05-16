@@ -415,6 +415,8 @@ class _ProfilePageState extends State<ProfilePage> {
   // 🗝️ Klucz do formularza
   final _formKey = GlobalKey<FormState>();
 
+  bool _isAccountInfoExpanded = false;
+
   // 📝 Kontrolery pól tekstowych
   late TextEditingController _displayNameController;
   late TextEditingController _dateOfBirthController;
@@ -829,29 +831,52 @@ class _ProfilePageState extends State<ProfilePage> {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Account Information',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF860E66),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isAccountInfoExpanded = !_isAccountInfoExpanded;
+                });
+              },
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Account Information',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF860E66),
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _isAccountInfoExpanded
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                    color: const Color(0xFF860E66),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            _buildInfoRow('User ID', user.uid),
-            _buildInfoRow('Email', user.email),
-            _buildInfoRow('Member since', _formatDisplayDate(user.createdAt)),
-            if (user.updatedAt != null)
-              _buildInfoRow('Last updated', _formatDateTime(user.updatedAt!)),
-            _buildInfoRow('Role', user.role.name.toUpperCase()),
-            if (user.country != null) _buildInfoRow('Country', user.country!),
-            if (user.timezone != null)
-              _buildInfoRow('Timezone', user.timezone!),
+            if (_isAccountInfoExpanded) ...[
+              const SizedBox(height: 12),
+              _buildInfoRow('User ID', user.uid),
+              _buildInfoRow('Email', user.email),
+              _buildInfoRow('Member since', _formatDisplayDate(user.createdAt)),
+              if (user.updatedAt != null)
+                _buildInfoRow('Last updated', _formatDateTime(user.updatedAt!)),
+              _buildInfoRow('Role', user.role.name.toUpperCase()),
+              if (user.country != null) _buildInfoRow('Country', user.country!),
+              if (user.timezone != null)
+                _buildInfoRow('Timezone', user.timezone!),
+            ],
           ],
         ),
       ),
@@ -1079,8 +1104,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         controller: _dateOfBirthController,
                         readOnly: true,
                         decoration: InputDecoration(
-                          labelText: 'Birth Date',
-                          hintText: 'Select your birth date',
+                          labelText: 'Birth Year',
+                          hintText: 'Select your birth year',
                           prefixIcon: const Icon(Icons.cake),
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.calendar_today),
