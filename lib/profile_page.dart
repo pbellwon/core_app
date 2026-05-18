@@ -429,7 +429,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildInjuryToggleButton(String label) {
     final isSelected = _selectedInjuryButtons.contains(label);
-    final onPressed = () {
+    void onPressed() {
       setState(() {
         if (isSelected) {
           _selectedInjuryButtons.remove(label);
@@ -437,7 +437,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _selectedInjuryButtons.add(label);
         }
       });
-    };
+    }
 
     final buttonChild = Text(
       label,
@@ -468,7 +468,41 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildMovementConsiderationsButtons() {
+  Widget _buildDashedDivider() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final dashCount = (constraints.maxWidth / 10).floor().clamp(1, 200);
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(
+            dashCount,
+            (_) => Container(width: 6, height: 1, color: Colors.grey.shade400),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMovementConsiderationsLabel(String text) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey.shade400,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMovementConsiderationsGroup(List<String> labels) {
+    if (labels.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final isNarrow = constraints.maxWidth < 520;
@@ -476,13 +510,12 @@ class _ProfilePageState extends State<ProfilePage> {
         if (isNarrow) {
           return Column(
             children: [
-              for (final label in _movementConsiderationLabels) ...[
+              for (final label in labels) ...[
                 SizedBox(
                   width: double.infinity,
                   child: _buildInjuryToggleButton(label),
                 ),
-                if (label != _movementConsiderationLabels.last)
-                  const SizedBox(height: 12),
+                if (label != labels.last) const SizedBox(height: 12),
               ],
             ],
           );
@@ -490,32 +523,52 @@ class _ProfilePageState extends State<ProfilePage> {
 
         return Column(
           children: [
-            for (
-              var i = 0;
-              i < _movementConsiderationLabels.length;
-              i += 2
-            ) ...[
+            for (var i = 0; i < labels.length; i += 2) ...[
               Row(
                 children: [
-                  Expanded(
-                    child: _buildInjuryToggleButton(
-                      _movementConsiderationLabels[i],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildInjuryToggleButton(
-                      _movementConsiderationLabels[i + 1],
-                    ),
-                  ),
+                  Expanded(child: _buildInjuryToggleButton(labels[i])),
+                  if (i + 1 < labels.length) ...[
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildInjuryToggleButton(labels[i + 1])),
+                  ] else ...[
+                    const SizedBox(width: 12),
+                    const Expanded(child: SizedBox.shrink()),
+                  ],
                 ],
               ),
-              if (i + 2 < _movementConsiderationLabels.length)
-                const SizedBox(height: 12),
+              if (i + 2 < labels.length) const SizedBox(height: 12),
             ],
           ],
         );
       },
+    );
+  }
+
+  Widget _buildMovementConsiderationsButtons() {
+    final unselectedLabels = _movementConsiderationLabels
+        .where((label) => !_selectedInjuryButtons.contains(label))
+        .toList();
+    final selectedLabels = _movementConsiderationLabels
+        .where((label) => _selectedInjuryButtons.contains(label))
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (unselectedLabels.isNotEmpty) ...[
+          _buildMovementConsiderationsLabel('Unselected'),
+          const SizedBox(height: 8),
+        ],
+        _buildMovementConsiderationsGroup(unselectedLabels),
+        const SizedBox(height: 20),
+        _buildDashedDivider(),
+        const SizedBox(height: 20),
+        if (selectedLabels.isNotEmpty) ...[
+          _buildMovementConsiderationsLabel('Selected'),
+          const SizedBox(height: 8),
+        ],
+        _buildMovementConsiderationsGroup(selectedLabels),
+      ],
     );
   }
 
