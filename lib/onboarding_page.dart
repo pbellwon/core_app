@@ -142,30 +142,30 @@ class OnboardingPageState extends State<OnboardingPage> {
   /// 📄 STRONA 1: WELCOME
   Widget _buildPage1() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.celebration, size: 80, color: Color(0xFF860E66)),
-          const SizedBox(height: 32),
-          const Text(
-            "Hey I'm glad you are here let's start",
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF860E66),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.celebration, size: 60, color: Color(0xFF860E66)),
+            const SizedBox(height: 32),
+            const Text(
+              """Hey! I’m really glad you’ve landed here. \n
+              
+  This space is designed to support you in the moment — whether
+  you’re feeling anxious, overwhelmed, flat, or just not yourself.
+              
+  Before we begin, I’d love to get to know you a little better so the
+  support you receive feels right for you.
+              
+  It only takes a few minutes and you can skip any questions you like. \n
+  Ready to begin?""",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'We will help you find the perfect workouts',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
