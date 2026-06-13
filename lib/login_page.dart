@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'onboarding_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -159,6 +160,7 @@ class LoginPageState extends State<LoginPage> {
               .set({
             'email': email,
             'accepted_terms_at': DateTime.now().toIso8601String(),
+            'onboardingCompleted': false,
           }, SetOptions(merge: true));
         }
 
@@ -169,6 +171,18 @@ class LoginPageState extends State<LoginPage> {
             content: Text('Account created successfully!'),
           ),
         );
+
+        // 🎯 POKAŻ ONBOARDING DIALOG
+        if (mounted) {
+          await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const OnboardingPage(),
+          );
+        }
+
+        // Po ukończeniu onboarding'u idź do welcome page
+        if (!mounted) return;
         Navigator.of(context).pushReplacementNamed('/welcome');
       }
     } on FirebaseAuthException catch (e) {

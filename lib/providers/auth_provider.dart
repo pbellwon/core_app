@@ -399,23 +399,55 @@ class AppAuthProvider with ChangeNotifier {
   /// 🐛 DEBUG: POKAŻ INFO O UŻYTKOWNIKU
   void debugUserInfo() {
     debugPrint('=== DEBUG USER INFO ===');
-    debugPrint('Logged in: \\$isLoggedIn');
-    debugPrint('Loading: \\$_isLoading');
+    debugPrint('Logged in: $isLoggedIn');
+    debugPrint('Loading: $_isLoading');
     if (_currentUser != null) {
-      debugPrint('UID: \\${_currentUser!.uid}');
-      debugPrint('Email: \\${_currentUser!.email}');
-      debugPrint('Display Name: \\${_currentUser!.displayName ?? "Not set"}');
-      debugPrint('Phone: \\${_currentUser!.phoneNumber ?? "Not set"}');
-      debugPrint('Date of Birth: \\${_currentUser!.dateOfBirth ?? "Not set"}');
-      debugPrint('Country: \\${_currentUser!.country ?? "Not set"}');
-      debugPrint('Timezone: \\${_currentUser!.timezone ?? "Not set"}');
-      debugPrint('Role: \\${_currentUser!.role.name}');
-      debugPrint('Quiz Answers: \\${_currentUser!.quizAnswers?.length ?? 0}');
+      debugPrint('UID: ${_currentUser!.uid}');
+      debugPrint('Email: ${_currentUser!.email}');
+      debugPrint('Display Name: ${_currentUser!.displayName ?? "Not set"}');
+      debugPrint('Phone: ${_currentUser!.phoneNumber ?? "Not set"}');
+      debugPrint('Date of Birth: ${_currentUser!.dateOfBirth ?? "Not set"}');
+      debugPrint('Country: ${_currentUser!.country ?? "Not set"}');
+      debugPrint('Timezone: ${_currentUser!.timezone ?? "Not set"}');
+      debugPrint('Role: ${_currentUser!.role.name}');
+      debugPrint('Quiz Answers: ${_currentUser!.quizAnswers?.length ?? 0}');
+      debugPrint('Onboarding Completed: ${_currentUser!.onboardingCompleted}');
     } else {
       debugPrint('No current user');
     }
     debugPrint('=======================');
   }
 
+  /// ✅ MARK ONBOARDING AS COMPLETED
+  Future<void> markOnboardingComplete() async {
+    if (_currentUser == null || _firebaseUser == null) {
+      debugPrint('❌ Cannot mark onboarding complete: no user logged in');
+      throw Exception('User is not logged in');
+    }
+
+    try {
+      debugPrint('✅ Marking onboarding as complete for: ${_currentUser!.email}');
+
+      // Update in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update({
+        'onboardingCompleted': true,
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+
+      // Update locally
+      _currentUser = _currentUser!.copyWith(onboardingCompleted: true);
+      notifyListeners();
+
+      debugPrint('✅ Onboarding marked as complete in Firestore');
+    } catch (e) {
+      debugPrint('❌ Error marking onboarding complete: $e');
+      rethrow;
+    }
+  }
+
   // (usunięto zduplikowane metody i gettery)
 }
+

@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/menu_provider.dart';
+import 'providers/auth_provider.dart';
+import 'onboarding_page.dart';
 
 class WelcomePage extends StatefulWidget {
   final bool justRegistered;
@@ -24,6 +26,19 @@ class _WelcomePageState extends State<WelcomePage> {
       try {
         final menuProvider = Provider.of<MenuProvider>(context, listen: false);
         menuProvider.setCurrentPage('welcome');
+
+        // 🎯 CHECK: Jeśli nowy user nie skończył onboarding'u, pokaż dialog
+        final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
+        if (authProvider.currentUser != null && 
+            !authProvider.currentUser!.onboardingCompleted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const OnboardingPage(),
+            );
+          });
+        }
       } catch (e) {
         debugPrint('Error setting current page: $e');
       }

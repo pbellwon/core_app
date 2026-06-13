@@ -64,6 +64,7 @@ class AppUser {
   final List<String>? favouriteVideos; // Lista ulubionych videoId
   final List<String>?
   movementConsiderations; // Wybór z sekcji "Movement Considerations"
+  final bool onboardingCompleted; // Czy użytkownik ukończył onboarding
 
   /// 🏗️ KONSTRUKTOR
   AppUser({
@@ -81,6 +82,7 @@ class AppUser {
     this.quizAnswers,
     this.favouriteVideos,
     this.movementConsiderations,
+    this.onboardingCompleted = false, // Domyślnie nowy user
   });
 
   /// 🔄 KONWERSJA NA MAP (dla Firestore)
@@ -92,6 +94,7 @@ class AppUser {
       'email': email,
       'createdAt': createdAt.toIso8601String(),
       'role': role.name, // Zapisujemy nazwę enuma jako string
+      'onboardingCompleted': onboardingCompleted, // Nowe pole
       // 📝 Opcjonalne pola (zapisujemy tylko jeśli nie są null)
       if (displayName != null) 'displayName': displayName,
       if (dateOfBirth != null) 'dateOfBirth': dateOfBirth!.toIso8601String(),
@@ -182,6 +185,7 @@ class AppUser {
       movementConsiderations: (data['movementConsiderations'] as List?)
           ?.map((e) => e.toString())
           .toList(),
+      onboardingCompleted: data['onboardingCompleted'] ?? false, // Nowe pole
     );
   }
 
@@ -280,6 +284,7 @@ class AppUser {
     List<QuizAnswer>? quizAnswers,
     List<String>? favouriteVideos,
     List<String>? movementConsiderations,
+    bool? onboardingCompleted,
   }) {
     return AppUser(
       uid: uid ?? this.uid,
@@ -297,6 +302,7 @@ class AppUser {
       favouriteVideos: favouriteVideos ?? this.favouriteVideos,
       movementConsiderations:
           movementConsiderations ?? this.movementConsiderations,
+      onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
     );
   }
 }
