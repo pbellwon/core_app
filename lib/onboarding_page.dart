@@ -333,26 +333,31 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 2: DISPLAY NAME
   Widget _buildPage2() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'What\'s your display name?',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF860E66),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'What\'s your display name?',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF860E66),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'This is how others will see you',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 24),
-          TextField(
-            controller: _displayNameController,
+            const SizedBox(height: 8),
+            const Text(
+              'This is how others will see you',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: _displayNameController,
             decoration: InputDecoration(
               hintText: 'Enter your display name',
               border: OutlineInputBorder(
@@ -363,34 +368,40 @@ class OnboardingPageState extends State<OnboardingPage> {
                 vertical: 12,
               ),
             ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /// 📄 STRONA 3: BIRTH DATE
   Widget _buildPage3() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'What\'s your birth date?',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF860E66),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'What\'s your birth date?',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF860E66),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'We use this to personalize your experience',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 24),
-          TextField(
-            controller: _birthDateController,
+            const SizedBox(height: 8),
+            const Text(
+              'We use this to personalize your experience',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: _birthDateController,
             readOnly: true,
             onTap: () async {
               final picked = await showDatePicker(
@@ -418,34 +429,40 @@ class OnboardingPageState extends State<OnboardingPage> {
                 vertical: 12,
               ),
             ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /// 📄 STRONA 4: TIMEZONE
   Widget _buildPage4() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'What\'s your timezone?',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF860E66),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'What\'s your timezone?',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF860E66),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'So we can time reminders properly',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 24),
-          TextField(
-            controller: _countryTimezoneSearchController,
+            const SizedBox(height: 8),
+            const Text(
+              'So we can time reminders properly',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: _countryTimezoneSearchController,
             focusNode: _countryTimezoneFocusNode,
             decoration: InputDecoration(
               hintText: 'Search timezone',
@@ -470,9 +487,9 @@ class OnboardingPageState extends State<OnboardingPage> {
                 _selectTimezoneCountry(_filteredTimezoneCountries.first);
               }
             },
-          ),
-          if (_showTimezoneSuggestions && _filteredTimezoneCountries.isNotEmpty)
-            Container(
+            ),
+            if (_showTimezoneSuggestions && _filteredTimezoneCountries.isNotEmpty)
+              Container(
               margin: const EdgeInsets.only(top: 8),
               constraints: const BoxConstraints(maxHeight: 250),
               decoration: BoxDecoration(
@@ -510,7 +527,8 @@ class OnboardingPageState extends State<OnboardingPage> {
                 },
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -548,163 +566,190 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 5: MOVEMENT CONSIDERATIONS
   Widget _buildPage5() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Movement Considerations',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF860E66),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Movement Considerations',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF860E66),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Select any that apply to you',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
-          _buildButtonGroup(
-            _movementConsiderationLabels,
-            _selectedMovementConsiderations,
-            true,
-          ),
-        ],
+            const SizedBox(height: 8),
+            const Text(
+              'Select any that apply to you',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            _buildButtonGroup(
+              _movementConsiderationLabels,
+              _selectedMovementConsiderations,
+              true,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /// 📄 STRONA 6: EXERCISE TYPES
   Widget _buildPage6() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'What types of exercises do you enjoy?',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF860E66),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'What types of exercises do you enjoy?',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF860E66),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Select all that interest you',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
-          _buildButtonGroup(
-            _exerciseTypeLabels,
-            _selectedExerciseTypes,
-            true,
-          ),
-        ],
+            const SizedBox(height: 8),
+            const Text(
+              'Select all that interest you',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            _buildButtonGroup(
+              _exerciseTypeLabels,
+              _selectedExerciseTypes,
+              true,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /// 📄 STRONA 7: FITNESS GOALS
   Widget _buildPage7() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'What are your fitness goals?',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF860E66),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'What are your fitness goals?',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF860E66),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Select all that apply',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
-          _buildButtonGroup(
-            _goalsLabels,
-            _selectedGoals,
-            true,
-          ),
-        ],
+            const SizedBox(height: 8),
+            const Text(
+              'Select all that apply',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            _buildButtonGroup(
+              _goalsLabels,
+              _selectedGoals,
+              true,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /// 📄 STRONA 8: EXPERIENCE LEVEL
   Widget _buildPage8() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'What is your fitness level?',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF860E66),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'What is your fitness level?',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF860E66),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Select one that best describes you',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
-          Column(
-            children: [
-              for (final level in _experienceLevelLabels) ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: _buildToggleButton(
-                    level,
-                    _selectedExperienceLevel == level,
-                    () {
-                      setState(() {
-                        _selectedExperienceLevel = level;
-                      });
-                    },
+            const SizedBox(height: 8),
+            const Text(
+              'Select one that best describes you',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            Column(
+              children: [
+                for (final level in _experienceLevelLabels) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: _buildToggleButton(
+                      level,
+                      _selectedExperienceLevel == level,
+                      () {
+                        setState(() {
+                          _selectedExperienceLevel = level;
+                        });
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-              ],
+                  const SizedBox(height: 12),
+                ],
             ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /// 📄 STRONA 9: SUMMARY / COMPLETION
   Widget _buildPage9() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Center(
-            child: Icon(Icons.check_circle, size: 80, color: Colors.green),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'All set!',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF860E66),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle, size: 80, color: Colors.green),
+            const SizedBox(height: 24),
+            const Text(
+              'All set!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF860E66),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            "You're ready to start your fitness journey. Click 'Done' to continue.",
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-          const SizedBox(height: 24),
-          Card(
+            const SizedBox(height: 16),
+            const Text(
+              "You're ready to start your fitness journey. Click 'Done' to continue.",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 24),
+            Card(
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
@@ -757,8 +802,9 @@ class OnboardingPageState extends State<OnboardingPage> {
                 ],
               ),
             ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
