@@ -332,7 +332,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   }
 
   /// 📄 STRONA 2: DISPLAY NAME
-  Widget _buildPageNewOne() {
+  Widget _buildPage2() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -370,7 +370,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   }
 
   /// 📄 STRONA 3: BIRTH DATE
-  Widget _buildPageNewTwo() {
+  Widget _buildPage3() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -425,7 +425,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   }
 
   /// 📄 STRONA 4: TIMEZONE
-  Widget _buildPageNewThree() {
+  Widget _buildPage4() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -547,7 +547,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   }
 
   /// 📄 STRONA 5: MOVEMENT CONSIDERATIONS
-  Widget _buildPage2() {
+  Widget _buildPage5() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -577,7 +577,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   }
 
   /// 📄 STRONA 6: EXERCISE TYPES
-  Widget _buildPage3() {
+  Widget _buildPage6() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -607,7 +607,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   }
 
   /// 📄 STRONA 7: FITNESS GOALS
-  Widget _buildPage4() {
+  Widget _buildPage7() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -637,7 +637,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   }
 
   /// 📄 STRONA 8: EXPERIENCE LEVEL
-  Widget _buildPage5() {
+  Widget _buildPage8() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -681,7 +681,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   }
 
   /// 📄 STRONA 9: SUMMARY / COMPLETION
-  Widget _buildPage8() {
+  Widget _buildPage9() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -785,21 +785,21 @@ class OnboardingPageState extends State<OnboardingPage> {
       case 0:
         return _buildPage1(); // STRONA 1: Welcome
       case 1:
-        return _buildPageNewOne(); // STRONA 2: Display Name
+        return _buildPage2(); // STRONA 2: Display Name
       case 2:
-        return _buildPageNewTwo(); // STRONA 3: Birth Date
+        return _buildPage3(); // STRONA 3: Birth Date
       case 3:
-        return _buildPageNewThree(); // STRONA 4: Timezone
+        return _buildPage4(); // STRONA 4: Timezone
       case 4:
-        return _buildPage2(); // STRONA 5: Movement Considerations
+        return _buildPage5(); // STRONA 5: Movement Considerations
       case 5:
-        return _buildPage3(); // STRONA 6: Exercise Types
+        return _buildPage6(); // STRONA 6: Exercise Types
       case 6:
-        return _buildPage4(); // STRONA 7: Fitness Goals
+        return _buildPage7(); // STRONA 7: Fitness Goals
       case 7:
-        return _buildPage5(); // STRONA 8: Experience Level
+        return _buildPage8(); // STRONA 8: Experience Level
       case 8:
-        return _buildPage8(); // STRONA 9: Summary / Completion
+        return _buildPage9(); // STRONA 9: Summary / Completion
       default:
         return _buildPage1();
     }
