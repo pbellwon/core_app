@@ -18,6 +18,8 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
+  late bool _onboardingDialogShown = false;
+
   @override
   void initState() {
     super.initState();
@@ -27,17 +29,22 @@ class _WelcomePageState extends State<WelcomePage> {
         final menuProvider = Provider.of<MenuProvider>(context, listen: false);
         menuProvider.setCurrentPage('welcome');
 
-        // 🎯 CHECK: Jeśli nowy user nie skończył onboarding'u, pokaż dialog
-        final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
-        if (authProvider.currentUser != null && 
-            !authProvider.currentUser!.onboardingCompleted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => const OnboardingPage(),
-            );
-          });
+        // 🎯 CHECK: Jeśli nowy user nie skończył onboarding'u, pokaż dialog (tylko raz)
+        if (!_onboardingDialogShown) {
+          final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
+          if (authProvider.currentUser != null && 
+              !authProvider.currentUser!.onboardingCompleted) {
+            _onboardingDialogShown = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const OnboardingPage(),
+                );
+              }
+            });
+          }
         }
       } catch (e) {
         debugPrint('Error setting current page: $e');

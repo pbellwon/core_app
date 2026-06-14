@@ -658,9 +658,26 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     // 🌍 Inicjalizacja wybranego kraju (dla strefy czasowej)
-    _selectedCountry = user?.country;
-    if (_selectedCountry != null) {
+    // Czytaj z country field (zawiera timezone country name) lub z timezone
+    if (user != null && 
+        user.country != null && 
+        user.country!.isNotEmpty && 
+        countryTimezoneMap.containsKey(user.country)) {
+      // Jeśli country field zawiera poprawną nazwę kraju z timezoneMap
+      _selectedCountry = user.country;
       _countryTimezoneSearchController.text = _selectedCountry!;
+    } else if (user?.timezone != null) {
+      // Fallback: Czytaj z timezone field i znajdź odpowiadającą mu nazwę kraju
+      _selectedCountry = countryTimezoneMap.entries
+          .firstWhere(
+            (entry) => entry.value == user!.timezone,
+            orElse: () => const MapEntry('', ''),
+          )
+          .key;
+      
+      if (_selectedCountry != null && _selectedCountry!.isNotEmpty) {
+        _countryTimezoneSearchController.text = _selectedCountry!;
+      }
     }
 
     _selectedInjuryButtons

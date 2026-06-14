@@ -847,7 +847,7 @@ class OnboardingPageState extends State<OnboardingPage> {
       case 8:
         return _buildPage9(); // STRONA 9: Summary / Completion
       default:
-        return _buildPage1();
+        return _buildPage1(); // Fallback do strony 1
     }
   }
 
@@ -858,6 +858,10 @@ class OnboardingPageState extends State<OnboardingPage> {
     try {
       final authProvider = context.read<AppAuthProvider>();
 
+      // Debug: Sprawdź co się zapisuje
+      debugPrint('🔍 DEBUG - _selectedCountry: $_selectedCountry');
+      debugPrint('🔍 DEBUG - timezone value: ${_selectedCountry != null ? countryTimezoneMap[_selectedCountry] : 'null'}');
+
       // Zapisz wszystkie dane profilowe
       await authProvider.updateUserProfile(
         displayName: _displayNameController.text.isNotEmpty
@@ -867,33 +871,35 @@ class OnboardingPageState extends State<OnboardingPage> {
         timezone: _selectedCountry != null
             ? countryTimezoneMap[_selectedCountry]
             : null,
+        country: _selectedCountry, // Zapisz też nazwę kraju dla timezone
         movementConsiderations: _selectedMovementConsiderations.toList()..sort(),
       );
 
       // Oznacz onboarding jako ukończony
       await authProvider.markOnboardingComplete();
 
-      // Close dialog i wróć do welcome page
+      // Wyłącz loading stan przed zamknięciem
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+
+      // Czekaj chwilę aby UI się odprawił
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Zamknij dialog i wróć do welcome page
       if (!mounted) return;
       Navigator.of(context).pop();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✅ Welcome! Your profile is ready.'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      
     } catch (e) {
       if (!mounted) return;
+      setState(() => _isLoading = false);
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('❌ Error: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
-    } finally {
-      setState(() => _isLoading = false);
     }
   }
 
