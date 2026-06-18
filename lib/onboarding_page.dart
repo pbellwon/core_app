@@ -331,8 +331,8 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 2: DISPLAY NAME
-  Widget _buildPage2() {
+  /// 📄 STRONA 1: DISPLAY NAME
+  Widget _buildPage1() {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -341,7 +341,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'What\'s your display name?',
+              'Hey! First of all, tell us your display name?',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20,
@@ -375,8 +375,8 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 3: BIRTH DATE
-  Widget _buildPage3() {
+  /// 📄 STRONA 2: BIRTH DATE
+  Widget _buildPage2() {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -436,8 +436,8 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 4: TIMEZONE
-  Widget _buildPage4() {
+  /// 📄 STRONA 3: TIMEZONE
+  Widget _buildPage3() {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -533,8 +533,8 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 1: WELCOME
-  Widget _buildPage1() {
+  /// 📄 STRONA 4: WELCOME
+  Widget _buildPage4() {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
