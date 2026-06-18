@@ -375,8 +375,11 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 2: BIRTH DATE
-  Widget _buildPage2() {
+  /// 📄 STRONA 3: BIRTH DATE
+  Widget _buildPage3() {
+    final displayName = _displayNameController.text.isNotEmpty
+        ? _displayNameController.text
+        : 'there';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -384,10 +387,10 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'What\'s your birth date?',
+            Text(
+              '$displayName, when were you born?',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF860E66),
@@ -436,8 +439,11 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 3: TIMEZONE
-  Widget _buildPage3() {
+  /// 📄 STRONA 4: TIMEZONE
+  Widget _buildPage4() {
+    final displayName = _displayNameController.text.isNotEmpty
+        ? _displayNameController.text
+        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -445,10 +451,10 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'What\'s your timezone?',
+            Text(
+              'And $displayName, where are you located?',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF860E66),
@@ -456,7 +462,7 @@ class OnboardingPageState extends State<OnboardingPage> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'So we can time reminders properly',
+              'So we can send you timely reminders',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
@@ -533,8 +539,11 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 4: WELCOME
-  Widget _buildPage4() {
+  /// 📄 STRONA 2: WELCOME
+  Widget _buildPage2() {
+    final displayName = _displayNameController.text.isNotEmpty
+        ? _displayNameController.text
+        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -542,10 +551,10 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.celebration, size: 60, color: Color(0xFF860E66)),
+            Icon(Icons.celebration, size: 60, color: const Color(0xFF860E66)),
             const SizedBox(height: 32),
-            const Text(
-              """Hey! I’m really glad you’ve landed here. \n
+            Text(
+              """Hey $displayName! I’m really glad you’ve landed here. \n
               
   This space is designed to support you in the moment — whether
   you’re feeling anxious, overwhelmed, flat, or just not yourself.
@@ -566,6 +575,9 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 5: MOVEMENT CONSIDERATIONS
   Widget _buildPage5() {
+    final displayName = _displayNameController.text.isNotEmpty
+        ? _displayNameController.text
+        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -573,10 +585,10 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Movement Considerations',
+            Text(
+              '$displayName, let\'s talk about your movement',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF860E66),
@@ -602,6 +614,9 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 6: EXERCISE TYPES
   Widget _buildPage6() {
+    final displayName = _displayNameController.text.isNotEmpty
+        ? _displayNameController.text
+        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -609,10 +624,10 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'What types of exercises do you enjoy?',
+            Text(
+              '$displayName, what types of exercises do you enjoy?',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF860E66),
@@ -638,6 +653,9 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 7: FITNESS GOALS
   Widget _buildPage7() {
+    final displayName = _displayNameController.text.isNotEmpty
+        ? _displayNameController.text
+        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -645,10 +663,10 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'What are your fitness goals?',
+            Text(
+              'What are your fitness goals, $displayName?',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF860E66),
@@ -674,6 +692,9 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 8: EXPERIENCE LEVEL
   Widget _buildPage8() {
+    final displayName = _displayNameController.text.isNotEmpty
+        ? _displayNameController.text
+        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -681,10 +702,10 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'What is your fitness level?',
+            Text(
+              '$displayName, what\'s your fitness level?',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF860E66),
@@ -724,6 +745,9 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 9: SUMMARY / COMPLETION
   Widget _buildPage9() {
+    final displayName = _displayNameController.text.isNotEmpty
+        ? _displayNameController.text
+        : '';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -733,20 +757,22 @@ class OnboardingPageState extends State<OnboardingPage> {
           children: [
             const Icon(Icons.check_circle, size: 80, color: Colors.green),
             const SizedBox(height: 24),
-            const Text(
-              'All set!',
+            Text(
+              displayName.isNotEmpty ? 'All set, $displayName!' : 'All set!',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF860E66),
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              "You're ready to start your fitness journey. Click 'Done' to continue.",
+            Text(
+              displayName.isNotEmpty
+                  ? "$displayName, you're ready to start your fitness journey. Click 'Done' to continue."
+                  : "You're ready to start your fitness journey. Click 'Done' to continue.",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 24),
             Card(
