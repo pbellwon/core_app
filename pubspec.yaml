@@ -44,10 +44,10 @@ dependencies:
   
   # State Management
   provider: ^6.1.1
-  matcher: any
-  meta: any
-  vector_math: any
-  youtube_player_flutter: ^10.0.1
+  matcher: any  # Pinned by flutter_test
+  meta: any  # Pinned by flutter_test
+  vector_math: any  # Pinned by flutter_test
+  youtube_player_flutter: ^8.1.2
   url_launcher: ^6.3.2
 
 dev_dependencies:
@@ -55,7 +55,7 @@ dev_dependencies:
     sdk: flutter
   shared_preferences: ^2.2.2
   video_player: ^2.7.0
-  test_api: any
+  test_api: ^0.7.9  # Pinned by flutter_test
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
