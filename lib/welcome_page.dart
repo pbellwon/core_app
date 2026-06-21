@@ -18,7 +18,8 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  late bool _onboardingDialogShown = false;
+  // Static - survives widget recreation caused by provider rebuilds
+  static bool _onboardingDialogShown = false;
 
   @override
   void initState() {

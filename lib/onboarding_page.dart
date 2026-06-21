@@ -222,6 +222,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   // 📍 PREFERRED LOCATION - removed from here
 
   bool _isLoading = false;
+  bool _isCompleting = false; // Prevent multiple clicks
 
   @override
   void initState() {
@@ -861,14 +862,14 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 💾 SAVE ONBOARDING DATA TO FIREBASE
   Future<void> _completeOnboarding() async {
+    // Prevent multiple clicks
+    if (_isCompleting) return;
+    _isCompleting = true;
+
     setState(() => _isLoading = true);
 
     try {
       final authProvider = context.read<AppAuthProvider>();
-
-      // Debug: Sprawdź co się zapisuje
-      debugPrint('🔍 DEBUG - _selectedCountry: $_selectedCountry');
-      debugPrint('🔍 DEBUG - timezone value: ${_selectedCountry != null ? countryTimezoneMap[_selectedCountry] : 'null'}');
 
       // Zapisz wszystkie dane profilowe
       await authProvider.updateUserProfile(
@@ -879,33 +880,39 @@ class OnboardingPageState extends State<OnboardingPage> {
         timezone: _selectedCountry != null
             ? countryTimezoneMap[_selectedCountry]
             : null,
-        country: _selectedCountry, // Zapisz też nazwę kraju dla timezone
+        country: _selectedCountry,
         movementConsiderations: _selectedMovementConsiderations.toList()..sort(),
       );
 
       // Oznacz onboarding jako ukończony
       await authProvider.markOnboardingComplete();
 
-      // Wyłącz loading stan przed zamknięciem
+      debugPrint('✅ Onboarding completed successfully');
+
+      // Wyłącz loading
       if (mounted) {
         setState(() => _isLoading = false);
       }
 
-      // Czekaj chwilę aby UI się odprawił
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Zamknij dialog i wróć do welcome page
+      // Czekaj krótko i zamknij dialog
+      if (!mounted) return;
+      await Future.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
       Navigator.of(context).pop();
       
     } catch (e) {
+      debugPrint('❌ Error in _completeOnboarding: $e');
+      
       if (!mounted) return;
+      
       setState(() => _isLoading = false);
+      _isCompleting = false;
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('❌ Error: ${e.toString()}'),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
         ),
       );
     }
@@ -989,7 +996,7 @@ class OnboardingPageState extends State<OnboardingPage> {
                 // SKIP / NEXT / DONE
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: _isLoading
+                    onPressed: (_isLoading || _isCompleting)
                         ? null
                         : () async {
                             if (_currentPage < _totalPages - 1) {
