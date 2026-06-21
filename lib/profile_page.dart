@@ -555,19 +555,19 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (unselectedLabels.isNotEmpty) ...[
-          _buildMovementConsiderationsLabel('Unselected'),
-          const SizedBox(height: 8),
-        ],
-        _buildMovementConsiderationsGroup(unselectedLabels),
-        const SizedBox(height: 20),
-        _buildDashedDivider(),
-        const SizedBox(height: 20),
         if (selectedLabels.isNotEmpty) ...[
           _buildMovementConsiderationsLabel('Selected'),
           const SizedBox(height: 8),
         ],
         _buildMovementConsiderationsGroup(selectedLabels),
+        const SizedBox(height: 20),
+        _buildDashedDivider(),
+        const SizedBox(height: 20),
+        if (unselectedLabels.isNotEmpty) ...[
+          _buildMovementConsiderationsLabel('Unselected'),
+          const SizedBox(height: 8),
+        ],
+        _buildMovementConsiderationsGroup(unselectedLabels),
       ],
     );
   }
