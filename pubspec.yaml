@@ -47,7 +47,7 @@ dependencies:
   matcher: any  # Pinned by flutter_test
   meta: any  # Pinned by flutter_test
   vector_math: any  # Pinned by flutter_test
-  youtube_player_flutter: ^8.1.2
+  youtube_player_flutter: ^10.0.1
   url_launcher: ^6.3.2
 
 dev_dependencies:
