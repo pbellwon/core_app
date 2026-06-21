@@ -377,9 +377,6 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 3: BIRTH DATE
   Widget _buildPage3() {
-    final displayName = _displayNameController.text.isNotEmpty
-        ? _displayNameController.text
-        : 'there';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -388,7 +385,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '$displayName, when were you born?',
+              'When were you born?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -441,9 +438,6 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 4: TIMEZONE
   Widget _buildPage4() {
-    final displayName = _displayNameController.text.isNotEmpty
-        ? _displayNameController.text
-        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -452,7 +446,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'And $displayName, where are you located?',
+              'And where are you located?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -575,9 +569,6 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 5: MOVEMENT CONSIDERATIONS
   Widget _buildPage5() {
-    final displayName = _displayNameController.text.isNotEmpty
-        ? _displayNameController.text
-        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -586,7 +577,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '$displayName, let\'s talk about your movement',
+              'Let\'s talk about your movement',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -614,9 +605,6 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 6: EXERCISE TYPES
   Widget _buildPage6() {
-    final displayName = _displayNameController.text.isNotEmpty
-        ? _displayNameController.text
-        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -625,7 +613,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '$displayName, what types of exercises do you enjoy?',
+              'What types of exercises do you enjoy?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -653,9 +641,6 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 7: FITNESS GOALS
   Widget _buildPage7() {
-    final displayName = _displayNameController.text.isNotEmpty
-        ? _displayNameController.text
-        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -664,7 +649,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'What are your fitness goals, $displayName?',
+              'What are your fitness goals?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -692,9 +677,6 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   /// 📄 STRONA 8: EXPERIENCE LEVEL
   Widget _buildPage8() {
-    final displayName = _displayNameController.text.isNotEmpty
-        ? _displayNameController.text
-        : 'you';
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -703,7 +685,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '$displayName, what\'s your fitness level?',
+              'What\'s your fitness level?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
