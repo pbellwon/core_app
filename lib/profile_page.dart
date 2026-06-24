@@ -427,6 +427,25 @@ class _ProfilePageState extends State<ProfilePage> {
     'POTS / Blood pressure related dizziness',
   ];
 
+  static const List<String> _emotionalEnergyLabels = <String>[
+    'Easing feelings of anxiety or overwhelm',
+    'Lifting low energy or finding motivation again',
+    'Moving through feeling stuck or frozen',
+    'Reconnecting with calm, joy, or steady energy',
+  ];
+
+  final Set<String> _selectedEmotionalEnergyButtons = <String>{};
+
+  // 🔔 NOTIFICATIONS
+  bool _notificationsEnabled = false;
+  final Set<String> _selectedNotifications = <String>{};
+
+  static const List<String> _notificationLabels = <String>[
+    'Give you new resource suggestions that match your needs',
+    'Quick tips and reminders that help you regulate',
+    'Give you option to be the first to test new app features',
+  ];
+
   Widget _buildInjuryToggleButton(String label) {
     final isSelected = _selectedInjuryButtons.contains(label);
     void onPressed() {
@@ -493,6 +512,216 @@ class _ProfilePageState extends State<ProfilePage> {
           fontSize: 14,
           color: Colors.grey.shade400,
           fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmotionalEnergyToggleButton(String label) {
+    final isSelected = _selectedEmotionalEnergyButtons.contains(label);
+    void onPressed() {
+      setState(() {
+        if (isSelected) {
+          _selectedEmotionalEnergyButtons.remove(label);
+        } else {
+          _selectedEmotionalEnergyButtons.add(label);
+        }
+      });
+    }
+
+    final buttonChild = Text(
+      label,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+      textAlign: TextAlign.center,
+    );
+
+    if (isSelected) {
+      return ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: buttonChild,
+      );
+    }
+
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: const Color(0xFF860E66),
+        side: const BorderSide(color: Color(0xFF860E66)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: buttonChild,
+    );
+  }
+
+  Widget _buildEmotionalEnergyGroup(List<String> labels) {
+    if (labels.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 520;
+
+        if (isNarrow) {
+          return Column(
+            children: [
+              for (final label in labels) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: _buildEmotionalEnergyToggleButton(label),
+                ),
+                if (label != labels.last) const SizedBox(height: 12),
+              ],
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            for (var i = 0; i < labels.length; i += 2) ...[
+              Row(
+                children: [
+                  Expanded(child: _buildEmotionalEnergyToggleButton(labels[i])),
+                  if (i + 1 < labels.length) ...[
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildEmotionalEnergyToggleButton(labels[i + 1])),
+                  ] else ...[
+                    const SizedBox(width: 12),
+                    const Expanded(child: SizedBox.shrink()),
+                  ],
+                ],
+              ),
+              if (i + 2 < labels.length) const SizedBox(height: 12),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildEmotionalEnergyButtons() {
+    final unselectedLabels = _emotionalEnergyLabels
+        .where((label) => !_selectedEmotionalEnergyButtons.contains(label))
+        .toList();
+    final selectedLabels = _emotionalEnergyLabels
+        .where((label) => _selectedEmotionalEnergyButtons.contains(label))
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (selectedLabels.isNotEmpty) ...[
+          _buildMovementConsiderationsLabel('Selected'),
+          const SizedBox(height: 8),
+        ],
+        _buildEmotionalEnergyGroup(selectedLabels),
+        const SizedBox(height: 20),
+        _buildDashedDivider(),
+        const SizedBox(height: 20),
+        if (unselectedLabels.isNotEmpty) ...[
+          _buildMovementConsiderationsLabel('Unselected'),
+          const SizedBox(height: 8),
+        ],
+        _buildEmotionalEnergyGroup(unselectedLabels),
+      ],
+    );
+  }
+
+  Widget _buildNotificationsToggle() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.orange, width: 2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Enable notifications',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+          Switch(
+            value: _notificationsEnabled,
+            onChanged: (value) {
+              setState(() {
+                _notificationsEnabled = value;
+                if (!_notificationsEnabled) {
+                  _selectedNotifications.clear();
+                }
+              });
+            },
+            activeColor: Colors.orange,
+            inactiveThumbColor: Colors.grey,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationsCheckboxes() {
+    return Column(
+      children: [
+        for (final label in _notificationLabels) ...[
+          SizedBox(
+            width: double.infinity,
+            child: _buildNotificationCheckbox(label),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildNotificationCheckbox(String label) {
+    final isSelected = _selectedNotifications.contains(label);
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            _selectedNotifications.remove(label);
+          } else {
+            _selectedNotifications.add(label);
+          }
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.orange.withOpacity(0.1) : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? Colors.orange : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Checkbox(
+              value: isSelected,
+              onChanged: (value) {
+                setState(() {
+                  if (value == true) {
+                    _selectedNotifications.add(label);
+                  } else {
+                    _selectedNotifications.remove(label);
+                  }
+                });
+              },
+              activeColor: Colors.orange,
+            ),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -683,6 +912,15 @@ class _ProfilePageState extends State<ProfilePage> {
     _selectedInjuryButtons
       ..clear()
       ..addAll(user?.movementConsiderations ?? const <String>[]);
+
+    _selectedEmotionalEnergyButtons
+      ..clear()
+      ..addAll(user?.emotionalEnergyPreferences ?? const <String>[]);
+
+    _notificationsEnabled = user?.notificationsEnabled ?? false;
+    _selectedNotifications
+      ..clear()
+      ..addAll(user?.notificationPreferences ?? const <String>[]);
   }
 
   /// 🔍 Filtrowanie krajów na podstawie wpisanej nazwy (dla telefonu)
@@ -918,6 +1156,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
       // ✏️ Aktualizacja profilu (wraz z nowymi polami)
       final movementConsiderations = _selectedInjuryButtons.toList()..sort();
+      final emotionalEnergyPreferences = _selectedEmotionalEnergyButtons.toList()..sort();
+      final notificationPreferences = _selectedNotifications.toList()..sort();
       await authProvider.updateUserProfile(
         displayName: _displayNameController.text.isNotEmpty
             ? _displayNameController.text.trim()
@@ -927,6 +1167,9 @@ class _ProfilePageState extends State<ProfilePage> {
         country: _selectedCountryCode?.name, // kraj z CountryCode
         timezone: timezone, // nowe pole
         movementConsiderations: movementConsiderations,
+        emotionalEnergyPreferences: emotionalEnergyPreferences,
+        notificationsEnabled: _notificationsEnabled,
+        notificationPreferences: notificationPreferences,
       );
 
       // 🎉 Powiadomienie o sukcesie
@@ -1447,7 +1690,56 @@ class _ProfilePageState extends State<ProfilePage> {
 
                       const SizedBox(height: 32),
 
-                      // 💾 PRZYCISK ZAPISU
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'What Would You Like Support With?',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF860E66),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildEmotionalEnergyButtons(),
+
+                      const SizedBox(height: 32),
+
+                      // � NOTIFICATIONS SECTION
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Do you want notifications?',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF860E66),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildNotificationsToggle(),
+
+                      if (_notificationsEnabled) ...[
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Would you like to receive notification that:',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildNotificationsCheckboxes(),
+                      ],
+
+                      const SizedBox(height: 32),
+
+                      // �💾 PRZYCISK ZAPISU
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(

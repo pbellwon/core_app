@@ -160,7 +160,7 @@ class OnboardingPage extends StatefulWidget {
 
 class OnboardingPageState extends State<OnboardingPage> {
   int _currentPage = 0;
-  final int _totalPages = 9;
+  final int _totalPages = 8;
 
   // 👤 DISPLAY NAME (strona 1)
   final TextEditingController _displayNameController = TextEditingController();
@@ -188,38 +188,25 @@ class OnboardingPageState extends State<OnboardingPage> {
     'POTS / Blood pressure related dizziness',
   ];
 
-  // 🎯 EXERCISE TYPE (strona 6)
-  final Set<String> _selectedExerciseTypes = <String>{};
-  static const List<String> _exerciseTypeLabels = <String>[
-    'Cardio',
-    'Strength',
-    'Flexibility',
-    'Balance',
-    'Functional',
-    'Sports',
+  // 💪 EMOTIONAL ENERGY PREFERENCES (strona 6)
+  final Set<String> _selectedEmotionalEnergyPreferences = <String>{};
+
+  static const List<String> _emotionalEnergyLabels = <String>[
+    'Easing feelings of anxiety or overwhelm',
+    'Lifting low energy or finding motivation again',
+    'Moving through feeling stuck or frozen',
+    'Reconnecting with calm, joy, or steady energy',
   ];
 
-  // 🎯 FITNESS GOALS (strona 7)
-  final Set<String> _selectedGoals = <String>{};
-  static const List<String> _goalsLabels = <String>[
-    'Weight Loss',
-    'Build Muscle',
-    'Increase Endurance',
-    'Improve Flexibility',
-    'Injury Recovery',
-    'General Health',
-  ];
+  // 🔔 NOTIFICATIONS (strona 7)
+  bool _notificationsEnabled = false;
+  final Set<String> _selectedNotifications = <String>{};
 
-  // 🕐 EXPERIENCE LEVEL (strona 8) - single choice
-  String? _selectedExperienceLevel;
-  static const List<String> _experienceLevelLabels = <String>[
-    'Beginner',
-    'Intermediate',
-    'Advanced',
+  static const List<String> _notificationLabels = <String>[
+    'Give you new resource suggestions that match your needs',
+    'Quick tips and reminders that help you regulate',
+    'Give you option to be the first to test new app features',
   ];
-
-  // ⏱️ AVAILABLE TIME - removed, was strona 6
-  // 📍 PREFERRED LOCATION - removed from here
 
   bool _isLoading = false;
   bool _isCompleting = false; // Prevent multiple clicks
@@ -342,7 +329,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'Hey! First of all, tell us your display name?',
+              'Hey! First of all, tell us your name?',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20,
@@ -386,7 +373,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'When were you born?',
+              'What was your year of birth?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -396,7 +383,7 @@ class OnboardingPageState extends State<OnboardingPage> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'We use this to personalize your experience',
+              'You have the option to continue\nwithout entering if you choose. ',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
@@ -447,7 +434,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'And where are you located?',
+              'What is your timezone?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -457,7 +444,7 @@ class OnboardingPageState extends State<OnboardingPage> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'So we can send you timely reminders',
+              'You have the option to continue\nwithout entering if you choose.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
@@ -578,7 +565,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Let\'s talk about your movement',
+              'Do you have any injuries or movement considerations we should account for? ',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -604,8 +591,8 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 6: EXERCISE TYPES
-  Widget _buildPage6() {
+  /// 📄 STRONA 7: NOTIFICATIONS
+  Widget _buildPage8() {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -614,7 +601,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'What types of exercises do you enjoy?',
+              'Do you want notifications?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -622,17 +609,110 @@ class OnboardingPageState extends State<OnboardingPage> {
                 color: Color(0xFF860E66),
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Select all that interest you',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+            const SizedBox(height: 24),
+            // Toggle switch for notifications
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.orange, width: 2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Enable notifications',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  Switch(
+                    value: _notificationsEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _notificationsEnabled = value;
+                        if (!_notificationsEnabled) {
+                          _selectedNotifications.clear();
+                        }
+                      });
+                    },
+                    activeColor: Colors.orange,
+                    inactiveThumbColor: Colors.grey,
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            _buildButtonGroup(
-              _exerciseTypeLabels,
-              _selectedExerciseTypes,
-              true,
+            const SizedBox(height: 24),
+            // Show notification preferences when enabled
+            if (_notificationsEnabled) ...[
+              const Text(
+                'Would you like to receive notification that:',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Column(
+                children: [
+                  for (final label in _notificationLabels) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: _buildNotificationCheckbox(label),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationCheckbox(String label) {
+    final isSelected = _selectedNotifications.contains(label);
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            _selectedNotifications.remove(label);
+          } else {
+            _selectedNotifications.add(label);
+          }
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.orange.withOpacity(0.1) : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? Colors.orange : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Checkbox(
+              value: isSelected,
+              onChanged: (value) {
+                setState(() {
+                  if (value == true) {
+                    _selectedNotifications.add(label);
+                  } else {
+                    _selectedNotifications.remove(label);
+                  }
+                });
+              },
+              activeColor: Colors.orange,
+            ),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              ),
             ),
           ],
         ),
@@ -640,8 +720,8 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 7: FITNESS GOALS
-  Widget _buildPage7() {
+  /// 📄 STRONA 6: EMOTIONAL ENERGY PREFERENCES
+  Widget _buildPage9Emotional() {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -650,7 +730,7 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'What are your fitness goals?',
+              'What would you like support with?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -666,8 +746,8 @@ class OnboardingPageState extends State<OnboardingPage> {
             ),
             const SizedBox(height: 16),
             _buildButtonGroup(
-              _goalsLabels,
-              _selectedGoals,
+              _emotionalEnergyLabels,
+              _selectedEmotionalEnergyPreferences,
               true,
             ),
           ],
@@ -676,58 +756,8 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 8: EXPERIENCE LEVEL
-  Widget _buildPage8() {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'What\'s your fitness level?',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF860E66),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Select one that best describes you',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            Column(
-              children: [
-                for (final level in _experienceLevelLabels) ...[
-                  SizedBox(
-                    width: double.infinity,
-                    child: _buildToggleButton(
-                      level,
-                      _selectedExperienceLevel == level,
-                      () {
-                        setState(() {
-                          _selectedExperienceLevel = level;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                ],
-            ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 📄 STRONA 9: SUMMARY / COMPLETION
-  Widget _buildPage9() {
+  /// 📄 STRONA 10: SUMMARY / COMPLETION
+  Widget _buildPage10Summary() {
     final displayName = _displayNameController.text.isNotEmpty
         ? _displayNameController.text
         : '';
@@ -752,8 +782,8 @@ class OnboardingPageState extends State<OnboardingPage> {
             const SizedBox(height: 16),
             Text(
               displayName.isNotEmpty
-                  ? "$displayName, you're ready to start your fitness journey. Click 'Done' to continue."
-                  : "You're ready to start your fitness journey. Click 'Done' to continue.",
+                  ? "$displayName, You’ve just helped create your personalised support space.🌼\n\nFrom here, you can explore ✨\n\nBrowse through grounding, calming, or energising tools to see what calls to you.\n\n Click the ⭐ on any activities you like to save them to your favourites for later!"
+                  : "You’ve just helped create your personalised support space.🌼\n\nFrom here, you can explore ✨\n\nBrowse through grounding, calming, or energising tools to see what calls to you.\n\n Click the ⭐ on any activities you like to save them to your favourites for later!",
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
@@ -791,22 +821,17 @@ class OnboardingPageState extends State<OnboardingPage> {
                   ),
                   const SizedBox(height: 8),
                   _buildSummaryRow(
-                    'Exercise Types',
-                    _selectedExerciseTypes.isEmpty
+                    'Emotional Energy Support',
+                    _selectedEmotionalEnergyPreferences.isEmpty
                         ? 'None selected'
-                        : '${_selectedExerciseTypes.length} selected',
+                        : '${_selectedEmotionalEnergyPreferences.length} selected',
                   ),
                   const SizedBox(height: 8),
                   _buildSummaryRow(
-                    'Fitness Goals',
-                    _selectedGoals.isEmpty
-                        ? 'None selected'
-                        : '${_selectedGoals.length} selected',
-                  ),
-                  const SizedBox(height: 8),
-                  _buildSummaryRow(
-                    'Experience Level',
-                    _selectedExperienceLevel ?? 'Not selected',
+                    'Notifications',
+                    _notificationsEnabled
+                        ? (_selectedNotifications.isEmpty ? 'Enabled (no preferences)' : '${_selectedNotifications.length} selected')
+                        : 'Disabled',
                   ),
                 ],
               ),
@@ -848,13 +873,11 @@ class OnboardingPageState extends State<OnboardingPage> {
       case 4:
         return _buildPage5(); // STRONA 5: Movement Considerations
       case 5:
-        return _buildPage6(); // STRONA 6: Exercise Types
+        return _buildPage9Emotional(); // STRONA 6: Emotional Energy Preferences
       case 6:
-        return _buildPage7(); // STRONA 7: Fitness Goals
+        return _buildPage8(); // STRONA 7: Notifications
       case 7:
-        return _buildPage8(); // STRONA 8: Experience Level
-      case 8:
-        return _buildPage9(); // STRONA 9: Summary / Completion
+        return _buildPage10Summary(); // STRONA 8: Summary / Completion
       default:
         return _buildPage1(); // Fallback do strony 1
     }
@@ -882,6 +905,9 @@ class OnboardingPageState extends State<OnboardingPage> {
             : null,
         country: _selectedCountry,
         movementConsiderations: _selectedMovementConsiderations.toList()..sort(),
+        emotionalEnergyPreferences: _selectedEmotionalEnergyPreferences.toList()..sort(),
+        notificationsEnabled: _notificationsEnabled,
+        notificationPreferences: _selectedNotifications.toList()..sort(),
       );
 
       // Oznacz onboarding jako ukończony

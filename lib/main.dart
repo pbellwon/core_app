@@ -10,6 +10,7 @@ import 'login_page.dart';
 import 'profile_page.dart';
 import 'get_started.dart';
 import 'welcome_page.dart';
+import 'onboarding_page.dart';
 import 'about_page.dart';
 import 'help_page.dart';
 import 'settings_page.dart';
@@ -213,6 +214,13 @@ class RootPage extends StatelessWidget {
 
         if (!authProvider.isLoggedIn) {
           return const LoginPage();
+        }
+
+        // Check if user has completed onboarding
+        final hasCompletedOnboarding = authProvider.currentUser?.onboardingCompleted ?? false;
+        
+        if (!hasCompletedOnboarding) {
+          return const OnboardingPage();
         }
 
         return const WelcomePage();

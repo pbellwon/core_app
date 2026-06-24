@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'onboarding_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -172,18 +171,15 @@ class LoginPageState extends State<LoginPage> {
           ),
         );
 
-        // 🎯 POKAŻ ONBOARDING DIALOG
-        if (mounted) {
-          await showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => const OnboardingPage(),
-          );
-        }
-
-        // Po ukończeniu onboarding'u idź do welcome page
+        // Po rejestracji, AuthProvider automatycznie zaloguje użytkownika
+        // RootPage będzie pokazywać OnboardingPage, bo onboardingCompleted = false
         if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed('/welcome');
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created! Please complete the onboarding.'),
+          ),
+        );
       }
     } on FirebaseAuthException catch (e) {
       String message = 'Something went wrong. Please try again.';

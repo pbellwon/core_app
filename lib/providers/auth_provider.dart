@@ -141,6 +141,9 @@ class AppAuthProvider with ChangeNotifier {
     String? country, // nowe pole
     String? timezone, // nowe pole
     List<String>? movementConsiderations,
+    List<String>? emotionalEnergyPreferences,
+    bool? notificationsEnabled,
+    List<String>? notificationPreferences,
   }) async {
     if (_currentUser == null || _firebaseUser == null) {
       debugPrint('❌ Cannot update profile: no user logged in');
@@ -207,6 +210,24 @@ class AppAuthProvider with ChangeNotifier {
           "🏃 Setting movementConsiderations: \\${movementConsiderations.join(', ')}",
         );
       }
+      if (emotionalEnergyPreferences != null) {
+        updateData['emotionalEnergyPreferences'] = emotionalEnergyPreferences;
+        debugPrint(
+          "💪 Setting emotionalEnergyPreferences: ${emotionalEnergyPreferences.join(', ')}",
+        );
+      }
+
+      if (notificationsEnabled != null) {
+        updateData['notificationsEnabled'] = notificationsEnabled;
+        debugPrint('🔔 Setting notificationsEnabled: $notificationsEnabled');
+      }
+
+      if (notificationPreferences != null) {
+        updateData['notificationPreferences'] = notificationPreferences;
+        debugPrint(
+          "🔔 Setting notificationPreferences: ${notificationPreferences.join(', ')}",
+        );
+      }
 
       // 3️⃣ ZAPISZ DO FIRESTORE
       debugPrint('💾 Saving to Firestore...');
@@ -226,6 +247,10 @@ class AppAuthProvider with ChangeNotifier {
         timezone: timezone ?? _currentUser!.timezone, // nowe
         movementConsiderations:
             movementConsiderations ?? _currentUser!.movementConsiderations,
+        emotionalEnergyPreferences:
+            emotionalEnergyPreferences ?? _currentUser!.emotionalEnergyPreferences,
+        notificationsEnabled: notificationsEnabled ?? _currentUser!.notificationsEnabled,
+        notificationPreferences: notificationPreferences ?? _currentUser!.notificationPreferences,
         updatedAt: DateTime.now(),
       );
 

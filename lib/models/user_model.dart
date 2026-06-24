@@ -64,6 +64,10 @@ class AppUser {
   final List<String>? favouriteVideos; // Lista ulubionych videoId
   final List<String>?
   movementConsiderations; // Wybór z sekcji "Movement Considerations"
+  final List<String>?
+  emotionalEnergyPreferences; // Preferencje wspierania emocjonalnego i energii
+  final bool notificationsEnabled; // Czy powiadomienia są włączone
+  final List<String>? notificationPreferences; // Preferencje powiadomień
   final bool onboardingCompleted; // Czy użytkownik ukończył onboarding
 
   /// 🏗️ KONSTRUKTOR
@@ -82,6 +86,9 @@ class AppUser {
     this.quizAnswers,
     this.favouriteVideos,
     this.movementConsiderations,
+    this.emotionalEnergyPreferences,
+    this.notificationsEnabled = false,
+    this.notificationPreferences,
     this.onboardingCompleted = false, // Domyślnie nowy user
   });
 
@@ -109,6 +116,11 @@ class AppUser {
         'favouriteVideos': favouriteVideos,
       if (movementConsiderations != null)
         'movementConsiderations': movementConsiderations,
+      if (emotionalEnergyPreferences != null)
+        'emotionalEnergyPreferences': emotionalEnergyPreferences,
+      'notificationsEnabled': notificationsEnabled,
+      if (notificationPreferences != null)
+        'notificationPreferences': notificationPreferences,
     };
   }
 
@@ -183,6 +195,13 @@ class AppUser {
           ?.map((e) => e.toString())
           .toList(),
       movementConsiderations: (data['movementConsiderations'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
+      emotionalEnergyPreferences: (data['emotionalEnergyPreferences'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
+      notificationsEnabled: data['notificationsEnabled'] ?? false,
+      notificationPreferences: (data['notificationPreferences'] as List?)
           ?.map((e) => e.toString())
           .toList(),
       onboardingCompleted: data['onboardingCompleted'] ?? false, // Nowe pole
@@ -284,6 +303,9 @@ class AppUser {
     List<QuizAnswer>? quizAnswers,
     List<String>? favouriteVideos,
     List<String>? movementConsiderations,
+    List<String>? emotionalEnergyPreferences,
+    bool? notificationsEnabled,
+    List<String>? notificationPreferences,
     bool? onboardingCompleted,
   }) {
     return AppUser(
@@ -302,6 +324,10 @@ class AppUser {
       favouriteVideos: favouriteVideos ?? this.favouriteVideos,
       movementConsiderations:
           movementConsiderations ?? this.movementConsiderations,
+      emotionalEnergyPreferences:
+          emotionalEnergyPreferences ?? this.emotionalEnergyPreferences,
+      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      notificationPreferences: notificationPreferences ?? this.notificationPreferences,
       onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
     );
   }
