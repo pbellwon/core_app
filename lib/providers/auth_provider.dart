@@ -474,6 +474,7 @@ class AppAuthProvider with ChangeNotifier {
   }
 
   /// 🎯 AUTOMATICALLY FAVORITE VIDEOS BASED ON EMOTIONAL ENERGY PREFERENCES
+  /// Also removes videos that no longer match the new preferences
   Future<void> autoFavoriteVideosByTags(
     List<String> emotionalEnergyPreferences,
     List<Map<String, dynamic>> allVideos,
@@ -484,39 +485,103 @@ class AppAuthProvider with ChangeNotifier {
     }
 
     if (emotionalEnergyPreferences.isEmpty) {
-      debugPrint('⚠️ No emotional energy preferences selected');
+      debugPrint('⚠️ No emotional energy preferences selected, removing auto-favorited videos');
+      // If no preferences selected, remove all videos with emotional tags
+      var currentFavs = List<String>.from(_currentUser!.favouriteVideos ?? []);
+      final allEmotionalTags = <String>{};
+      
+      for (final video in allVideos) {
+        final tags = (video['tags'] as List<dynamic>? ?? []).cast<String>();
+        allEmotionalTags.addAll(tags);
+      }
+      
+      for (final video in allVideos) {
+        final videoUrl = video['url'] as String? ?? '';
+        final tags = (video['tags'] as List<dynamic>? ?? []).cast<String>();
+        
+        bool hasEmotionalTag = tags.any((tag) => allEmotionalTags.contains(tag));
+        if (hasEmotionalTag && currentFavs.contains(videoUrl)) {
+          currentFavs.remove(videoUrl);
+          debugPrint('🗑️ Removed: ${video['title']}');
+        }
+      }
+      
+      _currentUser = _currentUser!.copyWith(
+        favouriteVideos: currentFavs,
+        emotionalEnergyPreferences: [],
+      );
+      notifyListeners();
+      
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update({
+            'favouriteVideos': currentFavs,
+            'emotionalEnergyPreferences': [],
+          });
+      
+      debugPrint('✅ Removed all auto-favorited videos');
       return;
     }
 
     try {
-      debugPrint('🎯 Auto-favoriting videos based on tags...');
-      final currentFavs = List<String>.from(_currentUser!.favouriteVideos ?? []);
+      debugPrint('🎯 Auto-favoriting videos based on tags: ${emotionalEnergyPreferences.join(", ")}');
+      var currentFavs = List<String>.from(_currentUser!.favouriteVideos ?? []);
 
-      // Iterate through all videos and check if tags match preferences
+      // Get all possible emotional tags from all videos
+      final allEmotionalTags = <String>{};
+      for (final video in allVideos) {
+        final tags = (video['tags'] as List<dynamic>? ?? []).cast<String>();
+        allEmotionalTags.addAll(tags);
+      }
+
+      debugPrint('📋 All available emotional tags: ${allEmotionalTags.join(", ")}');
+
+      // Process each video
       for (final video in allVideos) {
         final videoUrl = video['url'] as String? ?? '';
+        final videoTitle = video['title'] as String? ?? 'Unknown';
         final tags = (video['tags'] as List<dynamic>? ?? []).cast<String>();
 
-        // Check if any tag matches user preferences
-        bool hasMatchingTag = tags.any(
+        // Check if video has ANY emotional tag (means it could be added by autoFavorite system)
+        bool hasEmotionalTag = tags.any((tag) => allEmotionalTags.contains(tag));
+
+        if (!hasEmotionalTag) {
+          // Video has no emotional tags - skip it (user probably added manually)
+          continue;
+        }
+
+        // Check if any tag matches user's NEW preferences
+        bool matchesNewPreferences = tags.any(
           (tag) => emotionalEnergyPreferences.contains(tag),
         );
 
-        if (hasMatchingTag && !currentFavs.contains(videoUrl)) {
+        if (matchesNewPreferences && !currentFavs.contains(videoUrl)) {
+          // ADD: matches new preferences and not already in favorites
           currentFavs.add(videoUrl);
-          debugPrint('⭐ Added to favorites: ${video['title']} (tags: ${tags.join(", ")})');
+          debugPrint('⭐ Added to favorites: $videoTitle (tags: ${tags.join(", ")})');
+        } else if (!matchesNewPreferences && currentFavs.contains(videoUrl)) {
+          // REMOVE: doesn't match new preferences but is in favorites
+          currentFavs.remove(videoUrl);
+          debugPrint('🗑️ Removed from favorites: $videoTitle');
         }
       }
 
       // Update locally
-      _currentUser = _currentUser!.copyWith(favouriteVideos: currentFavs);
+      _currentUser = _currentUser!.copyWith(
+        favouriteVideos: currentFavs,
+        emotionalEnergyPreferences: emotionalEnergyPreferences,
+      );
       notifyListeners();
 
       // Update in Firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(_currentUser!.uid)
-          .update({'favouriteVideos': currentFavs});
+          .update({
+            'favouriteVideos': currentFavs,
+            'emotionalEnergyPreferences': emotionalEnergyPreferences,
+          });
 
       debugPrint('✅ Auto-favorited ${currentFavs.length} video(s) total');
     } catch (e) {
