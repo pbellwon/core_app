@@ -52,7 +52,7 @@ const List<Map<String, dynamic>> videosData = [
     'url': 'https://www.youtube.com/watch?v=V-_O7nl0Ii0',
     'title': 'Test Vid 3',
     'tags': [
-      'Moving through feeling stuck or frozen',
+      'Lifting low energy or finding motivation again',
     ],
   },
 ];
