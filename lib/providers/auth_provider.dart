@@ -473,6 +473,58 @@ class AppAuthProvider with ChangeNotifier {
     }
   }
 
+  /// 🎯 AUTOMATICALLY FAVORITE VIDEOS BASED ON EMOTIONAL ENERGY PREFERENCES
+  Future<void> autoFavoriteVideosByTags(
+    List<String> emotionalEnergyPreferences,
+    List<Map<String, dynamic>> allVideos,
+  ) async {
+    if (_currentUser == null || _firebaseUser == null) {
+      debugPrint('❌ Cannot auto-favorite videos: no user logged in');
+      return;
+    }
+
+    if (emotionalEnergyPreferences.isEmpty) {
+      debugPrint('⚠️ No emotional energy preferences selected');
+      return;
+    }
+
+    try {
+      debugPrint('🎯 Auto-favoriting videos based on tags...');
+      final currentFavs = List<String>.from(_currentUser!.favouriteVideos ?? []);
+
+      // Iterate through all videos and check if tags match preferences
+      for (final video in allVideos) {
+        final videoUrl = video['url'] as String? ?? '';
+        final tags = (video['tags'] as List<dynamic>? ?? []).cast<String>();
+
+        // Check if any tag matches user preferences
+        bool hasMatchingTag = tags.any(
+          (tag) => emotionalEnergyPreferences.contains(tag),
+        );
+
+        if (hasMatchingTag && !currentFavs.contains(videoUrl)) {
+          currentFavs.add(videoUrl);
+          debugPrint('⭐ Added to favorites: ${video['title']} (tags: ${tags.join(", ")})');
+        }
+      }
+
+      // Update locally
+      _currentUser = _currentUser!.copyWith(favouriteVideos: currentFavs);
+      notifyListeners();
+
+      // Update in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update({'favouriteVideos': currentFavs});
+
+      debugPrint('✅ Auto-favorited ${currentFavs.length} video(s) total');
+    } catch (e) {
+      debugPrint('❌ Error auto-favoriting videos: $e');
+      rethrow;
+    }
+  }
+
   // (usunięto zduplikowane metody i gettery)
 }
 
