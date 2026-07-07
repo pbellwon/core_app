@@ -201,7 +201,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
                           child: Text(
-                            'Showing ${filteredVideos.length} video(s)',
+                            '',
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,

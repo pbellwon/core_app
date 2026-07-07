@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'data/videos_data.dart';
 import 'providers/auth_provider.dart';
 import 'widgets/main_app_bar.dart';
 import 'models/user_model.dart';
@@ -1172,13 +1171,6 @@ class _ProfilePageState extends State<ProfilePage> {
         emotionalEnergyPreferences: emotionalEnergyPreferences,
         notificationsEnabled: _notificationsEnabled,
         notificationPreferences: notificationPreferences,
-      );
-
-      // 🎯 AUTO-FAVORITE VIDEOS BASED ON EMOTIONAL ENERGY PREFERENCES
-      // Always call this - it handles both adding and removing videos
-      await authProvider.autoFavoriteVideosByTags(
-        emotionalEnergyPreferences,
-        videosData,
       );
 
       // ✅🎉 Powiadomienie o sukcesie
