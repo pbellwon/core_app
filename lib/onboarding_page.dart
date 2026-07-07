@@ -1,7 +1,6 @@
 // lib/onboarding_page.dart - ONBOARDING DIALOG Z 9 STRONAMI
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'data/videos_data.dart';
 import 'providers/auth_provider.dart';
 
 /// 🗺️ Mapa krajów do stref czasowych (UTC)
@@ -317,6 +316,99 @@ class OnboardingPageState extends State<OnboardingPage> {
             ),
           ),
       ],
+    );
+  }
+
+  /// 🔘 Build emotional energy toggle button (simple)
+  Widget _buildEmotionalEnergyToggleButton(String label) {
+    final isSelected = _selectedEmotionalEnergyPreferences.contains(label);
+    void onPressed() {
+      setState(() {
+        if (isSelected) {
+          _selectedEmotionalEnergyPreferences.remove(label);
+        } else {
+          _selectedEmotionalEnergyPreferences.add(label);
+        }
+      });
+    }
+
+    final buttonChild = Text(
+      label,
+      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+      textAlign: TextAlign.center,
+    );
+
+    if (isSelected) {
+      return ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: buttonChild,
+      );
+    }
+
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: const Color(0xFF860E66),
+        side: const BorderSide(color: Color(0xFF860E66)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: buttonChild,
+    );
+  }
+
+  /// 🎨 Build emotional energy button group (no selection/unselection split)
+  Widget _buildEmotionalEnergyGroup(List<String> labels) {
+    if (labels.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 520;
+
+        if (isNarrow) {
+          return Column(
+            children: [
+              for (final label in labels) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: _buildEmotionalEnergyToggleButton(label),
+                ),
+                if (label != labels.last) const SizedBox(height: 8),
+              ],
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            for (var i = 0; i < labels.length; i += 2) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildEmotionalEnergyToggleButton(labels[i]),
+                  ),
+                  if (i + 1 < labels.length) ...[
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildEmotionalEnergyToggleButton(labels[i + 1]),
+                    ),
+                  ] else ...[
+                    const SizedBox(width: 8),
+                    const Expanded(child: SizedBox.shrink()),
+                  ],
+                ],
+              ),
+              if (i + 2 < labels.length) const SizedBox(height: 8),
+            ],
+          ],
+        );
+      },
     );
   }
 
@@ -730,10 +822,10 @@ class OnboardingPageState extends State<OnboardingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            const Text(
               'What would you like support with?',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF860E66),
@@ -745,12 +837,8 @@ class OnboardingPageState extends State<OnboardingPage> {
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
-            const SizedBox(height: 16),
-            _buildButtonGroup(
-              _emotionalEnergyLabels,
-              _selectedEmotionalEnergyPreferences,
-              true,
-            ),
+            const SizedBox(height: 24),
+            _buildEmotionalEnergyGroup(_emotionalEnergyLabels),
           ],
         ),
       ),
@@ -909,13 +997,6 @@ class OnboardingPageState extends State<OnboardingPage> {
         emotionalEnergyPreferences: _selectedEmotionalEnergyPreferences.toList()..sort(),
         notificationsEnabled: _notificationsEnabled,
         notificationPreferences: _selectedNotifications.toList()..sort(),
-      );
-
-      // 🎯 AUTO-FAVORITE VIDEOS BASED ON EMOTIONAL ENERGY PREFERENCES
-      // Always call this - it handles both adding and removing videos
-      await authProvider.autoFavoriteVideosByTags(
-        _selectedEmotionalEnergyPreferences.toList(),
-        videosData,
       );
 
       // Oznacz onboarding jako ukończony
