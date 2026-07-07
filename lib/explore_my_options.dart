@@ -21,6 +21,14 @@ class ExploreMyOptionsPage extends StatefulWidget {
 
 class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
   late final List<_VideoData> _videos;
+  final Set<String> _selectedEmotionalEnergyButtons = <String>{};
+
+  static const List<String> _emotionalEnergyLabels = <String>[
+    'Easing feelings of anxiety or overwhelm',
+    'Lifting low energy or finding motivation again',
+    'Moving through feeling stuck or frozen',
+    'Reconnecting with calm, joy, or steady energy',
+  ];
 
   @override
   void initState() {
@@ -35,6 +43,112 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
         .toList();
   }
 
+  /// 🎬 Get filtered videos based on selected emotional energy buttons
+  List<_VideoData> _getFilteredVideos() {
+    if (_selectedEmotionalEnergyButtons.isEmpty) {
+      return _videos;
+    }
+    return _videos
+        .where((video) => video.tags
+            .any((tag) => _selectedEmotionalEnergyButtons.contains(tag)))
+        .toList();
+  }
+
+  /// 🔘 Build emotional energy toggle button
+  Widget _buildEmotionalEnergyToggleButton(String label) {
+    final isSelected = _selectedEmotionalEnergyButtons.contains(label);
+    void onPressed() {
+      setState(() {
+        if (isSelected) {
+          _selectedEmotionalEnergyButtons.remove(label);
+        } else {
+          _selectedEmotionalEnergyButtons.add(label);
+        }
+      });
+    }
+
+    final buttonChild = Text(
+      label,
+      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+      textAlign: TextAlign.center,
+    );
+
+    if (isSelected) {
+      return ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: buttonChild,
+      );
+    }
+
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: const Color(0xFF860E66),
+        side: const BorderSide(color: Color(0xFF860E66)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: buttonChild,
+    );
+  }
+
+  /// 🔍 Build emotional energy filter buttons group
+  Widget _buildEmotionalEnergyFilterButtons() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 520;
+
+        if (isNarrow) {
+          return Column(
+            children: [
+              for (final label in _emotionalEnergyLabels) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: _buildEmotionalEnergyToggleButton(label),
+                ),
+                if (label != _emotionalEnergyLabels.last)
+                  const SizedBox(height: 8),
+              ],
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            for (var i = 0; i < _emotionalEnergyLabels.length; i += 2) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildEmotionalEnergyToggleButton(
+                      _emotionalEnergyLabels[i],
+                    ),
+                  ),
+                  if (i + 1 < _emotionalEnergyLabels.length) ...[
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildEmotionalEnergyToggleButton(
+                        _emotionalEnergyLabels[i + 1],
+                      ),
+                    ),
+                  ] else ...[
+                    const SizedBox(width: 8),
+                    const Expanded(child: SizedBox.shrink()),
+                  ],
+                ],
+              ),
+              if (i + 2 < _emotionalEnergyLabels.length)
+                const SizedBox(height: 8),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,18 +158,93 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
       ),
       body: Consumer<AppAuthProvider>(
         builder: (context, authProvider, child) {
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: _videos.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 20),
-            itemBuilder: (context, index) {
-              final video = _videos[index];
-              final videoId = video.url; // lub YoutubePlayer.convertUrlToId(video.url) ?? video.url
-              final isFav = authProvider.isFavourite(videoId);
-              return _buildVideoCard(video, isFav, () {
-                authProvider.toggleFavouriteVideo(videoId);
-              });
-            },
+          final filteredVideos = _getFilteredVideos();
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 🔽 FILTERS AT THE TOP
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Filter by emotional support:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF860E66),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildEmotionalEnergyFilterButtons(),
+                      if (_selectedEmotionalEnergyButtons.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Text(
+                            'Showing ${filteredVideos.length} video(s)',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // 📺 VIDEOS LIST
+                if (filteredVideos.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.video_library_outlined,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No videos found for this filter',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        for (int index = 0; index < filteredVideos.length; index++) ...[
+                          Builder(
+                            builder: (context) {
+                              final video = filteredVideos[index];
+                              final videoId = video.url;
+                              final isFav = authProvider.isFavourite(videoId);
+                              return _buildVideoCard(video, isFav, () {
+                                authProvider.toggleFavouriteVideo(videoId);
+                              });
+                            },
+                          ),
+                          if (index < filteredVideos.length - 1)
+                            const SizedBox(height: 20),
+                        ],
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 20),
+              ],
+            ),
           );
         },
       ),
