@@ -41,6 +41,23 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
               tags: List<String>.from(video['tags'] as List),
             ))
         .toList();
+
+    // 🎯 Load emotional energy preferences from profile
+    _loadEmotionalEnergyPreferences();
+  }
+
+  /// 🎯 Load emotional energy preferences from user profile
+  void _loadEmotionalEnergyPreferences() {
+    final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
+    final user = authProvider.currentUser;
+
+    if (user?.emotionalEnergyPreferences != null) {
+      _selectedEmotionalEnergyButtons
+        ..clear()
+        ..addAll(user!.emotionalEnergyPreferences ?? []);
+    } else {
+      _selectedEmotionalEnergyButtons.clear();
+    }
   }
 
   /// 🎬 Get filtered videos based on selected emotional energy buttons
