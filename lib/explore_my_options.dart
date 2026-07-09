@@ -268,7 +268,6 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                         builder: (context, constraints) {
                           final isWide = constraints.maxWidth > 900;
                           final widthFactor = isWide ? 0.45 : 0.9;
-                          final maxWidth = isWide ? constraints.maxWidth * 0.95 : constraints.maxWidth;
 
                           return Wrap(
                             alignment: WrapAlignment.center,
