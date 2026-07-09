@@ -21,13 +21,16 @@ class ExploreMyOptionsPage extends StatefulWidget {
 
 class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
   late final List<_VideoData> _videos;
-  final Set<String> _selectedEmotionalEnergyButtons = <String>{};
+  final Set<String> _selectedMovementConsiderationButtons = <String>{};
+  bool _isMovementConsiderationExpanded = false;
 
-  static const List<String> _emotionalEnergyLabels = <String>[
-    'Easing feelings of anxiety or overwhelm',
-    'Lifting low energy or finding motivation again',
-    'Moving through feeling stuck or frozen',
-    'Reconnecting with calm, joy, or steady energy',
+  static const List<String> _movementConsiderationLabels = <String>[
+    'Knee injury/pain',
+    'Wrist injury/pain',
+    'Shoulder injury/pain',
+    'Lower-back injury/pain',
+    'Upper back/neck injury/pain',
+    'POTS / Blood pressure related dizziness',
   ];
 
   @override
@@ -38,48 +41,48 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
         .map((video) => _VideoData(
               url: video['url'] as String,
               title: video['title'] as String,
-              tags: List<String>.from(video['tags'] as List),
+              tags: List<String>.from(video['tags_movementconsiderations'] as List? ?? []),
             ))
         .toList();
 
-    // 🎯 Load emotional energy preferences from profile
-    _loadEmotionalEnergyPreferences();
+    // 🎯 Load movement consideration preferences from profile
+    _loadMovementConsiderationPreferences();
   }
 
-  /// 🎯 Load emotional energy preferences from user profile
-  void _loadEmotionalEnergyPreferences() {
+  /// 🎯 Load movement consideration preferences from user profile
+  void _loadMovementConsiderationPreferences() {
     final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
     final user = authProvider.currentUser;
 
-    if (user?.emotionalEnergyPreferences != null) {
-      _selectedEmotionalEnergyButtons
+    if (user?.movementConsiderations != null) {
+      _selectedMovementConsiderationButtons
         ..clear()
-        ..addAll(user!.emotionalEnergyPreferences ?? []);
+        ..addAll(user!.movementConsiderations ?? []);
     } else {
-      _selectedEmotionalEnergyButtons.clear();
+      _selectedMovementConsiderationButtons.clear();
     }
   }
 
-  /// 🎬 Get filtered videos based on selected emotional energy buttons
+  /// 🎬 Get filtered videos based on selected movement consideration buttons
   List<_VideoData> _getFilteredVideos() {
-    if (_selectedEmotionalEnergyButtons.isEmpty) {
+    if (_selectedMovementConsiderationButtons.isEmpty) {
       return _videos;
     }
     return _videos
         .where((video) => video.tags
-            .any((tag) => _selectedEmotionalEnergyButtons.contains(tag)))
+            .any((tag) => _selectedMovementConsiderationButtons.contains(tag)))
         .toList();
   }
 
-  /// 🔘 Build emotional energy toggle button
-  Widget _buildEmotionalEnergyToggleButton(String label) {
-    final isSelected = _selectedEmotionalEnergyButtons.contains(label);
+  /// 🔘 Build movement consideration toggle button
+  Widget _buildMovementConsiderationToggleButton(String label) {
+    final isSelected = _selectedMovementConsiderationButtons.contains(label);
     void onPressed() {
       setState(() {
         if (isSelected) {
-          _selectedEmotionalEnergyButtons.remove(label);
+          _selectedMovementConsiderationButtons.remove(label);
         } else {
-          _selectedEmotionalEnergyButtons.add(label);
+          _selectedMovementConsiderationButtons.add(label);
         }
       });
     }
@@ -113,8 +116,8 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     );
   }
 
-  /// 🔍 Build emotional energy filter buttons group
-  Widget _buildEmotionalEnergyFilterButtons() {
+  /// 🔍 Build movement consideration filter buttons group
+  Widget _buildMovementConsiderationFilterButtons() {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isNarrow = constraints.maxWidth < 520;
@@ -122,12 +125,12 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
         if (isNarrow) {
           return Column(
             children: [
-              for (final label in _emotionalEnergyLabels) ...[
+              for (final label in _movementConsiderationLabels) ...[
                 SizedBox(
                   width: double.infinity,
-                  child: _buildEmotionalEnergyToggleButton(label),
+                  child: _buildMovementConsiderationToggleButton(label),
                 ),
-                if (label != _emotionalEnergyLabels.last)
+                if (label != _movementConsiderationLabels.last)
                   const SizedBox(height: 8),
               ],
             ],
@@ -136,19 +139,19 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
 
         return Column(
           children: [
-            for (var i = 0; i < _emotionalEnergyLabels.length; i += 2) ...[
+            for (var i = 0; i < _movementConsiderationLabels.length; i += 2) ...[
               Row(
                 children: [
                   Expanded(
-                    child: _buildEmotionalEnergyToggleButton(
-                      _emotionalEnergyLabels[i],
+                    child: _buildMovementConsiderationToggleButton(
+                      _movementConsiderationLabels[i],
                     ),
                   ),
-                  if (i + 1 < _emotionalEnergyLabels.length) ...[
+                  if (i + 1 < _movementConsiderationLabels.length) ...[
                     const SizedBox(width: 8),
                     Expanded(
-                      child: _buildEmotionalEnergyToggleButton(
-                        _emotionalEnergyLabels[i + 1],
+                      child: _buildMovementConsiderationToggleButton(
+                        _movementConsiderationLabels[i + 1],
                       ),
                     ),
                   ] else ...[
@@ -157,7 +160,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                   ],
                 ],
               ),
-              if (i + 2 < _emotionalEnergyLabels.length)
+              if (i + 2 < _movementConsiderationLabels.length)
                 const SizedBox(height: 8),
             ],
           ],
@@ -184,32 +187,52 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                 // 🔽 FILTERS AT THE TOP
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Filter by emotional support:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF860E66),
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Movement Considerations Filter Button
+                        ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _isMovementConsiderationExpanded = !_isMovementConsiderationExpanded;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Movement Considerations',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              _isMovementConsiderationExpanded ? Icons.expand_less : Icons.expand_more,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      _buildEmotionalEnergyFilterButtons(),
-                      if (_selectedEmotionalEnergyButtons.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Text(
-                            '',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                              fontStyle: FontStyle.italic,
-                            ),
+                        // Expanded Filters Section
+                        if (_isMovementConsiderationExpanded) ...[
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: _buildMovementConsiderationFilterButtons(),
                           ),
-                        ),
-                    ],
+                        ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -238,25 +261,38 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                     ),
                   )
                 else
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: [
-                        for (int index = 0; index < filteredVideos.length; index++) ...[
-                          Builder(
-                            builder: (context) {
-                              final video = filteredVideos[index];
-                              final videoId = video.url;
-                              final isFav = authProvider.isFavourite(videoId);
-                              return _buildVideoCard(video, isFav, () {
-                                authProvider.toggleFavouriteVideo(videoId);
-                              });
-                            },
-                          ),
-                          if (index < filteredVideos.length - 1)
-                            const SizedBox(height: 20),
-                        ],
-                      ],
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isWide = constraints.maxWidth > 900;
+                          final widthFactor = isWide ? 0.45 : 0.9;
+                          final maxWidth = isWide ? constraints.maxWidth * 0.95 : constraints.maxWidth;
+
+                          return Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 20,
+                            runSpacing: 20,
+                            children: [
+                              for (int index = 0; index < filteredVideos.length; index++)
+                                SizedBox(
+                                  width: constraints.maxWidth * widthFactor,
+                                  child: Builder(
+                                    builder: (context) {
+                                      final video = filteredVideos[index];
+                                      final videoId = video.url;
+                                      final isFav = authProvider.isFavourite(videoId);
+                                      return _buildVideoCard(video, isFav, () {
+                                        authProvider.toggleFavouriteVideo(videoId);
+                                      }, 1.0);
+                                    },
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ),
                 const SizedBox(height: 20),
@@ -269,10 +305,10 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
   }
 
   // Zmieniam sygnaturę _buildVideoCard
-  Widget _buildVideoCard(_VideoData video, bool isFav, VoidCallback onFavToggle) {
+  Widget _buildVideoCard(_VideoData video, bool isFav, VoidCallback onFavToggle, double widthFactor) {
     return Center(
       child: FractionallySizedBox(
-        widthFactor: 0.5,
+        widthFactor: widthFactor,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Container(
