@@ -192,15 +192,15 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Movement Considerations Filter Button
-                        ElevatedButton(
+                        OutlinedButton(
                         onPressed: () {
                           setState(() {
                             _isMovementConsiderationExpanded = !_isMovementConsiderationExpanded;
                           });
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF860E66),
+                          side: const BorderSide(color: Color(0xFF860E66), width: 2),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

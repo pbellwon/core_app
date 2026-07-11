@@ -12,10 +12,10 @@ import 'widgets/menu_overlay.dart';
 class MyFavouritesPage extends StatelessWidget {
   const MyFavouritesPage({super.key});
 
-  Widget _buildVideoCard(BuildContext context, _VideoData video, bool isFav, VoidCallback onFavToggle) {
+  Widget _buildVideoCard(BuildContext context, _VideoData video, bool isFav, VoidCallback onFavToggle, double widthFactor) {
     return Center(
       child: FractionallySizedBox(
-        widthFactor: 0.5,
+        widthFactor: widthFactor,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Container(
@@ -160,17 +160,37 @@ class MyFavouritesPage extends StatelessWidget {
                 ),
               );
             }
-            return ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: favVideos.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 20),
-              itemBuilder: (context, index) {
-                final video = favVideos[index];
-                final isFav = favIds.contains(video.url);
-                return _buildVideoCard(context, video, isFav, () {
-                  authProvider.toggleFavouriteVideo(video.url);
-                });
-              },
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide = constraints.maxWidth > 900;
+                    final widthFactor = isWide ? 0.28 : 0.9;
+
+                    return Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 20,
+                      runSpacing: 20,
+                      children: [
+                        for (int index = 0; index < favVideos.length; index++)
+                          SizedBox(
+                            width: constraints.maxWidth * widthFactor,
+                            child: Builder(
+                              builder: (context) {
+                                final video = favVideos[index];
+                                final isFav = favIds.contains(video.url);
+                                return _buildVideoCard(context, video, isFav, () {
+                                  authProvider.toggleFavouriteVideo(video.url);
+                                }, 1.0);
+                              },
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ),
             );
           },
         ),
