@@ -143,53 +143,66 @@ class MyFavouritesPage extends StatelessWidget {
         ),
         body: Consumer<AppAuthProvider>(
           builder: (context, authProvider, child) {
-            final favIds = authProvider.currentUser?.favouriteVideos ?? [];
-            // Konwertuj videosData do listy _VideoData
-            final allVideos = videosData
-                .map((v) => _VideoData(
-                      url: v['url'] as String,
-                      title: v['title'] as String,
-                    ))
-                .toList();
-            final favVideos = allVideos.where((v) => favIds.contains(v.url)).toList();
-            if (favVideos.isEmpty) {
-              return const Center(
-                child: Text(
-                  'You have no favourite videos yet.',
-                  style: TextStyle(fontSize: 18),
-                ),
-              );
-            }
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isWide = constraints.maxWidth > 900;
-                    final widthFactor = isWide ? 0.28 : 0.9;
-
-                    return Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 20,
-                      runSpacing: 20,
-                      children: [
-                        for (int index = 0; index < favVideos.length; index++)
-                          SizedBox(
-                            width: constraints.maxWidth * widthFactor,
-                            child: Builder(
-                              builder: (context) {
-                                final video = favVideos[index];
-                                final isFav = favIds.contains(video.url);
-                                return _buildVideoCard(context, video, isFav, () {
-                                  authProvider.toggleFavouriteVideo(video.url);
-                                }, 1.0);
-                              },
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Builder(
+                    builder: (context) {
+                      final favIds = authProvider.currentUser?.favouriteVideos ?? [];
+                      // Konwertuj videosData do listy _VideoData
+                      final allVideos = videosData
+                          .map((v) => _VideoData(
+                                url: v['url'] as String,
+                                title: v['title'] as String,
+                              ))
+                          .toList();
+                      final favVideos = allVideos.where((v) => favIds.contains(v.url)).toList();
+                      if (favVideos.isEmpty) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Text(
+                              'You have no favourite videos yet.',
+                              style: TextStyle(fontSize: 18),
                             ),
                           ),
-                      ],
-                    );
-                  },
-                ),
+                        );
+                      }
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final isWide = constraints.maxWidth > 900;
+                              final widthFactor = isWide ? 0.28 : 0.9;
+
+                              return Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 20,
+                                runSpacing: 20,
+                                children: [
+                                  for (int index = 0; index < favVideos.length; index++)
+                                    SizedBox(
+                                      width: constraints.maxWidth * widthFactor,
+                                      child: Builder(
+                                        builder: (context) {
+                                          final video = favVideos[index];
+                                          final isFav = favIds.contains(video.url);
+                                          return _buildVideoCard(context, video, isFav, () {
+                                            authProvider.toggleFavouriteVideo(video.url);
+                                          }, 1.0);
+                                        },
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             );
           },
