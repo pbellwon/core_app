@@ -187,11 +187,10 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                 // 🔽 FILTERS AT THE TOP
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Movement Considerations Filter Button
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Movement Considerations Filter Button
                         OutlinedButton(
                         onPressed: () {
                           setState(() {
@@ -223,16 +222,15 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                           ],
                         ),
                       ),
-                        // Expanded Filters Section
-                        if (_isMovementConsiderationExpanded) ...[
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: _buildMovementConsiderationFilterButtons(),
-                          ),
-                        ],
+                      // Expanded Filters Section
+                      if (_isMovementConsiderationExpanded) ...[
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: _buildMovementConsiderationFilterButtons(),
+                        ),
                       ],
-                    ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 8),
