@@ -739,36 +739,41 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         color: Colors.black,
-        child: Stack(
+        child: Column(
           children: [
-            // InAppWebView z YouTube - Direct embed URL
-            InAppWebView(
-              initialUrlRequest: URLRequest(
-                url: WebUri('https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0&fs=1'),
-              ),
-              onLoadError: (controller, url, code, message) {
-                debugPrint('WebView error: $code - $message');
-                setState(() => _webViewFailed = true);
-              },
-            ),
-            // Close button - na wierzchu
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Material(
-                color: Colors.transparent,
-                child: IconButton(
-                  icon: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(200),
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(8),
-                    child: const Icon(Icons.close, color: Colors.black, size: 20),
+            // Close button header
+            Container(
+              height: 50,
+              color: Colors.black,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 48), // Placeholder for left
+                  const Text(
+                    'YouTube',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  tooltip: 'Zamknij',
+                  SizedBox(
+                    width: 48,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                      tooltip: 'Zamknij',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // WebView - Expanded
+            Expanded(
+              child: InAppWebView(
+                initialUrlRequest: URLRequest(
+                  url: WebUri('https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0&fs=1'),
                 ),
+                onLoadError: (controller, url, code, message) {
+                  debugPrint('WebView error: $code - $message');
+                  setState(() => _webViewFailed = true);
+                },
               ),
             ),
           ],
