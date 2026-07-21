@@ -1,10 +1,7 @@
-// lib/explore_my_options.dart
-
 import 'package:flutter/material.dart';
 import 'widgets/main_app_bar.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/link.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'data/videos_data.dart';
@@ -554,69 +551,38 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                 const SizedBox(height: 8),
                 Builder(
                   builder: (context) {
-                    final videoId = YoutubePlayer.convertUrlToId(video.url);
-                    if (videoId == null) {
+                    final videoId = _extractYoutubeId(video.url);
+                    if (videoId.isEmpty) {
                       return Container(
                         height: 120,
                         color: Colors.grey[300],
                         child: const Center(child: Icon(Icons.error, color: Colors.red)),
                       );
                     }
-                    if (kIsWeb) {
-                      return Link(
-                        uri: Uri.parse(video.url),
-                        target: LinkTarget.blank,
-                        builder: (context, followLink) => AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: InkWell(
-                              onTap: followLink,
-                              child: Image.network(
-                                'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
-                                fit: BoxFit.cover,
-                                loadingBuilder: (context, child, progress) {
-                                  if (progress == null) return child;
-                                  return Container(
-                                    color: Colors.grey[200],
-                                    child: const Center(child: CircularProgressIndicator()),
-                                  );
-                                },
-                                errorBuilder: (context, error, stackTrace) => Container(
-                                  color: Colors.grey[300],
-                                  child: const Center(child: Icon(Icons.broken_image, color: Colors.red)),
-                                ),
-                              ),
+                    return InkWell(
+                      onTap: () => _openVideoPage(video.url),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return Container(
+                                color: Colors.grey[200],
+                                child: const Center(child: CircularProgressIndicator()),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: Colors.grey[300],
+                              child: const Center(child: Icon(Icons.broken_image, color: Colors.red)),
                             ),
                           ),
                         ),
-                      );
-                    } else {
-                      return InkWell(
-                        onTap: () => _openVideoPage(video.url),
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, progress) {
-                                if (progress == null) return child;
-                                return Container(
-                                  color: Colors.grey[200],
-                                  child: const Center(child: CircularProgressIndicator()),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                color: Colors.grey[300],
-                                child: const Center(child: Icon(Icons.broken_image, color: Colors.red)),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
+                      ),
+                    );
                   },
                 ),
               ],
@@ -628,38 +594,28 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
   }
 
   void _openVideoPage(String url) async {
-    final uri = Uri.parse(url);
-    // Na webie i desktopie otwieraj w przeglądarce, na Android/iOS player
     if (kIsWeb) {
+      // Na webie - otwórz w nowej karcie
+      final uri = Uri.parse(url);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nie można otworzyć linku.')),
-        );
       }
-      return;
-    }
-    // Rozpoznanie platformy mobilnej przez Theme.of(context).platform
-    final platform = Theme.of(context).platform;
-    if (platform == TargetPlatform.android || platform == TargetPlatform.iOS) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => YoutubePlayerScreen(videoUrl: url),
-        ),
-      );
     } else {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nie można otworzyć linku.')),
-        );
-      }
+      // Na mobile - pokaż popup z WebView
+      showDialog(
+        context: context,
+        builder: (context) => VideoPlayerDialog(videoUrl: url),
+      );
     }
+  }
+
+  String _extractYoutubeId(String url) {
+    final regex = RegExp(
+      r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)',
+      caseSensitive: false,
+    );
+    final match = regex.firstMatch(url);
+    return match?.group(1) ?? '';
   }
 }
 
@@ -682,6 +638,182 @@ class _VideoData {
   });
 }
 
+class VideoPlayerDialog extends StatefulWidget {
+  final String videoUrl;
+  const VideoPlayerDialog({super.key, required this.videoUrl});
+
+  @override
+  State<VideoPlayerDialog> createState() => _VideoPlayerDialogState();
+}
+
+class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
+  late WebViewController _webViewController;
+  bool _webViewFailed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final videoId = _extractYoutubeId(widget.videoUrl);
+    
+    try {
+      _webViewController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setBackgroundColor(Colors.black)
+        ..loadHtmlString(
+          '''
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              body {
+                margin: 0;
+                padding: 0;
+                background-color: black;
+              }
+              .video-container {
+                position: relative;
+                width: 100%;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+              }
+              .video-container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="video-container">
+              <iframe 
+                src="https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0"
+                title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </body>
+          </html>
+          ''',
+        );
+    } catch (e) {
+      _webViewFailed = true;
+      debugPrint('WebView initialization failed: $e');
+    }
+  }
+
+  String _extractYoutubeId(String url) {
+    final regex = RegExp(
+      r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)',
+      caseSensitive: false,
+    );
+    final match = regex.firstMatch(url);
+    return match?.group(1) ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_webViewFailed) {
+      return Dialog(
+        insetPadding: const EdgeInsets.all(16),
+        backgroundColor: Colors.black,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width - 32,
+            maxHeight: MediaQuery.of(context).size.height * 0.6,
+          ),
+          color: Colors.black,
+          child: Stack(
+            children: [
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.video_library, color: Colors.white, size: 64),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Otwórz film na YouTube',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final uri = Uri.parse(widget.videoUrl);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        }
+                        if (mounted) Navigator.pop(context);
+                      },
+                      child: const Text('Otwórz w przeglądarce'),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(200),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(Icons.close, color: Colors.black, size: 24),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Dialog(
+      insetPadding: const EdgeInsets.all(16),
+      backgroundColor: Colors.black,
+      child: Container(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width - 32,
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
+        color: Colors.black,
+        child: Stack(
+          children: [
+            // WebView z YouTube
+            WebViewWidget(controller: _webViewController),
+            // Close button
+            Positioned(
+              top: 8,
+              right: 8,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(200),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(Icons.close, color: Colors.black, size: 24),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class YoutubePlayerScreen extends StatefulWidget {
   final String videoUrl;
   const YoutubePlayerScreen({super.key, required this.videoUrl});
@@ -691,25 +823,69 @@ class YoutubePlayerScreen extends StatefulWidget {
 }
 
 class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
-  late YoutubePlayerController _controller;
+  late WebViewController _webViewController;
 
   @override
   void initState() {
     super.initState();
-    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl)!;
-    _controller = YoutubePlayerController(
-      initialVideoId: videoId,
-      flags: const YoutubePlayerFlags(
-        autoPlay: true,
-        mute: false,
-      ),
-    );
+    final videoId = _extractYoutubeId(widget.videoUrl);
+    
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(Colors.black)
+      ..loadHtmlString(
+        '''
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              margin: 0;
+              padding: 0;
+              background-color: black;
+            }
+            .video-container {
+              position: relative;
+              width: 100%;
+              padding-bottom: 56.25%;
+              height: 0;
+              overflow: hidden;
+            }
+            .video-container iframe {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              border: none;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="video-container">
+            <iframe 
+              src="https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+          </div>
+        </body>
+        </html>
+        ''',
+      );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  String _extractYoutubeId(String url) {
+    final regex = RegExp(
+      r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)',
+      caseSensitive: false,
+    );
+    final match = regex.firstMatch(url);
+    return match?.group(1) ?? '';
   }
 
   @override
@@ -720,16 +896,7 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
         backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.black,
-      body: Center(
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: YoutubePlayer(
-            controller: _controller,
-            showVideoProgressIndicator: true,
-            progressIndicatorColor: Colors.blueAccent,
-          ),
-        ),
-      ),
+      body: WebViewWidget(controller: _webViewController),
     );
   }
 }
