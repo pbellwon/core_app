@@ -311,19 +311,23 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
                 setState(() => _webViewFailed = true);
               },
             ),
-            // Close button
+            // Close button - na wierzchu
             Positioned(
               top: 8,
               right: 8,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(200),
-                    shape: BoxShape.circle,
+              child: Material(
+                color: Colors.transparent,
+                child: IconButton(
+                  icon: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(200),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(Icons.close, color: Colors.black, size: 20),
                   ),
-                  padding: const EdgeInsets.all(8),
-                  child: const Icon(Icons.close, color: Colors.black, size: 24),
+                  onPressed: () => Navigator.pop(context),
+                  tooltip: 'Zamknij',
                 ),
               ),
             ),
