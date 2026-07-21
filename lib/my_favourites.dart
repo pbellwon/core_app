@@ -289,48 +289,6 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
     }
 
     final videoId = _extractYoutubeId(widget.videoUrl);
-    final htmlContent = '''
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: black;
-    }
-    .video-container {
-      position: relative;
-      width: 100%;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-    }
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
-</head>
-<body>
-  <div class="video-container">
-    <iframe 
-      src="https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0"
-      title="YouTube video player"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen>
-    </iframe>
-  </div>
-</body>
-</html>
-''';
 
     return Dialog(
       insetPadding: const EdgeInsets.all(16),
@@ -343,10 +301,13 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
         color: Colors.black,
         child: Stack(
           children: [
-            // InAppWebView z YouTube
+            // InAppWebView z YouTube - Direct embed URL
             InAppWebView(
-              initialData: InAppWebViewInitialData(data: htmlContent),
+              initialUrlRequest: URLRequest(
+                url: WebUri('https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0&fs=1'),
+              ),
               onLoadError: (controller, url, code, message) {
+                debugPrint('WebView error: $code - $message');
                 setState(() => _webViewFailed = true);
               },
             ),
