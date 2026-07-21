@@ -88,20 +88,11 @@ class MyFavouritesPage extends StatelessWidget {
     );
   }
 
-  void _openVideoPage(BuildContext context, String url) async {
-    if (kIsWeb) {
-      // Na webie - otwórz w nowej karcie
-      final uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    } else {
-      // Na mobile - pokaż popup z WebView
-      showDialog(
-        context: context,
-        builder: (context) => VideoPlayerDialog(videoUrl: url),
-      );
-    }
+  void _openVideoPage(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder: (context) => VideoPlayerDialog(videoUrl: url),
+    );
   }
 
   String _extractYoutubeId(String url) {
