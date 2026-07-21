@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'widgets/main_app_bar.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
@@ -638,64 +638,23 @@ class VideoPlayerDialog extends StatefulWidget {
 }
 
 class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
-  late WebViewController _webViewController;
   bool _webViewFailed = false;
 
   @override
   void initState() {
     super.initState();
-    final videoId = _extractYoutubeId(widget.videoUrl);
-    
+    _initializeWebView();
+  }
+
+  Future<void> _initializeWebView() async {
     try {
-      _webViewController = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setBackgroundColor(Colors.black)
-        ..loadHtmlString(
-          '''
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              body {
-                margin: 0;
-                padding: 0;
-                background-color: black;
-              }
-              .video-container {
-                position: relative;
-                width: 100%;
-                padding-bottom: 56.25%;
-                height: 0;
-                overflow: hidden;
-              }
-              .video-container iframe {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                border: none;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="video-container">
-              <iframe 
-                src="https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
-            </div>
-          </body>
-          </html>
-          ''',
-        );
+      final videoId = _extractYoutubeId(widget.videoUrl);
+      if (videoId.isEmpty) {
+        setState(() => _webViewFailed = true);
+        return;
+      }
     } catch (e) {
-      _webViewFailed = true;
+      setState(() => _webViewFailed = true);
       debugPrint('WebView initialization failed: $e');
     }
   }
@@ -769,6 +728,50 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
       );
     }
 
+    final videoId = _extractYoutubeId(widget.videoUrl);
+    final htmlContent = '''
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+    }
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-container">
+    <iframe 
+      src="https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0"
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
+</body>
+</html>
+''';
+
     return Dialog(
       insetPadding: const EdgeInsets.all(16),
       backgroundColor: Colors.black,
@@ -780,8 +783,13 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
         color: Colors.black,
         child: Stack(
           children: [
-            // WebView z YouTube
-            WebViewWidget(controller: _webViewController),
+            // InAppWebView z YouTube
+            InAppWebView(
+              initialData: InAppWebViewInitialData(data: htmlContent),
+              onLoadError: (controller, url, code, message) {
+                setState(() => _webViewFailed = true);
+              },
+            ),
             // Close button
             Positioned(
               top: 8,
@@ -814,60 +822,9 @@ class YoutubePlayerScreen extends StatefulWidget {
 }
 
 class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
-  late WebViewController _webViewController;
-
   @override
   void initState() {
     super.initState();
-    final videoId = _extractYoutubeId(widget.videoUrl);
-    
-    _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.black)
-      ..loadHtmlString(
-        '''
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            body {
-              margin: 0;
-              padding: 0;
-              background-color: black;
-            }
-            .video-container {
-              position: relative;
-              width: 100%;
-              padding-bottom: 56.25%;
-              height: 0;
-              overflow: hidden;
-            }
-            .video-container iframe {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              border: none;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="video-container">
-            <iframe 
-              src="https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0"
-              title="YouTube video player"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen>
-            </iframe>
-          </div>
-        </body>
-        </html>
-        ''',
-      );
   }
 
   String _extractYoutubeId(String url) {
@@ -881,13 +838,59 @@ class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final videoId = _extractYoutubeId(widget.videoUrl);
+    final htmlContent = '''
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+    }
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-container">
+    <iframe 
+      src="https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0"
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
+</body>
+</html>
+''';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Odtwarzacz YouTube'),
         backgroundColor: Colors.black,
       ),
       backgroundColor: Colors.black,
-      body: WebViewWidget(controller: _webViewController),
+      body: InAppWebView(
+        initialData: InAppWebViewInitialData(data: htmlContent),
+      ),
     );
   }
 }
