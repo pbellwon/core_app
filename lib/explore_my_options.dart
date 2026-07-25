@@ -74,6 +74,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
         .map((video) => _VideoData(
               url: video['url'] as String,
               title: video['title'] as String,
+              summary: video['summary'] as String? ?? '',
               tags: List<String>.from(video['tags_movementconsiderations'] as List? ?? []),
               practiceType: video['practice_type'] as String? ?? 'Movement Practice',
               duration: video['duration'] as String? ?? '15-20 minutes',
@@ -521,13 +522,14 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
       child: FractionallySizedBox(
         widthFactor: widthFactor,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(12),
           child: Container(
             color: Colors.white,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // 📌 TITLE WITH FAVORITE BUTTON
                 Row(
                   children: [
                     Expanded(
@@ -537,59 +539,162 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     IconButton(
                       icon: Icon(
                         isFav ? Icons.star : Icons.star_border,
                         color: isFav ? Colors.amber : Colors.grey,
+                        size: 28,
                       ),
                       onPressed: onFavToggle,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                      padding: EdgeInsets.zero,
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Builder(
-                  builder: (context) {
-                    final videoId = _extractYoutubeId(video.url);
-                    if (videoId.isEmpty) {
-                      return Container(
-                        height: 120,
-                        color: Colors.grey[300],
-                        child: const Center(child: Icon(Icons.error, color: Colors.red)),
-                      );
-                    }
-                    return InkWell(
-                      onTap: () => _openVideoPage(video.url),
-                      child: AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 10),
+                // 📺 THUMBNAIL AND INFO ROW
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // THUMBNAIL
+                    Builder(
+                      builder: (context) {
+                        final videoId = _extractYoutubeId(video.url);
+                        if (videoId.isEmpty) {
+                          return Container(
+                            width: 140,
+                            height: 110,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.error, color: Colors.red, size: 28),
+                          );
+                        }
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
                           child: Image.network(
                             'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
+                            width: 140,
+                            height: 110,
                             fit: BoxFit.cover,
                             loadingBuilder: (context, child, progress) {
                               if (progress == null) return child;
                               return Container(
+                                width: 140,
+                                height: 110,
                                 color: Colors.grey[200],
-                                child: const Center(child: CircularProgressIndicator()),
+                                child: const Center(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                ),
                               );
                             },
                             errorBuilder: (context, error, stackTrace) => Container(
-                              color: Colors.grey[300],
-                              child: const Center(child: Icon(Icons.broken_image, color: Colors.red)),
+                              width: 140,
+                              height: 110,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.broken_image, color: Colors.red, size: 28),
                             ),
                           ),
-                        ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 12),
+                    // INFO COLUMN
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // SUMMARY
+                          _buildInfoRow(
+                            'SUMMARY:',
+                            video.summary,
+                            maxLines: 2,
+                          ),
+                          const SizedBox(height: 8),
+                          // PROPS
+                          _buildInfoRow(
+                            'PROPS:',
+                            video.props,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 8),
+                          // DURATION
+                          _buildInfoRow(
+                            'DURATION:',
+                            video.duration,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 10),
+                          // EXPLORE NOW BUTTON
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () => _openVideoPage(video.url),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFF9800),
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Explore Now',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// Helper widget to build info rows
+  Widget _buildInfoRow(String label, String value, {int maxLines = 1}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF860E66),
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 13,
+            color: Colors.black87,
+          ),
+          maxLines: maxLines,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 
@@ -613,6 +718,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
 class _VideoData {
   final String url;
   final String title;
+  final String summary;
   final List<String> tags; // Tagi dla preferencji emocjonalnych
   final String practiceType;
   final String duration;
@@ -621,6 +727,7 @@ class _VideoData {
   const _VideoData({
     required this.url,
     required this.title,
+    this.summary = '',
     this.tags = const [],
     this.practiceType = 'Movement Practice',
     this.duration = '15-20 minutes',

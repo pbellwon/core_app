@@ -6,6 +6,7 @@ const List<Map<String, dynamic>> videosData = [
   {
     'url': 'https://www.youtube.com/watch?v=i3FIu_sQSLw',
     'title': 'Week 11 Breathing Practice',
+    'summary': 'Calming breathing techniques to reduce anxiety and improve blood circulation',
     'tags_movementconsiderations': [
       'Knee injury/pain',
       'POTS / Blood pressure related dizziness',
@@ -18,6 +19,7 @@ const List<Map<String, dynamic>> videosData = [
   {
     'url': 'https://www.youtube.com/watch?v=Rl7Q041hQQY',
     'title': 'FlowEating movement sequence',
+    'summary': 'Gentle flowing movements to improve mobility and reduce muscle tension',
     'tags_movementconsiderations': [
       'Lower-back injury/pain',
       'Wrist injury/pain',
@@ -30,6 +32,7 @@ const List<Map<String, dynamic>> videosData = [
   {
     'url': 'https://www.youtube.com/watch?v=wer0sQicOAU',
     'title': 'Movement sequence',
+    'summary': 'Comprehensive movement practice targeting upper body and shoulders',
     'tags_movementconsiderations': [
       'Shoulder injury/pain',
       'Upper back/neck injury/pain',
@@ -42,6 +45,7 @@ const List<Map<String, dynamic>> videosData = [
   {
     'url': 'https://www.youtube.com/watch?v=b3-_ha9-wAY',
     'title': 'FlowEating Movement',
+    'summary': 'Quick and easy movement sequence for knee-friendly exercise',
     'tags_movementconsiderations': [
       'Knee injury/pain',
     ],
@@ -53,6 +57,7 @@ const List<Map<String, dynamic>> videosData = [
   {
     'url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     'title': 'Test Vid 1',
+    'summary': 'Meditation session focused on relaxation and mindfulness',
     'tags_movementconsiderations': [
       'Lower-back injury/pain',
     ],
@@ -64,6 +69,7 @@ const List<Map<String, dynamic>> videosData = [
   {
     'url': 'https://www.youtube.com/watch?v=5qap5aO4i9A',
     'title': 'Test Vid 2',
+    'summary': 'Extended movement practice for deep stretching and recovery',
     'tags_movementconsiderations': [
       'Wrist injury/pain',
     ],
@@ -75,6 +81,7 @@ const List<Map<String, dynamic>> videosData = [
   {
     'url': 'https://www.youtube.com/watch?v=V-_O7nl0Ii0',
     'title': 'Test Vid 3',
+    'summary': 'Restorative meditation for blood pressure management and relaxation',
     'tags_movementconsiderations': [
       'POTS / Blood pressure related dizziness',
     ],
