@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'widgets/main_app_bar.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'data/videos_data.dart';
 import 'providers/auth_provider.dart';
+import 'pages/video_detail_page.dart';
 
 
 
@@ -641,7 +640,22 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () => _openVideoPage(video.url),
+                              onPressed: () {
+                                // Find the video data from videosData
+                                final videoData = videosData.firstWhere(
+                                  (v) => v['url'] == video.url,
+                                  orElse: () => {},
+                                );
+                                if (videoData.isNotEmpty) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => VideoDetailPage(
+                                        videoData: videoData,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFF9800),
                                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -698,13 +712,6 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     );
   }
 
-  void _openVideoPage(String url) {
-    showDialog(
-      context: context,
-      builder: (context) => VideoPlayerDialog(videoUrl: url),
-    );
-  }
-
   String _extractYoutubeId(String url) {
     final regex = RegExp(
       r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)',
@@ -734,200 +741,4 @@ class _VideoData {
     this.position = 'Standing',
     this.props = 'No props',
   });
-}
-
-class VideoPlayerDialog extends StatefulWidget {
-  final String videoUrl;
-  const VideoPlayerDialog({super.key, required this.videoUrl});
-
-  @override
-  State<VideoPlayerDialog> createState() => _VideoPlayerDialogState();
-}
-
-class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
-  bool _webViewFailed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeWebView();
-  }
-
-  Future<void> _initializeWebView() async {
-    try {
-      final videoId = _extractYoutubeId(widget.videoUrl);
-      if (videoId.isEmpty) {
-        setState(() => _webViewFailed = true);
-        return;
-      }
-    } catch (e) {
-      setState(() => _webViewFailed = true);
-      debugPrint('WebView initialization failed: $e');
-    }
-  }
-
-  String _extractYoutubeId(String url) {
-    final regex = RegExp(
-      r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)',
-      caseSensitive: false,
-    );
-    final match = regex.firstMatch(url);
-    return match?.group(1) ?? '';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_webViewFailed) {
-      return Dialog(
-        insetPadding: const EdgeInsets.all(16),
-        backgroundColor: Colors.black,
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width - 32,
-            maxHeight: MediaQuery.of(context).size.height * 0.6,
-          ),
-          color: Colors.black,
-          child: Stack(
-            children: [
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.video_library, color: Colors.white, size: 64),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Otwórz film na YouTube',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final uri = Uri.parse(widget.videoUrl);
-                        if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri, mode: LaunchMode.externalApplication);
-                        }
-                        if (mounted) Navigator.pop(context);
-                      },
-                      child: const Text('Otwórz w przeglądarce'),
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(200),
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(8),
-                    child: const Icon(Icons.close, color: Colors.black, size: 24),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final videoId = _extractYoutubeId(widget.videoUrl);
-
-    return Dialog(
-      insetPadding: const EdgeInsets.all(16),
-      backgroundColor: Colors.black,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width - 32,
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-        ),
-        color: Colors.black,
-        child: Column(
-          children: [
-            // Close button header
-            Container(
-              height: 50,
-              color: Colors.black,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(width: 48), // Placeholder for left
-                  const Text(
-                    'YouTube',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                  SizedBox(
-                    width: 48,
-                    child: IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                      tooltip: 'Zamknij',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // WebView - Expanded
-            Expanded(
-              child: InAppWebView(
-                initialUrlRequest: URLRequest(
-                  url: WebUri('https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0&fs=1'),
-                ),
-                onLoadError: (controller, url, code, message) {
-                  debugPrint('WebView error: $code - $message');
-                  setState(() => _webViewFailed = true);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class YoutubePlayerScreen extends StatefulWidget {
-  final String videoUrl;
-  const YoutubePlayerScreen({super.key, required this.videoUrl});
-
-  @override
-  State<YoutubePlayerScreen> createState() => _YoutubePlayerScreenState();
-}
-
-class _YoutubePlayerScreenState extends State<YoutubePlayerScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  String _extractYoutubeId(String url) {
-    final regex = RegExp(
-      r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)',
-      caseSensitive: false,
-    );
-    final match = regex.firstMatch(url);
-    return match?.group(1) ?? '';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final videoId = _extractYoutubeId(widget.videoUrl);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Odtwarzacz YouTube'),
-        backgroundColor: Colors.black,
-      ),
-      backgroundColor: Colors.black,
-      body: InAppWebView(
-        initialUrlRequest: URLRequest(
-          url: WebUri('https://www.youtube.com/embed/$videoId?autoplay=1&modestbranding=1&rel=0&fs=1'),
-        ),
-      ),
-    );
-  }
 }
