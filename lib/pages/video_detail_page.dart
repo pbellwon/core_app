@@ -53,205 +53,209 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 📌 TITLE AND FAVORITE BUTTON
-                  Row(
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          _isFavorite ? Icons.star : Icons.star_border,
-                          color: _isFavorite ? Colors.amber : Colors.grey,
-                          size: 32,
-                        ),
-                        onPressed: () {
-                          authProvider.toggleFavouriteVideo(url);
-                          setState(() {
-                            _isFavorite = !_isFavorite;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // 🎥 VIDEO PLAYER
-                  Builder(
-                    builder: (context) {
-                      final videoId = _extractYoutubeId(url);
-                      if (videoId.isEmpty) {
-                        return Container(
-                          height: 250,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Center(
-                            child: Icon(Icons.error, color: Colors.red, size: 48),
-                          ),
-                        );
-                      }
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: GestureDetector(
-                          onTap: () => _openVideoPlayer(context, url),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Image.network(
-                                'https://img.youtube.com/vi/$videoId/maxresdefault.jpg',
-                                height: 250,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                loadingBuilder: (context, child, progress) {
-                                  if (progress == null) return child;
-                                  return Container(
-                                    height: 250,
-                                    color: Colors.grey[200],
-                                    child: const Center(
-                                      child: SizedBox(
-                                        width: 32,
-                                        height: 32,
-                                        child:
-                                            CircularProgressIndicator(strokeWidth: 2),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Container(
-                                  height: 250,
-                                  color: Colors.grey[300],
-                                  child: const Icon(Icons.broken_image,
-                                      color: Colors.red, size: 48),
-                                ),
+                      // 📌 TITLE AND FAVORITE BUTTON
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
                               ),
-                              Container(
-                                height: 250,
-                                width: double.infinity,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              _isFavorite ? Icons.star : Icons.star_border,
+                              color: _isFavorite ? Colors.amber : Colors.grey,
+                              size: 32,
+                            ),
+                            onPressed: () {
+                              authProvider.toggleFavouriteVideo(url);
+                              setState(() {
+                                _isFavorite = !_isFavorite;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 🎥 VIDEO PLAYER
+                      Builder(
+                        builder: (context) {
+                          final videoId = _extractYoutubeId(url);
+                          if (videoId.isEmpty) {
+                            return Center(
+                              child: Container(
+                                width: 400,
+                                height: 280,
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.3),
+                                  color: Colors.grey[300],
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                              ),
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.play_arrow,
-                                  color: Color(0xFF860E66),
-                                  size: 48,
+                                child: const Center(
+                                  child: Icon(Icons.error, color: Colors.red, size: 48),
                                 ),
                               ),
-                            ],
+                            );
+                          }
+                          return Center(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: GestureDetector(
+                                onTap: () => _openVideoPlayer(context, url),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Image.network(
+                                      'https://img.youtube.com/vi/$videoId/maxresdefault.jpg',
+                                      width: 400,
+                                      height: 280,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (context, child, progress) {
+                                        if (progress == null) return child;
+                                        return Container(
+                                          width: 400,
+                                          height: 280,
+                                          color: Colors.grey[200],
+                                          child: const Center(
+                                            child: SizedBox(
+                                              width: 32,
+                                              height: 32,
+                                              child:
+                                                  CircularProgressIndicator(strokeWidth: 2),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          Container(
+                                        width: 400,
+                                        height: 280,
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.broken_image,
+                                            color: Colors.red, size: 48),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 400,
+                                      height: 280,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.3),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: 80,
+                                          height: 80,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.9),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.play_arrow,
+                                            color: Color(0xFF860E66),
+                                            size: 48,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        const Text(
+                                          'PLAY NOW',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
+
+                      // 📋 SUMMARY SECTION
+                      if (summary.isNotEmpty) ...[
+                        Text(
+                          'Summary',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF860E66),
                           ),
                         ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // 📋 SUMMARY SECTION
-                  if (summary.isNotEmpty) ...[
-                    Text(
-                      'Summary',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF860E66),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      summary,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-
-                  // 📝 DESCRIPTION SECTION
-                  if (description.isNotEmpty) ...[
-                    Text(
-                      'Description',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF860E66),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      description,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Colors.black87,
-                        height: 1.6,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-
-                  // ℹ️ DETAILS SECTION
-                  Text(
-                    'Details',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF860E66),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDetailRow('Practice Type:', practiceType),
-                  const SizedBox(height: 12),
-                  _buildDetailRow('Duration:', duration),
-                  const SizedBox(height: 12),
-                  _buildDetailRow('Position:', position),
-                  const SizedBox(height: 12),
-                  _buildDetailRow('Props:', props),
-                  const SizedBox(height: 28),
-
-                  // 🎬 PLAY BUTTON
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => _openVideoPlayer(context, url),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF9800),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                        const SizedBox(height: 8),
+                        Text(
+                          summary,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black87,
+                            height: 1.5,
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Watch Now',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                        const SizedBox(height: 20),
+                      ],
+
+                      // 📝 DESCRIPTION SECTION
+                      if (description.isNotEmpty) ...[
+                        Text(
+                          'Description',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF860E66),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          description,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Colors.black87,
+                            height: 1.6,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+
+                      // ℹ️ DETAILS SECTION
+                      Text(
+                        'Details',
+                        style: const TextStyle(
+                          fontSize: 20,
                           fontWeight: FontWeight.w600,
+                          color: Color(0xFF860E66),
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      _buildDetailRow('Practice Type:', practiceType),
+                      const SizedBox(height: 12),
+                      _buildDetailRow('Duration:', duration),
+                      const SizedBox(height: 12),
+                      _buildDetailRow('Position:', position),
+                      const SizedBox(height: 12),
+                      _buildDetailRow('Props:', props),
+                    ],
                   ),
-                  const SizedBox(height: 40),
-                ],
+                ),
               ),
             ),
           );
@@ -419,14 +423,6 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
               onLoadError: (controller, url, code, message) {
                 debugPrint('WebView load error: $message');
               },
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
             ),
           ],
         ),
