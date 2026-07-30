@@ -478,8 +478,9 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                          final isWide = constraints.maxWidth > 900;
-                          final widthFactor = isWide ? 0.45 : 0.9;
+                          final widthFactor = constraints.maxWidth > 1200 
+                            ? 0.30 
+                            : (constraints.maxWidth > 900 ? 0.45 : 0.9);
 
                           return Wrap(
                             alignment: WrapAlignment.center,
