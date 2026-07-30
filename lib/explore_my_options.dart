@@ -555,9 +555,9 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                // 📺 THUMBNAIL AND INFO ROW
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                // 📺 THUMBNAIL AND INFO COLUMN
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // THUMBNAIL
                     Builder(
@@ -565,8 +565,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                         final videoId = _extractYoutubeId(video.url);
                         if (videoId.isEmpty) {
                           return Container(
-                            width: 140,
-                            height: 110,
+                            height: 180,
                             decoration: BoxDecoration(
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(8),
@@ -578,14 +577,12 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                           borderRadius: BorderRadius.circular(8),
                           child: Image.network(
                             'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
-                            width: 140,
-                            height: 110,
+                            height: 180,
                             fit: BoxFit.cover,
                             loadingBuilder: (context, child, progress) {
                               if (progress == null) return child;
                               return Container(
-                                width: 140,
-                                height: 110,
+                                height: 180,
                                 color: Colors.grey[200],
                                 child: const Center(
                                   child: SizedBox(
@@ -597,8 +594,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                               );
                             },
                             errorBuilder: (context, error, stackTrace) => Container(
-                              width: 140,
-                              height: 110,
+                              height: 180,
                               decoration: BoxDecoration(
                                 color: Colors.grey[300],
                                 borderRadius: BorderRadius.circular(8),
@@ -609,72 +605,70 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                         );
                       },
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(height: 12),
                     // INFO COLUMN
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // SUMMARY
-                          _buildInfoRow(
-                            'SUMMARY:',
-                            video.summary,
-                            maxLines: 2,
-                          ),
-                          const SizedBox(height: 8),
-                          // PROPS
-                          _buildInfoRow(
-                            'PROPS:',
-                            video.props,
-                            maxLines: 1,
-                          ),
-                          const SizedBox(height: 8),
-                          // DURATION
-                          _buildInfoRow(
-                            'DURATION:',
-                            video.duration,
-                            maxLines: 1,
-                          ),
-                          const SizedBox(height: 10),
-                          // EXPLORE NOW BUTTON
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                // Find the video data from videosData
-                                final videoData = videosData.firstWhere(
-                                  (v) => v['url'] == video.url,
-                                  orElse: () => {},
-                                );
-                                if (videoData.isNotEmpty) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => VideoDetailPage(
-                                        videoData: videoData,
-                                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // SUMMARY
+                        _buildInfoRow(
+                          'SUMMARY:',
+                          video.summary,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(height: 8),
+                        // PROPS
+                        _buildInfoRow(
+                          'PROPS:',
+                          video.props,
+                          maxLines: 1,
+                        ),
+                        const SizedBox(height: 8),
+                        // DURATION
+                        _buildInfoRow(
+                          'DURATION:',
+                          video.duration,
+                          maxLines: 1,
+                        ),
+                        const SizedBox(height: 10),
+                        // EXPLORE NOW BUTTON
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Find the video data from videosData
+                              final videoData = videosData.firstWhere(
+                                (v) => v['url'] == video.url,
+                                orElse: () => {},
+                              );
+                              if (videoData.isNotEmpty) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => VideoDetailPage(
+                                      videoData: videoData,
                                     ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFF9800),
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFF9800),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text(
-                                'Explore Now',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                            ),
+                            child: const Text(
+                              'Explore Now',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
