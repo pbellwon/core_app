@@ -55,13 +55,6 @@ class MenuProvider with ChangeNotifier {
         type: MenuItemType.pageLink,
       ),
       MenuItem(
-        title: 'In The Moment Support',
-        icon: Icons.favorite,
-        route: '/get_started',
-        pageFilter: null,
-        type: MenuItemType.pageLink,
-      ),
-      MenuItem(
         title: 'Explore My Options',
         icon: Icons.explore,
         route: '/explore_my_options',
@@ -75,13 +68,7 @@ class MenuProvider with ChangeNotifier {
         pageFilter: null,
         type: MenuItemType.pageLink,
       ),
-      MenuItem(
-        title: 'My Program',
-        icon: Icons.check_box,
-        route: '/get_started',
-        pageFilter: null,
-        type: MenuItemType.pageLink,
-      ),      
+      
       // USER ACTIONS - pokazują się w menu użytkownika (po prawej)
       MenuItem(
         title: 'Settings',

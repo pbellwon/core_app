@@ -64,6 +64,13 @@ class _GetStartedPageState extends State<GetStartedPage> {
               ),
               const SizedBox(height: 20),
               _WelcomeButton(
+                text: 'Go to my favourites',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/my_favourites');
+                },
+              ),
+              const SizedBox(height: 20),
+              _WelcomeButton(
                 text: "Explore my options",
                 onPressed: () {
                   Navigator.push(
@@ -72,13 +79,6 @@ class _GetStartedPageState extends State<GetStartedPage> {
                       builder: (context) => const ExploreMyOptionsPage(),
                     ),
                   );
-                },
-              ),
-              const SizedBox(height: 20),
-              _WelcomeButton(
-                text: 'Go to my favourites',
-                onPressed: () {
-                  Navigator.pushNamed(context, '/my_favourites');
                 },
               ),
               const SizedBox(height: 40),
