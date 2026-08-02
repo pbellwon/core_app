@@ -68,6 +68,13 @@ class MenuProvider with ChangeNotifier {
         pageFilter: null,
         type: MenuItemType.pageLink,
       ),
+      MenuItem(
+        title: 'My Program',
+        icon: Icons.check_box,
+        route: '/get_started',
+        pageFilter: null,
+        type: MenuItemType.pageLink,
+      ),
       
       // USER ACTIONS - pokazują się w menu użytkownika (po prawej)
       MenuItem(
