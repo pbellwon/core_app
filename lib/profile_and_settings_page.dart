@@ -403,16 +403,16 @@ final List<CountryCode> allCountryCodes = [
   CountryCode(name: 'Zimbabwe', code: '+263'),
 ];
 
-/// 👤 STRONA PROFILU UŻYTKOWNIKA
+/// 👤 STRONA PROFILU I USTAWIEŃ UŻYTKOWNIKA
 /// Pozwala przeglądać i edytować dane profilowe
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class ProfileAndSettingsPage extends StatefulWidget {
+  const ProfileAndSettingsPage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfileAndSettingsPage> createState() => _ProfileAndSettingsPageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
   // 🗝️ Klucz do formularza
   final _formKey = GlobalKey<FormState>();
 

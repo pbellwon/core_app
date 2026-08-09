@@ -7,13 +7,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'login_page.dart';
-import 'profile_page.dart';
 import 'get_started.dart';
 import 'welcome_page.dart';
 import 'onboarding_page.dart';
 import 'about_page.dart';
 import 'help_page.dart';
-import 'settings_page.dart';
+import 'share_feedback_page.dart';
+import 'profile_and_settings_page.dart';
 import 'client_profile_quiz.dart';
 import 'quiz_results.dart';
 import 'explore_my_options.dart';
@@ -174,8 +174,8 @@ class MyApp extends StatelessWidget {
           '/': (_) => const RootPage(),
           '/welcome': (_) => const WelcomePage(),
           '/login': (_) => const LoginPage(),
-          '/settings': (_) => const SettingsPage(),
-          '/profile': (_) => const ProfilePage(),
+          '/share_feedback': (_) => const ShareFeedbackPage(),
+          '/profile': (_) => const ProfileAndSettingsPage(),
           '/help': (_) => const HelpPage(),
           '/about': (_) => const AboutPage(),
           '/get_started': (_) => const GetStartedPage(),

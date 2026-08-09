@@ -85,14 +85,14 @@ class MenuProvider with ChangeNotifier {
       
       // USER ACTIONS - pokazują się w menu użytkownika (po prawej)
       MenuItem(
-        title: 'Settings',
-        icon: Icons.settings,
-        route: '/settings',
+        title: 'Share your feedback',
+        icon: Icons.feedback,
+        route: '/share_feedback',
         pageFilter: null,
         type: MenuItemType.userAction,
       ),
       MenuItem(
-        title: 'Profile',
+        title: 'Profile and Settings',
         icon: Icons.person,
         route: '/profile',
         pageFilter: null,
@@ -112,13 +112,6 @@ class MenuProvider with ChangeNotifier {
         pageFilter: null,
         type: MenuItemType.userAction,
       ),     
-      MenuItem(
-        title: 'About',
-        icon: Icons.info,
-        route: '/about',
-        pageFilter: null,
-        type: MenuItemType.userAction,
-      ),
 
       // GLOBAL ACTIONS - pokazują się wszędzie
      // MenuItem(
