@@ -17,7 +17,7 @@ import 'settings_page.dart';
 import 'client_profile_quiz.dart';
 import 'quiz_results.dart';
 import 'explore_my_options.dart';
-import 'help_me_reconnect.dart';
+import 'request_resource.dart';
 import 'my_favourites.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
@@ -182,7 +182,7 @@ class MyApp extends StatelessWidget {
           '/client_quiz': (_) => const ClientProfileQuizPage(),
           '/quiz_results': (_) => const QuizResultsPage(),
           '/explore_my_options': (_) => const ExploreMyOptionsPage(),
-          '/help_me_reconnect': (_) => const HelpMeReconnectPage(),
+          '/request_resource': (_) => const RequestResourcePage(),
           '/my_favourites': (_) => const MyFavouritesPage(),
         },
         onUnknownRoute: (_) {

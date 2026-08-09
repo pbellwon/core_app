@@ -57,9 +57,9 @@ class _GetStartedPageState extends State<GetStartedPage> {
               ),
               const SizedBox(height: 32),
               _WelcomeButton(
-                text: 'Help me reconnect',
+                text: 'Request resource',
                 onPressed: () {
-                  Navigator.pushNamed(context, '/help_me_reconnect');
+                  Navigator.pushNamed(context, '/request_resource');
                 },
               ),
               const SizedBox(height: 20),

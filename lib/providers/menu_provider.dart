@@ -62,6 +62,13 @@ class MenuProvider with ChangeNotifier {
         type: MenuItemType.pageLink,
       ),
       MenuItem(
+        title: 'Request Resource',
+        icon: Icons.add_box,
+        route: '/request_resource',
+        pageFilter: null,
+        type: MenuItemType.pageLink,
+      ),
+      MenuItem(
         title: 'Favourites',
         icon: Icons.star,
         route: '/my_favourites',
