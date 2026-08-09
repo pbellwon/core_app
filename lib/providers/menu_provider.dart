@@ -78,7 +78,7 @@ class MenuProvider with ChangeNotifier {
       MenuItem(
         title: 'My Program',
         icon: Icons.check_box,
-        route: '/get_started',
+        route: '/my_program',
         pageFilter: null,
         type: MenuItemType.pageLink,
       ),

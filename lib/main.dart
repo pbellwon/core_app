@@ -18,6 +18,7 @@ import 'client_profile_quiz.dart';
 import 'quiz_results.dart';
 import 'explore_my_options.dart';
 import 'request_resource.dart';
+import 'my_program_page.dart';
 import 'my_favourites.dart';
 import 'providers/auth_provider.dart';
 import 'providers/menu_provider.dart';
@@ -183,6 +184,7 @@ class MyApp extends StatelessWidget {
           '/quiz_results': (_) => const QuizResultsPage(),
           '/explore_my_options': (_) => const ExploreMyOptionsPage(),
           '/request_resource': (_) => const RequestResourcePage(),
+          '/my_program': (_) => const MyProgramPage(),
           '/my_favourites': (_) => const MyFavouritesPage(),
         },
         onUnknownRoute: (_) {

@@ -57,14 +57,14 @@ class _GetStartedPageState extends State<GetStartedPage> {
               ),
               const SizedBox(height: 32),
               _WelcomeButton(
-                text: 'Request resource',
+                text: 'Go to My Program',
                 onPressed: () {
-                  Navigator.pushNamed(context, '/request_resource');
+                  Navigator.pushNamed(context, '/my_program');
                 },
               ),
               const SizedBox(height: 20),
               _WelcomeButton(
-                text: 'Go to my favourites',
+                text: 'Go to My Favourites',
                 onPressed: () {
                   Navigator.pushNamed(context, '/my_favourites');
                 },
