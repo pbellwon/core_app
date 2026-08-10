@@ -165,9 +165,9 @@ class OnboardingPageState extends State<OnboardingPage> {
   // 👤 DISPLAY NAME (strona 1)
   final TextEditingController _displayNameController = TextEditingController();
 
-  // 📅 BIRTH DATE (strona 2)
-  DateTime? _selectedBirthDate;
-  final TextEditingController _birthDateController = TextEditingController();
+  // 📅 BIRTH YEAR (strona 3)
+  int? _selectedBirthYear;
+  final TextEditingController _birthYearController = TextEditingController();
 
   // 🕐 TIMEZONE (strona 3)
   String? _selectedCountry;
@@ -229,7 +229,7 @@ class OnboardingPageState extends State<OnboardingPage> {
   @override
   void dispose() {
     _displayNameController.dispose();
-    _birthDateController.dispose();
+    _birthYearController.dispose();
     _countryTimezoneSearchController.dispose();
     _countryTimezoneFocusNode.dispose();
     super.dispose();
@@ -456,8 +456,14 @@ class OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  /// 📄 STRONA 3: BIRTH DATE
+  /// 📄 STRONA 3: BIRTH YEAR
   Widget _buildPage3() {
+    final currentYear = DateTime.now().year;
+    final years = List.generate(
+      currentYear - 1920 + 1,
+      (index) => (1920 + index),
+    ).toList()..sort((a, b) => b.compareTo(a));
+
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -481,35 +487,34 @@ class OnboardingPageState extends State<OnboardingPage> {
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 24),
-            TextField(
-              controller: _birthDateController,
-            readOnly: true,
-            onTap: () async {
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: _selectedBirthDate ?? DateTime(2000),
-                firstDate: DateTime(1920),
-                lastDate: DateTime.now(),
-              );
-              if (picked != null) {
-                setState(() {
-                  _selectedBirthDate = picked;
-                  _birthDateController.text =
-                      '${picked.day}/${picked.month}/${picked.year}';
-                });
-              }
-            },
-            decoration: InputDecoration(
-              hintText: 'Select your birth date',
-              suffixIcon: const Icon(Icons.calendar_today),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+            DropdownButtonFormField<int>(
+              value: _selectedBirthYear,
+              hint: const Text('Select your birth year'),
+              items: years
+                  .map((year) => DropdownMenuItem<int>(
+                        value: year,
+                        child: Text(year.toString()),
+                      ))
+                  .toList(),
+              onChanged: (selectedYear) {
+                if (selectedYear != null) {
+                  setState(() {
+                    _selectedBirthYear = selectedYear;
+                    _birthYearController.text = selectedYear.toString();
+                  });
+                }
+              },
+              decoration: InputDecoration(
+                hintText: 'Select your birth year',
+                prefixIcon: const Icon(Icons.calendar_today),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-            ),
             ),
           ],
         ),
@@ -891,9 +896,9 @@ class OnboardingPageState extends State<OnboardingPage> {
                   ),
                   const SizedBox(height: 8),
                   _buildSummaryRow(
-                    'Birth Date',
-                    _selectedBirthDate != null
-                        ? '${_selectedBirthDate!.day}/${_selectedBirthDate!.month}/${_selectedBirthDate!.year}'
+                    'Birth Year',
+                    _selectedBirthYear != null
+                        ? _selectedBirthYear.toString()
                         : 'Not selected',
                   ),
                   const SizedBox(height: 8),
@@ -988,7 +993,9 @@ class OnboardingPageState extends State<OnboardingPage> {
         displayName: _displayNameController.text.isNotEmpty
             ? _displayNameController.text
             : null,
-        dateOfBirth: _selectedBirthDate,
+        dateOfBirth: _selectedBirthYear != null
+            ? DateTime(_selectedBirthYear!)
+            : null,
         timezone: _selectedCountry != null
             ? countryTimezoneMap[_selectedCountry]
             : null,

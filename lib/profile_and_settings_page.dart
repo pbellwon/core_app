@@ -867,7 +867,7 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
     );
 
     _dateOfBirthController = TextEditingController(
-      text: user?.dateOfBirth != null ? _formatDate(user!.dateOfBirth!) : '',
+      text: user?.dateOfBirth != null ? user!.dateOfBirth!.year.toString() : '',
     );
 
     // 📱 Rozdzielenie numeru telefonu na kod i numer właściwy
@@ -999,25 +999,13 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
     _phoneNumberOnlyController.text = fullPhoneNumber;
   }
 
-  /// 📅 FORMATOWANIE DATY (yyyy-MM-dd)
-  String _formatDate(DateTime date) {
-    final year = date.year.toString();
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '$year-$month-$day';
-  }
-
-  /// 📅 PARSOWANIE DATY (z yyyy-MM-dd)
-  DateTime? _parseDate(String dateString) {
-    if (dateString.isEmpty) return null;
+  /// 📅 PARSOWANIE ROKU URODZENIA
+  DateTime? _parseDate(String yearString) {
+    if (yearString.isEmpty) return null;
     try {
-      final parts = dateString.split('-');
-      if (parts.length != 3) return null;
-      final year = int.tryParse(parts[0]);
-      final month = int.tryParse(parts[1]);
-      final day = int.tryParse(parts[2]);
-      if (year == null || month == null || day == null) return null;
-      return DateTime(year, month, day);
+      final year = int.tryParse(yearString);
+      if (year == null) return null;
+      return DateTime(year);
     } catch (e) {
       return null;
     }
@@ -1085,17 +1073,30 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
 
   /// 📅 WYBÓR DATY URODZENIA
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
+    final currentYear = DateTime.now().year;
+    final years = List.generate(
+      currentYear - 1900 + 1,
+      (index) => (1900 + index),
+    ).toList()..sort((a, b) => b.compareTo(a));
+
+    final selectedYear = await showDialog<int>(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      initialEntryMode: DatePickerEntryMode.calendarOnly,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Select your birth year'),
+          children: years
+              .map((year) => SimpleDialogOption(
+                    onPressed: () => Navigator.pop(context, year),
+                    child: Text(year.toString()),
+                  ))
+              .toList(),
+        );
+      },
     );
 
-    if (pickedDate != null && mounted) {
+    if (selectedYear != null && mounted) {
       setState(() {
-        _dateOfBirthController.text = _formatDate(pickedDate);
+        _dateOfBirthController.text = selectedYear.toString();
       });
     }
   }
