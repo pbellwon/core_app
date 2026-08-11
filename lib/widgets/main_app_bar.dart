@@ -278,18 +278,30 @@ class UserProfileButton extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Przycisk "No"
+                  // Przycisk "No"
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context, false),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        foregroundColor: Colors.grey[800],
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                          (states) {
+                            if (states.contains(WidgetState.hovered) ||
+                                states.contains(WidgetState.pressed)) {
+                              return Colors.grey[400]!;
+                            }
+                            return Colors.grey[300]!;
+                          },
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        foregroundColor: WidgetStateProperty.all(Colors.grey[800]),
+                        padding: WidgetStateProperty.all(
+                          const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
                       child: const Text(
@@ -303,15 +315,27 @@ class UserProfileButton extends StatelessWidget {
                     // Przycisk "Yes"
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context, true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFB31288),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                          (states) {
+                            if (states.contains(WidgetState.hovered) ||
+                                states.contains(WidgetState.pressed)) {
+                              return const Color(0xFFFF854D);
+                            }
+                            return const Color(0xFFB31288);
+                          },
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        foregroundColor: WidgetStateProperty.all(Colors.white),
+                        padding: WidgetStateProperty.all(
+                          const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
                       child: const Text(
