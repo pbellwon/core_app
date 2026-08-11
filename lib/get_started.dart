@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widgets/main_app_bar.dart';
 import 'providers/menu_provider.dart';
-import 'explore_my_options.dart';
 
 class GetStartedPage extends StatefulWidget {
   const GetStartedPage({super.key});
@@ -57,27 +56,25 @@ class _GetStartedPageState extends State<GetStartedPage> {
               ),
               const SizedBox(height: 32),
               _WelcomeButton(
-                text: 'Go to My Program',
+                text: 'Explore my options',
                 onPressed: () {
-                  Navigator.pushNamed(context, '/my_program');
+                  Navigator.pushNamed(context, '/explore_my_options');
                 },
               ),
               const SizedBox(height: 20),
               _WelcomeButton(
-                text: 'Go to My Favourites',
+                text: 'Go to my favourites',
                 onPressed: () {
                   Navigator.pushNamed(context, '/my_favourites');
                 },
               ),
               const SizedBox(height: 20),
               _WelcomeButton(
-                text: "Explore my options",
+                text: "Go to my program",
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushNamed(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const ExploreMyOptionsPage(),
-                    ),
+                    '/my_program',
                   );
                 },
               ),

@@ -55,42 +55,35 @@ class MenuProvider with ChangeNotifier {
         type: MenuItemType.pageLink,
       ),
       MenuItem(
-        title: 'Explore My Options',
+        title: 'Explore my options',
         icon: Icons.explore,
         route: '/explore_my_options',
         pageFilter: null,
         type: MenuItemType.pageLink,
       ),
       MenuItem(
-        title: 'Request Resource',
-        icon: Icons.add_box,
-        route: '/request_resource',
-        pageFilter: null,
-        type: MenuItemType.pageLink,
-      ),
-      MenuItem(
-        title: 'Favourites',
+        title: 'My favourites',
         icon: Icons.star,
         route: '/my_favourites',
         pageFilter: null,
         type: MenuItemType.pageLink,
       ),
       MenuItem(
-        title: 'My Program',
+        title: 'My program',
         icon: Icons.check_box,
         route: '/my_program',
         pageFilter: null,
         type: MenuItemType.pageLink,
       ),
+      MenuItem(
+        title: 'Request a resource',
+        icon: Icons.add_box,
+        route: '/request_resource',
+        pageFilter: null,
+        type: MenuItemType.pageLink,
+      ),
       
       // USER ACTIONS - pokazują się w menu użytkownika (po prawej)
-      MenuItem(
-        title: 'Share your feedback',
-        icon: Icons.feedback,
-        route: '/share_feedback',
-        pageFilter: null,
-        type: MenuItemType.userAction,
-      ),
       MenuItem(
         title: 'Profile and Settings',
         icon: Icons.person,
@@ -99,9 +92,9 @@ class MenuProvider with ChangeNotifier {
         type: MenuItemType.userAction,
       ),
       MenuItem(
-        title: 'Logout',
-        icon: Icons.logout,
-        route: '/logout',
+        title: 'Share your feedback',
+        icon: Icons.feedback,
+        route: '/share_feedback',
         pageFilter: null,
         type: MenuItemType.userAction,
       ),
@@ -111,7 +104,14 @@ class MenuProvider with ChangeNotifier {
         route: '/help',
         pageFilter: null,
         type: MenuItemType.userAction,
-      ),     
+      ),
+      MenuItem(
+        title: 'Logout',
+        icon: Icons.logout,
+        route: '/logout',
+        pageFilter: null,
+        type: MenuItemType.userAction,
+      ),    
 
       // GLOBAL ACTIONS - pokazują się wszędzie
      // MenuItem(
