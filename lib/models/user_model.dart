@@ -62,6 +62,7 @@ class AppUser {
   final UserRole role; // Rola użytkownika
   final List<QuizAnswer>? quizAnswers; // Odpowiedzi na quiz profilowy
   final List<String>? favouriteVideos; // Lista ulubionych videoId
+  final List<String>? programVideos; // Lista videoId w My Program
   final List<String>?
   movementConsiderations; // Wybór z sekcji "Movement Considerations"
   final List<String>?
@@ -85,6 +86,7 @@ class AppUser {
     this.role = UserRole.user, // Domyślnie zwykły użytkownik
     this.quizAnswers,
     this.favouriteVideos,
+    this.programVideos,
     this.movementConsiderations,
     this.emotionalEnergyPreferences,
     this.notificationsEnabled = false,
@@ -114,6 +116,8 @@ class AppUser {
         'quizAnswers': quizAnswers!.map((answer) => answer.toMap()).toList(),
       if (favouriteVideos != null && favouriteVideos!.isNotEmpty)
         'favouriteVideos': favouriteVideos,
+      if (programVideos != null && programVideos!.isNotEmpty)
+        'programVideos': programVideos,
       if (movementConsiderations != null)
         'movementConsiderations': movementConsiderations,
       if (emotionalEnergyPreferences != null)
@@ -192,6 +196,9 @@ class AppUser {
       role: parseRole(data['role']),
       quizAnswers: parseQuizAnswers(data['quizAnswers']),
       favouriteVideos: (data['favouriteVideos'] as List?)
+          ?.map((e) => e.toString())
+          .toList(),
+      programVideos: (data['programVideos'] as List?)
           ?.map((e) => e.toString())
           .toList(),
       movementConsiderations: (data['movementConsiderations'] as List?)
@@ -302,6 +309,7 @@ class AppUser {
     UserRole? role,
     List<QuizAnswer>? quizAnswers,
     List<String>? favouriteVideos,
+    List<String>? programVideos,
     List<String>? movementConsiderations,
     List<String>? emotionalEnergyPreferences,
     bool? notificationsEnabled,
@@ -322,6 +330,7 @@ class AppUser {
       role: role ?? this.role,
       quizAnswers: quizAnswers ?? this.quizAnswers,
       favouriteVideos: favouriteVideos ?? this.favouriteVideos,
+      programVideos: programVideos ?? this.programVideos,
       movementConsiderations:
           movementConsiderations ?? this.movementConsiderations,
       emotionalEnergyPreferences:

@@ -9,7 +9,15 @@ import 'pages/video_detail_page.dart';
 class MyFavouritesPage extends StatelessWidget {
   const MyFavouritesPage({super.key});
 
-  Widget _buildVideoCard(BuildContext context, _VideoData video, bool isFav, VoidCallback onFavToggle, double widthFactor) {
+  Widget _buildVideoCard(
+    BuildContext context,
+    _VideoData video,
+    bool isFav,
+    VoidCallback onFavToggle,
+    bool isInProgram,
+    VoidCallback onProgramToggle,
+    double widthFactor,
+  ) {
     return Center(
       child: FractionallySizedBox(
         widthFactor: widthFactor,
@@ -21,36 +29,20 @@ class MyFavouritesPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 📌 TITLE WITH FAVORITE BUTTON
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        video.title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        isFav ? Icons.star : Icons.star_border,
-                        color: isFav ? Colors.amber : Colors.grey,
-                        size: 28,
-                      ),
-                      onPressed: onFavToggle,
-                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                      padding: EdgeInsets.zero,
-                    ),
-                  ],
+                // 📌 TITLE
+                Text(
+                  video.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 10),
-                // 📺 THUMBNAIL AND INFO ROW
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                // 📺 THUMBNAIL AND INFO COLUMN
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // THUMBNAIL
                     Builder(
@@ -58,8 +50,7 @@ class MyFavouritesPage extends StatelessWidget {
                         final videoId = _extractYoutubeId(video.url);
                         if (videoId.isEmpty) {
                           return Container(
-                            width: 140,
-                            height: 110,
+                            height: 180,
                             decoration: BoxDecoration(
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(8),
@@ -71,14 +62,12 @@ class MyFavouritesPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           child: Image.network(
                             'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
-                            width: 140,
-                            height: 110,
+                            height: 180,
                             fit: BoxFit.cover,
                             loadingBuilder: (context, child, progress) {
                               if (progress == null) return child;
                               return Container(
-                                width: 140,
-                                height: 110,
+                                height: 180,
                                 color: Colors.grey[200],
                                 child: const Center(
                                   child: SizedBox(
@@ -90,8 +79,7 @@ class MyFavouritesPage extends StatelessWidget {
                               );
                             },
                             errorBuilder: (context, error, stackTrace) => Container(
-                              width: 140,
-                              height: 110,
+                              height: 180,
                               decoration: BoxDecoration(
                                 color: Colors.grey[300],
                                 borderRadius: BorderRadius.circular(8),
@@ -102,72 +90,93 @@ class MyFavouritesPage extends StatelessWidget {
                         );
                       },
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(height: 12),
                     // INFO COLUMN
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // SUMMARY
-                          _buildInfoRow(
-                            'SUMMARY:',
-                            video.summary,
-                            maxLines: 2,
-                          ),
-                          const SizedBox(height: 8),
-                          // PROPS
-                          _buildInfoRow(
-                            'PROPS:',
-                            video.props,
-                            maxLines: 1,
-                          ),
-                          const SizedBox(height: 8),
-                          // DURATION
-                          _buildInfoRow(
-                            'DURATION:',
-                            video.duration,
-                            maxLines: 1,
-                          ),
-                          const SizedBox(height: 10),
-                          // EXPLORE NOW BUTTON
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                // Find the video data from videosData
-                                final videoData = videosData.firstWhere(
-                                  (v) => v['url'] == video.url,
-                                  orElse: () => {},
-                                );
-                                if (videoData.isNotEmpty) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => VideoDetailPage(
-                                        videoData: videoData,
-                                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // SUMMARY
+                        _buildInfoRow(
+                          'SUMMARY:',
+                          video.summary,
+                          maxLines: 2,
+                        ),
+                        const SizedBox(height: 8),
+                        // PROPS
+                        _buildInfoRow(
+                          'PROPS:',
+                          video.props,
+                          maxLines: 1,
+                        ),
+                        const SizedBox(height: 8),
+                        // DURATION
+                        _buildInfoRow(
+                          'DURATION:',
+                          video.duration,
+                          maxLines: 1,
+                        ),
+                        const SizedBox(height: 10),
+                        // EXPLORE NOW BUTTON
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Find the video data from videosData
+                              final videoData = videosData.firstWhere(
+                                (v) => v['url'] == video.url,
+                                orElse: () => {},
+                              );
+                              if (videoData.isNotEmpty) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => VideoDetailPage(
+                                      videoData: videoData,
                                     ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFF9800),
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFF9800),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text(
-                                'Explore Now',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                            ),
+                            child: const Text(
+                              'Explore Now',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 12),
+                        // ACTION BUTTONS ROW
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildActionButton(
+                                icon: Icons.star,
+                                label: 'Add to Favorites',
+                                isActive: isFav,
+                                onPressed: onFavToggle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _buildActionButton(
+                                icon: Icons.check_box,
+                                label: 'Add to Program',
+                                isActive: isInProgram,
+                                onPressed: onProgramToggle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -180,6 +189,38 @@ class MyFavouritesPage extends StatelessWidget {
   }
 
   /// Helper widget to build info rows
+  /// Helper widget to build action buttons
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(
+        icon,
+        color: isActive ? const Color(0xFFFF9800) : Colors.white,
+        size: 20,
+      ),
+      label: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF860E66),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
   Widget _buildInfoRow(String label, String value, {int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,9 +313,16 @@ class MyFavouritesPage extends StatelessWidget {
                                         builder: (context) {
                                           final video = favVideos[index];
                                           final isFav = favIds.contains(video.url);
-                                          return _buildVideoCard(context, video, isFav, () {
-                                            authProvider.toggleFavouriteVideo(video.url);
-                                          }, 1.0);
+                                          final isInProg = authProvider.isInProgram(video.url);
+                                          return _buildVideoCard(
+                                            context,
+                                            video,
+                                            isFav,
+                                            () => authProvider.toggleFavouriteVideo(video.url),
+                                            isInProg,
+                                            () => authProvider.toggleProgramVideo(video.url),
+                                            1.0,
+                                          );
                                         },
                                       ),
                                     ),

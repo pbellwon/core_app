@@ -132,6 +132,37 @@ class AppAuthProvider with ChangeNotifier {
     return _currentUser?.favouriteVideos?.contains(videoId) ?? false;
   }
 
+  // 📋 DODAJ/USUŃ FILM Z MY PROGRAM
+  Future<void> toggleProgramVideo(String videoId) async {
+    if (_currentUser == null || _firebaseUser == null) {
+      debugPrint('❌ Cannot update program: no user logged in');
+      throw Exception('User is not logged in');
+    }
+    final currentProgram = List<String>.from(_currentUser!.programVideos ?? []);
+    bool isInProgram = currentProgram.contains(videoId);
+    if (isInProgram) {
+      currentProgram.remove(videoId);
+    } else {
+      currentProgram.add(videoId);
+    }
+    _currentUser = _currentUser!.copyWith(programVideos: currentProgram);
+    notifyListeners();
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update({'programVideos': currentProgram});
+      debugPrint('📋 Program updated in Firestore');
+    } catch (e) {
+      debugPrint('❌ Error updating program: $e');
+    }
+  }
+
+  // 📋 SPRAWDŹ, CZY FILM JEST W MY PROGRAM
+  bool isInProgram(String videoId) {
+    return _currentUser?.programVideos?.contains(videoId) ?? false;
+  }
+
   /// ✏️ AKTUALIZACJA PROFILU UŻYTKOWNIKA
   Future<void> updateUserProfile({
     String? displayName,

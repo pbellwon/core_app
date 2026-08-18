@@ -495,9 +495,15 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                                       final video = filteredVideos[index];
                                       final videoId = video.url;
                                       final isFav = authProvider.isFavourite(videoId);
-                                      return _buildVideoCard(video, isFav, () {
-                                        authProvider.toggleFavouriteVideo(videoId);
-                                      }, 1.0);
+                                      final isInProg = authProvider.isInProgram(videoId);
+                                      return _buildVideoCard(
+                                        video,
+                                        isFav,
+                                        () => authProvider.toggleFavouriteVideo(videoId),
+                                        isInProg,
+                                        () => authProvider.toggleProgramVideo(videoId),
+                                        1.0,
+                                      );
                                     },
                                   ),
                                 ),
@@ -517,7 +523,14 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
   }
 
   // Zmieniam sygnaturę _buildVideoCard
-  Widget _buildVideoCard(_VideoData video, bool isFav, VoidCallback onFavToggle, double widthFactor) {
+  Widget _buildVideoCard(
+    _VideoData video,
+    bool isFav,
+    VoidCallback onFavToggle,
+    bool isInProgram,
+    VoidCallback onProgramToggle,
+    double widthFactor,
+  ) {
     return Center(
       child: FractionallySizedBox(
         widthFactor: widthFactor,
@@ -529,31 +542,15 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 📌 TITLE WITH FAVORITE BUTTON
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        video.title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        isFav ? Icons.star : Icons.star_border,
-                        color: isFav ? Colors.amber : Colors.grey,
-                        size: 28,
-                      ),
-                      onPressed: onFavToggle,
-                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                      padding: EdgeInsets.zero,
-                    ),
-                  ],
+                // 📌 TITLE
+                Text(
+                  video.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 10),
                 // 📺 THUMBNAIL AND INFO COLUMN
@@ -669,6 +666,29 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 12),
+                        // ACTION BUTTONS ROW
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildActionButton(
+                                icon: Icons.star,
+                                label: 'Add to Favorites',
+                                isActive: isFav,
+                                onPressed: onFavToggle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _buildActionButton(
+                                icon: Icons.check_box,
+                                label: 'Add to Program',
+                                isActive: isInProgram,
+                                onPressed: onProgramToggle,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ],
@@ -676,6 +696,38 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  /// Helper widget to build action buttons
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(
+        icon,
+        color: isActive ? const Color(0xFFFF9800) : Colors.white,
+        size: 20,
+      ),
+      label: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF860E66),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
     );
