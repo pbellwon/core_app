@@ -723,7 +723,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF860E66),
+        backgroundColor: const Color(0xFFB31288),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         shape: RoundedRectangleBorder(

@@ -211,7 +211,7 @@ class MyFavouritesPage extends StatelessWidget {
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF860E66),
+        backgroundColor: const Color(0xFFB31288),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         shape: RoundedRectangleBorder(
@@ -298,8 +298,9 @@ class MyFavouritesPage extends StatelessWidget {
                           padding: const EdgeInsets.all(16),
                           child: LayoutBuilder(
                             builder: (context, constraints) {
-                              final isWide = constraints.maxWidth > 900;
-                              final widthFactor = isWide ? 0.45 : 0.9;
+                              final widthFactor = constraints.maxWidth > 1200 
+                                ? 0.30 
+                                : (constraints.maxWidth > 900 ? 0.45 : 0.9);
 
                               return Wrap(
                                 alignment: WrapAlignment.center,
