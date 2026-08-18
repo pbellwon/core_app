@@ -160,7 +160,7 @@ class MyFavouritesPage extends StatelessWidget {
                             Expanded(
                               child: _buildActionButton(
                                 icon: Icons.star,
-                                label: 'Add to Favorites',
+                                label: 'Add to Favourites',
                                 isActive: isFav,
                                 onPressed: onFavToggle,
                               ),

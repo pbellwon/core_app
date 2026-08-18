@@ -673,7 +673,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                             Expanded(
                               child: _buildActionButton(
                                 icon: Icons.star,
-                                label: 'Add to Favorites',
+                                label: 'Add to Favourites',
                                 isActive: isFav,
                                 onPressed: onFavToggle,
                               ),
