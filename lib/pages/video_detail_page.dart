@@ -62,32 +62,13 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 📌 TITLE AND FAVORITE BUTTON
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              _isFavorite ? Icons.star : Icons.star_border,
-                              color: _isFavorite ? Colors.amber : Colors.grey,
-                              size: 32,
-                            ),
-                            onPressed: () {
-                              authProvider.toggleFavouriteVideo(url);
-                              setState(() {
-                                _isFavorite = !_isFavorite;
-                              });
-                            },
-                          ),
-                        ],
+                      // 📌 TITLE
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -253,6 +234,69 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                       _buildDetailRow('Position:', position),
                       const SizedBox(height: 12),
                       _buildDetailRow('Props:', props),
+                      const SizedBox(height: 24),
+                      // ACTION BUTTONS ROW
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                authProvider.toggleFavouriteVideo(url);
+                                setState(() {
+                                  _isFavorite = !_isFavorite;
+                                });
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    color: _isFavorite ? const Color(0xFFFF9800) : Colors.grey[600],
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Add to Favourites',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: _isFavorite ? const Color(0xFFFF9800) : Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                authProvider.toggleProgramVideo(url);
+                                setState(() {});
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.check_box,
+                                    color: authProvider.isInProgram(url) ? const Color(0xFFFF9800) : Colors.grey[600],
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Add to Program',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: authProvider.isInProgram(url) ? const Color(0xFFFF9800) : Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
