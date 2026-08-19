@@ -205,34 +205,33 @@ class _MyProgramPageState extends State<MyProgramPage> {
   }
 
   /// Helper widget to build info rows
-  /// Helper widget to build action buttons
+  /// Helper widget to build action buttons (icon + text, clickable)
   Widget _buildActionButton({
     required IconData icon,
     required String label,
     required bool isActive,
     required VoidCallback onPressed,
   }) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(
-        icon,
-        color: isActive ? const Color(0xFFFF9800) : Colors.white,
-        size: 20,
-      ),
-      label: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFB31288),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+    return GestureDetector(
+      onTap: onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isActive ? const Color(0xFFFF9800) : Colors.grey[600],
+            size: 20,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isActive ? const Color(0xFFFF9800) : Colors.grey[600],
+            ),
+          ),
+        ],
       ),
     );
   }
