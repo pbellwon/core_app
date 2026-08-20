@@ -523,6 +523,22 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
   }
 
   // Zmieniam sygnaturę _buildVideoCard
+  void _openVideoDetail(_VideoData video) {
+    final videoData = videosData.firstWhere(
+      (v) => v['url'] == video.url,
+      orElse: () => {},
+    );
+    if (videoData.isNotEmpty) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => VideoDetailPage(
+            videoData: videoData,
+          ),
+        ),
+      );
+    }
+  }
+
   Widget _buildVideoCard(
     _VideoData video,
     bool isFav,
@@ -534,166 +550,155 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     return Center(
       child: FractionallySizedBox(
         widthFactor: widthFactor,
-        child: ClipRRect(
+        child: InkWell(
+          onTap: () => _openVideoDetail(video),
           borderRadius: BorderRadius.circular(12),
-          child: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 📌 TITLE
-                Text(
-                  video.title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 📌 TITLE
+                  Text(
+                    video.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 10),
-                // 📺 THUMBNAIL AND INFO COLUMN
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // THUMBNAIL
-                    Builder(
-                      builder: (context) {
-                        final videoId = _extractYoutubeId(video.url);
-                        if (videoId.isEmpty) {
-                          return Container(
-                            height: 180,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.error, color: Colors.red, size: 28),
-                          );
-                        }
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
-                            height: 180,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, progress) {
-                              if (progress == null) return child;
-                              return Container(
-                                height: 180,
-                                color: Colors.grey[200],
-                                child: const Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  ),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) => Container(
+                  const SizedBox(height: 10),
+                  // 📺 THUMBNAIL AND INFO COLUMN
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // THUMBNAIL
+                      Builder(
+                        builder: (context) {
+                          final videoId = _extractYoutubeId(video.url);
+                          if (videoId.isEmpty) {
+                            return Container(
                               height: 180,
                               decoration: BoxDecoration(
                                 color: Colors.grey[300],
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(Icons.broken_image, color: Colors.red, size: 28),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    // INFO COLUMN
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // SUMMARY
-                        _buildInfoRow(
-                          'SUMMARY:',
-                          video.summary,
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 8),
-                        // PROPS
-                        _buildInfoRow(
-                          'PROPS:',
-                          video.props,
-                          maxLines: 1,
-                        ),
-                        const SizedBox(height: 8),
-                        // DURATION
-                        _buildInfoRow(
-                          'DURATION:',
-                          video.duration,
-                          maxLines: 1,
-                        ),
-                        const SizedBox(height: 10),
-                        // EXPLORE NOW BUTTON
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Find the video data from videosData
-                              final videoData = videosData.firstWhere(
-                                (v) => v['url'] == video.url,
-                                orElse: () => {},
-                              );
-                              if (videoData.isNotEmpty) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => VideoDetailPage(
-                                      videoData: videoData,
+                              child: const Icon(Icons.error, color: Colors.red, size: 28),
+                            );
+                          }
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
+                              height: 180,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, progress) {
+                                if (progress == null) return child;
+                                return Container(
+                                  height: 180,
+                                  color: Colors.grey[200],
+                                  child: const Center(
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
                                     ),
                                   ),
                                 );
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF9800),
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                              },
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                height: 180,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.broken_image, color: Colors.red, size: 28),
                               ),
                             ),
-                            child: const Text(
-                              'Explore Now',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      // INFO COLUMN
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // SUMMARY
+                          _buildInfoRow(
+                            'SUMMARY:',
+                            video.summary,
+                            maxLines: 2,
+                          ),
+                          const SizedBox(height: 8),
+                          // PROPS
+                          _buildInfoRow(
+                            'PROPS:',
+                            video.props,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 8),
+                          // DURATION
+                          _buildInfoRow(
+                            'DURATION:',
+                            video.duration,
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 10),
+                          // EXPLORE NOW BUTTON
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () => _openVideoDetail(video),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFF9800),
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Explore Now',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        // ACTION BUTTONS ROW
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildActionButton(
-                                icon: Icons.star,
-                                label: 'Add to Favourites',
-                                isActive: isFav,
-                                onPressed: onFavToggle,
+                          const SizedBox(height: 12),
+                          // ACTION BUTTONS ROW
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildActionButton(
+                                  icon: Icons.star,
+                                  label: 'Add to Favourites',
+                                  isActive: isFav,
+                                  onPressed: onFavToggle,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _buildActionButton(
-                                icon: Icons.check_box,
-                                label: 'Add to Program',
-                                isActive: isInProgram,
-                                onPressed: onProgramToggle,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: _buildActionButton(
+                                  icon: Icons.check_box,
+                                  label: 'Add to Program',
+                                  isActive: isInProgram,
+                                  onPressed: onProgramToggle,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
