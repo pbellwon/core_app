@@ -288,7 +288,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     return Scaffold(
       appBar: const MainAppBar(
         title: '',
-        showBackButton: true,
+        showBackButton: false,
       ),
       body: Consumer<AppAuthProvider>(
         builder: (context, authProvider, child) {

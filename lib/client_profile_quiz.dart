@@ -326,7 +326,7 @@ class _ClientProfileQuizPageState extends State<ClientProfileQuizPage> {
     return Scaffold(
       appBar: const MainAppBar(
         title: '',
-        showBackButton: true,
+        showBackButton: false,
       ),
       body: Consumer<AppAuthProvider>(
         builder: (context, authProvider, child) {

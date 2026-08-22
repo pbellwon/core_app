@@ -1332,7 +1332,7 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainAppBar(title: '', showBackButton: true),
+      appBar: const MainAppBar(title: '', showBackButton: false),
       body: Consumer<AppAuthProvider>(
         builder: (context, authProvider, child) {
           // ⏳ Ładowanie

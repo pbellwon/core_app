@@ -24,7 +24,7 @@ class _AboutPageState extends State<AboutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainAppBar(title: "", showBackButton: true),
+      appBar: const MainAppBar(title: "", showBackButton: false),
       body: const Center(
         child: Text(
           'About Page\nThis is the about page.',

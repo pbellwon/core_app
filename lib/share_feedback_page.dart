@@ -24,7 +24,7 @@ class _ShareFeedbackPageState extends State<ShareFeedbackPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainAppBar(title: "", showBackButton: true),
+      appBar: const MainAppBar(title: "", showBackButton: false),
       body: const Center(
         child: Text(
           'Share Your Feedback Page\nThis is the Share Your Feedback page.',

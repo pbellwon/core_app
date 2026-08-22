@@ -168,7 +168,7 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainAppBar(title: "", showBackButton: true),
+      appBar: const MainAppBar(title: "", showBackButton: false),
       body: const SafeArea(
         child: Center(
           child: Column(

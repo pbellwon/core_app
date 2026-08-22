@@ -28,43 +28,53 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: title.isNotEmpty ? Text(title) : null,
 
-      // Dynamiczne menu po lewej stronie (jak UserProfileButton)
-      leading: Consumer<MenuProvider>(
-        builder: (context, menuProvider, _) {
-          final pageLinks = menuProvider.pageLinks;
-          final globalActions = menuProvider.globalActions;
-          final allMenuItems = [...pageLinks, ...globalActions];
-          if (allMenuItems.isEmpty) {
-            return const SizedBox.shrink();
-          }
-          return PopupMenuButton<MenuItem>(
-            tooltip: 'Menu',
-            onSelected: (item) {
-              navigatorKey.currentState?.pushNamed(item.route);
-            },
-            itemBuilder: (context) => allMenuItems
-                .map((item) => PopupMenuItem<MenuItem>(
-                      value: item,
-                      child: Row(
-                        children: [
-                          if (item.icon != null)
-                            Icon(item.icon, size: 20, color: const Color(0xFF860E66)),
-                          if (item.icon != null) const SizedBox(width: 12),
-                          Text(
-                            item.title,
-                            style: const TextStyle(
-                              color: Color(0xFF860E66),
-                              fontWeight: FontWeight.w500,
+      // Wyświetlaj przycisk BACK zamiast menu gdy showBackButton == true
+      leading: showBackButton
+          ? Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Color(0xFF860E66)),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            )
+          : Consumer<MenuProvider>(
+              builder: (context, menuProvider, _) {
+                final pageLinks = menuProvider.pageLinks;
+                final globalActions = menuProvider.globalActions;
+                final allMenuItems = [...pageLinks, ...globalActions];
+                if (allMenuItems.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return PopupMenuButton<MenuItem>(
+                  tooltip: 'Menu',
+                  onSelected: (item) {
+                    navigatorKey.currentState?.pushNamed(item.route);
+                  },
+                  itemBuilder: (context) => allMenuItems
+                      .map((item) => PopupMenuItem<MenuItem>(
+                            value: item,
+                            child: Row(
+                              children: [
+                                if (item.icon != null)
+                                  Icon(item.icon, size: 20, color: const Color(0xFF860E66)),
+                                if (item.icon != null) const SizedBox(width: 12),
+                                Text(
+                                  item.title,
+                                  style: const TextStyle(
+                                    color: Color(0xFF860E66),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ))
-                .toList(),
-            child: const Icon(Icons.menu, color: Color(0xFF860E66)),
-          );
-        },
-      ),
+                          ))
+                      .toList(),
+                  child: const Icon(Icons.menu, color: Color(0xFF860E66)),
+                );
+              },
+            ),
 
       centerTitle: false,
       titleSpacing: showBackButton ? 0 : 16,

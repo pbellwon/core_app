@@ -281,7 +281,7 @@ class _MyProgramPageState extends State<MyProgramPage> {
       child: Scaffold(
         appBar: const MainAppBar(
           title: '',
-          showBackButton: true,
+          showBackButton: false,
         ),
         body: Consumer<AppAuthProvider>(
           builder: (context, authProvider, child) {
