@@ -20,6 +20,8 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
   final Set<String> _selectedMovementConsiderationButtons = <String>{};
   bool _isMovementConsiderationExpanded = false;
   bool _isFiltersExpanded = false;
+  String _modalSearchQuery = '';
+  bool _isSearchModalOpen = false;
   
   // Filter selections
   final Set<String> _selectedPracticeTypes = <String>{};
@@ -134,102 +136,25 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     }).toList();
   }
 
-  /// 🔘 Build movement consideration toggle button
-  Widget _buildMovementConsiderationToggleButton(String label) {
-    final isSelected = _selectedMovementConsiderationButtons.contains(label);
-    void onPressed() {
-      setState(() {
-        if (isSelected) {
-          _selectedMovementConsiderationButtons.remove(label);
-        } else {
-          _selectedMovementConsiderationButtons.add(label);
-        }
-      });
-    }
-
-    final buttonChild = Text(
-      label,
-      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-      textAlign: TextAlign.center,
-    );
-
-    if (isSelected) {
-      return ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: buttonChild,
-      );
-    }
-
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF860E66),
-        side: const BorderSide(color: Color(0xFF860E66)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      child: buttonChild,
-    );
+  /// 🔍 Get search-only results (independent of filters)
+  List<_VideoData> _getSearchOnlyVideos() {
+    if (_modalSearchQuery.isEmpty) return _videos;
+    
+    final query = _modalSearchQuery.toLowerCase();
+    return _videos.where((video) {
+      return video.title.toLowerCase().contains(query) ||
+          video.summary.toLowerCase().contains(query) ||
+          video.tags.any((tag) => tag.toLowerCase().contains(query)) ||
+          video.practiceType.toLowerCase().contains(query) ||
+          video.duration.toLowerCase().contains(query) ||
+          video.position.toLowerCase().contains(query) ||
+          video.props.toLowerCase().contains(query);
+    }).toList();
   }
 
-  /// 🔍 Build movement consideration filter buttons group
-  Widget _buildMovementConsiderationFilterButtons() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isNarrow = constraints.maxWidth < 520;
 
-        if (isNarrow) {
-          return Column(
-            children: [
-              for (final label in _movementConsiderationLabels) ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: _buildMovementConsiderationToggleButton(label),
-                ),
-                if (label != _movementConsiderationLabels.last)
-                  const SizedBox(height: 8),
-              ],
-            ],
-          );
-        }
 
-        return Column(
-          children: [
-            for (var i = 0; i < _movementConsiderationLabels.length; i += 2) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildMovementConsiderationToggleButton(
-                      _movementConsiderationLabels[i],
-                    ),
-                  ),
-                  if (i + 1 < _movementConsiderationLabels.length) ...[
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildMovementConsiderationToggleButton(
-                        _movementConsiderationLabels[i + 1],
-                      ),
-                    ),
-                  ] else ...[
-                    const SizedBox(width: 8),
-                    const Expanded(child: SizedBox.shrink()),
-                  ],
-                ],
-              ),
-              if (i + 2 < _movementConsiderationLabels.length)
-                const SizedBox(height: 8),
-            ],
-          ],
-        );
-      },
-    );
-  }
-
-  /// 🔘 Build filter checkbox
+  ///  Build filter checkbox
   Widget _buildFilterCheckbox(
     String label,
     bool isSelected,
@@ -283,6 +208,148 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     );
   }
 
+  /// 🔍 Show search results modal dialog
+  void _showSearchResultsModal(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateModal) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Search Videos',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF860E66),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      _isSearchModalOpen = false;
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 🔍 Search bar in modal
+                    TextField(
+                      onChanged: (value) {
+                        setStateModal(() => _modalSearchQuery = value);
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search in all videos...',
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: _modalSearchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                setStateModal(() => _modalSearchQuery = '');
+                              },
+                            )
+                          : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Results
+                    Expanded(
+                      child: _getSearchOnlyVideos().isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.video_library_outlined,
+                                  size: 64,
+                                  color: Colors.grey.shade400,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _modalSearchQuery.isEmpty
+                                    ? 'Start typing to search...'
+                                    : 'No videos found for "$_modalSearchQuery"',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          )
+                        : Consumer<AppAuthProvider>(
+                            builder: (context, authProvider, child) {
+                              return LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final widthFactor = constraints.maxWidth > 1200 
+                                    ? 0.30 
+                                    : (constraints.maxWidth > 900 ? 0.45 : 0.9);
+
+                                  return SingleChildScrollView(
+                                    child: Wrap(
+                                      alignment: WrapAlignment.center,
+                                      spacing: 20,
+                                      runSpacing: 20,
+                                      children: [
+                                        for (final video in _getSearchOnlyVideos())
+                                          SizedBox(
+                                            width: constraints.maxWidth * widthFactor,
+                                            child: Builder(
+                                              builder: (context) {
+                                                final videoId = video.url;
+                                                final isFav = authProvider.isFavourite(videoId);
+                                                final isInProg = authProvider.isInProgram(videoId);
+                                                return _buildVideoCard(
+                                                  video,
+                                                  isFav,
+                                                  () => authProvider.toggleFavouriteVideo(videoId),
+                                                  isInProg,
+                                                  () => authProvider.toggleProgramVideo(videoId),
+                                                  1.0,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              contentPadding: const EdgeInsets.all(20),
+              insetPadding: const EdgeInsets.all(16),
+            );
+          },
+        );
+      },
+    ).then((_) {
+      // Reset flags and rebuild when modal is closed
+      setState(() {
+        _isSearchModalOpen = false;
+        _modalSearchQuery = '';
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -304,8 +371,28 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // 🔍 SEARCH BAR
+                      TextField(
+                        onTap: () {
+                          // Show modal only on tap
+                          if (!_isSearchModalOpen) {
+                            _isSearchModalOpen = true;
+                            _showSearchResultsModal(context);
+                          }
+                        },
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          hintText: 'Search all videos...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       // Movement Considerations Filter Button
-                        OutlinedButton(
+                      OutlinedButton(
                         onPressed: () {
                           setState(() {
                             _isMovementConsiderationExpanded = !_isMovementConsiderationExpanded;
@@ -329,19 +416,64 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
+                            if (_selectedMovementConsiderationButtons.isNotEmpty) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF860E66),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${_selectedMovementConsiderationButtons.length}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
                             const SizedBox(width: 8),
-                            Icon(
-                              _isMovementConsiderationExpanded ? Icons.expand_less : Icons.expand_more,
-                            ),
+                            if (_selectedMovementConsiderationButtons.isNotEmpty)
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedMovementConsiderationButtons.clear();
+                                  });
+                                },
+                                child: const Icon(Icons.close, size: 20),
+                              )
+                            else
+                              Icon(
+                                _isMovementConsiderationExpanded ? Icons.expand_less : Icons.expand_more,
+                              ),
                           ],
                         ),
                       ),
-                      // Expanded Filters Section
+                      // Expanded Movement Considerations Content
                       if (_isMovementConsiderationExpanded) ...[
                         const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: _buildMovementConsiderationFilterButtons(),
+                        SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildFilterCheckboxGroup(
+                                'MOVEMENT CONSIDERATIONS',
+                                _movementConsiderationLabels,
+                                _selectedMovementConsiderationButtons,
+                                (label) {
+                                  setState(() {
+                                    if (_selectedMovementConsiderationButtons.contains(label)) {
+                                      _selectedMovementConsiderationButtons.remove(label);
+                                    } else {
+                                      _selectedMovementConsiderationButtons.add(label);
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                       // Filters Button
@@ -370,10 +502,41 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
+                            if (_selectedPracticeTypes.isNotEmpty || _selectedDurations.isNotEmpty || _selectedPositions.isNotEmpty || _selectedProps.isNotEmpty) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF860E66),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${_selectedPracticeTypes.length + _selectedDurations.length + _selectedPositions.length + _selectedProps.length}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
                             const SizedBox(width: 8),
-                            Icon(
-                              _isFiltersExpanded ? Icons.expand_less : Icons.expand_more,
-                            ),
+                            if (_selectedPracticeTypes.isNotEmpty || _selectedDurations.isNotEmpty || _selectedPositions.isNotEmpty || _selectedProps.isNotEmpty)
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedPracticeTypes.clear();
+                                    _selectedDurations.clear();
+                                    _selectedPositions.clear();
+                                    _selectedProps.clear();
+                                  });
+                                },
+                                child: const Icon(Icons.close, size: 20),
+                              )
+                            else
+                              Icon(
+                                _isFiltersExpanded ? Icons.expand_less : Icons.expand_more,
+                              ),
                           ],
                         ),
                       ),
