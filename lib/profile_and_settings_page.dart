@@ -447,189 +447,78 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
     'Give you option to be the first to test new app features',
   ];
 
-  Widget _buildInjuryToggleButton(String label) {
-    final isSelected = _selectedInjuryButtons.contains(label);
-    void onPressed() {
-      setState(() {
-        if (isSelected) {
-          _selectedInjuryButtons.remove(label);
-        } else {
-          _selectedInjuryButtons.add(label);
-        }
-      });
-    }
-
-    final buttonChild = Text(
-      label,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-      textAlign: TextAlign.center,
-    );
-
-    if (isSelected) {
-      return ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+  /// 🔘 Build profile checkbox
+  Widget _buildProfileCheckbox(
+    String label,
+    bool isSelected,
+    Function(bool?) onChanged,
+  ) {
+    return Row(
+      children: [
+        Checkbox(
+          value: isSelected,
+          onChanged: onChanged,
+          activeColor: const Color(0xFF860E66),
+        ),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 14),
           ),
         ),
-        child: buttonChild,
-      );
-    }
-
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF860E66),
-        side: const BorderSide(color: Color(0xFF860E66)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      child: buttonChild,
+      ],
     );
   }
 
-  Widget _buildDashedDivider() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final dashCount = (constraints.maxWidth / 10).floor().clamp(1, 200);
-
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(
-            dashCount,
-            (_) => Container(width: 6, height: 1, color: Colors.grey.shade400),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildMovementConsiderationsLabel(String text) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 14,
-          color: Colors.grey.shade400,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmotionalEnergyToggleButton(String label) {
-    final isSelected = _selectedEmotionalEnergyButtons.contains(label);
-    void onPressed() {
-      setState(() {
-        if (isSelected) {
-          _selectedEmotionalEnergyButtons.remove(label);
-        } else {
-          _selectedEmotionalEnergyButtons.add(label);
-        }
-      });
-    }
-
-    final buttonChild = Text(
-      label,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-      textAlign: TextAlign.center,
-    );
-
-    if (isSelected) {
-      return ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: buttonChild,
-      );
-    }
-
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF860E66),
-        side: const BorderSide(color: Color(0xFF860E66)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      child: buttonChild,
-    );
-  }
-
-  Widget _buildEmotionalEnergyGroup(List<String> labels) {
-    if (labels.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isNarrow = constraints.maxWidth < 520;
-
-        if (isNarrow) {
-          return Column(
-            children: [
-              for (final label in labels) ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: _buildEmotionalEnergyToggleButton(label),
-                ),
-                if (label != labels.last) const SizedBox(height: 12),
-              ],
-            ],
+  /// 🔍 Build profile checkbox group
+  Widget _buildProfileCheckboxGroup(
+    List<String> labels,
+    Set<String> selectedItems,
+    Function(String) onToggle,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ...labels.map((label) {
+          return _buildProfileCheckbox(
+            label,
+            selectedItems.contains(label),
+            (_) => onToggle(label),
           );
-        }
-
-        return Column(
-          children: [
-            for (var i = 0; i < labels.length; i += 2) ...[
-              Row(
-                children: [
-                  Expanded(child: _buildEmotionalEnergyToggleButton(labels[i])),
-                  if (i + 1 < labels.length) ...[
-                    const SizedBox(width: 12),
-                    Expanded(child: _buildEmotionalEnergyToggleButton(labels[i + 1])),
-                  ] else ...[
-                    const SizedBox(width: 12),
-                    const Expanded(child: SizedBox.shrink()),
-                  ],
-                ],
-              ),
-              if (i + 2 < labels.length) const SizedBox(height: 12),
-            ],
-          ],
-        );
-      },
+        }).toList(),
+      ],
     );
   }
 
   Widget _buildEmotionalEnergyButtons() {
-    final unselectedLabels = _emotionalEnergyLabels
-        .where((label) => !_selectedEmotionalEnergyButtons.contains(label))
-        .toList();
-    final selectedLabels = _emotionalEnergyLabels
-        .where((label) => _selectedEmotionalEnergyButtons.contains(label))
-        .toList();
+    return _buildProfileCheckboxGroup(
+      _emotionalEnergyLabels,
+      _selectedEmotionalEnergyButtons,
+      (label) {
+        setState(() {
+          if (_selectedEmotionalEnergyButtons.contains(label)) {
+            _selectedEmotionalEnergyButtons.remove(label);
+          } else {
+            _selectedEmotionalEnergyButtons.add(label);
+          }
+        });
+      },
+    );
+  }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (selectedLabels.isNotEmpty) ...[
-          _buildMovementConsiderationsLabel('Selected'),
-          const SizedBox(height: 8),
-        ],
-        _buildEmotionalEnergyGroup(selectedLabels),
-        const SizedBox(height: 20),
-        _buildDashedDivider(),
-        const SizedBox(height: 20),
-        if (unselectedLabels.isNotEmpty) ...[
-          _buildMovementConsiderationsLabel('Unselected'),
-          const SizedBox(height: 8),
-        ],
-        _buildEmotionalEnergyGroup(unselectedLabels),
-      ],
+  Widget _buildMovementConsiderationsButtons() {
+    return _buildProfileCheckboxGroup(
+      _movementConsiderationLabels,
+      _selectedInjuryButtons,
+      (label) {
+        setState(() {
+          if (_selectedInjuryButtons.contains(label)) {
+            _selectedInjuryButtons.remove(label);
+          } else {
+            _selectedInjuryButtons.add(label);
+          }
+        });
+      },
     );
   }
 
@@ -725,80 +614,6 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildMovementConsiderationsGroup(List<String> labels) {
-    if (labels.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isNarrow = constraints.maxWidth < 520;
-
-        if (isNarrow) {
-          return Column(
-            children: [
-              for (final label in labels) ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: _buildInjuryToggleButton(label),
-                ),
-                if (label != labels.last) const SizedBox(height: 12),
-              ],
-            ],
-          );
-        }
-
-        return Column(
-          children: [
-            for (var i = 0; i < labels.length; i += 2) ...[
-              Row(
-                children: [
-                  Expanded(child: _buildInjuryToggleButton(labels[i])),
-                  if (i + 1 < labels.length) ...[
-                    const SizedBox(width: 12),
-                    Expanded(child: _buildInjuryToggleButton(labels[i + 1])),
-                  ] else ...[
-                    const SizedBox(width: 12),
-                    const Expanded(child: SizedBox.shrink()),
-                  ],
-                ],
-              ),
-              if (i + 2 < labels.length) const SizedBox(height: 12),
-            ],
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildMovementConsiderationsButtons() {
-    final unselectedLabels = _movementConsiderationLabels
-        .where((label) => !_selectedInjuryButtons.contains(label))
-        .toList();
-    final selectedLabels = _movementConsiderationLabels
-        .where((label) => _selectedInjuryButtons.contains(label))
-        .toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (selectedLabels.isNotEmpty) ...[
-          _buildMovementConsiderationsLabel('Selected'),
-          const SizedBox(height: 8),
-        ],
-        _buildMovementConsiderationsGroup(selectedLabels),
-        const SizedBox(height: 20),
-        _buildDashedDivider(),
-        const SizedBox(height: 20),
-        if (unselectedLabels.isNotEmpty) ...[
-          _buildMovementConsiderationsLabel('Unselected'),
-          const SizedBox(height: 8),
-        ],
-        _buildMovementConsiderationsGroup(unselectedLabels),
-      ],
     );
   }
 
@@ -1672,6 +1487,9 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
                           ),
                         ],
                       ),
+
+                      const SizedBox(height: 16),
+
 
                       const SizedBox(height: 16),
 
