@@ -16,12 +16,187 @@ class MyProgramPage extends StatefulWidget {
 }
 
 class _MyProgramPageState extends State<MyProgramPage> {
+  String _modalSearchQuery = '';
+  bool _isSearchModalOpen = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<MenuProvider>(context, listen: false)
           .setCurrentPage('MyProgram');
+    });
+  }
+
+  /// Get search-only results
+  List<_VideoData> _getSearchOnlyVideos() {
+    if (_modalSearchQuery.isEmpty) {
+      return videosData
+          .map((video) => _VideoData(
+                url: video['url'] as String,
+                title: video['title'] as String,
+                summary: video['summary'] as String? ?? '',
+                duration: video['duration'] as String? ?? '15-20 minutes',
+                props: video['props'] as String? ?? 'No props',
+              ))
+          .toList();
+    }
+
+    final query = _modalSearchQuery.toLowerCase();
+    return videosData
+        .map((video) => _VideoData(
+              url: video['url'] as String,
+              title: video['title'] as String,
+              summary: video['summary'] as String? ?? '',
+              duration: video['duration'] as String? ?? '15-20 minutes',
+              props: video['props'] as String? ?? 'No props',
+            ))
+        .where((video) {
+          return video.title.toLowerCase().contains(query) ||
+              video.summary.toLowerCase().contains(query) ||
+              video.duration.toLowerCase().contains(query) ||
+              video.props.toLowerCase().contains(query);
+        })
+        .toList();
+  }
+
+  /// Show search results modal
+  void _showSearchResultsModal(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateModal) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Search Videos',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF860E66),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      _isSearchModalOpen = false;
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (value) {
+                        setStateModal(() => _modalSearchQuery = value);
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search in all videos...',
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: _modalSearchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                setStateModal(() => _modalSearchQuery = '');
+                              },
+                            )
+                          : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: _getSearchOnlyVideos().isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.video_library_outlined,
+                                  size: 64,
+                                  color: Colors.grey.shade400,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _modalSearchQuery.isEmpty
+                                    ? 'Start typing to search...'
+                                    : 'No videos found for "$_modalSearchQuery"',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          )
+                        : Consumer<AppAuthProvider>(
+                            builder: (context, authProvider, child) {
+                              return LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final widthFactor = constraints.maxWidth > 1200 
+                                    ? 0.30 
+                                    : (constraints.maxWidth > 900 ? 0.45 : 0.9);
+
+                                  return SingleChildScrollView(
+                                    child: Wrap(
+                                      alignment: WrapAlignment.center,
+                                      spacing: 20,
+                                      runSpacing: 20,
+                                      children: [
+                                        for (final video in _getSearchOnlyVideos())
+                                          SizedBox(
+                                            width: constraints.maxWidth * widthFactor,
+                                            child: Builder(
+                                              builder: (context) {
+                                                final videoId = video.url;
+                                                final isFav = authProvider.isFavourite(videoId);
+                                                final isInProg = authProvider.isInProgram(videoId);
+                                                return _buildVideoCard(
+                                                  context,
+                                                  video,
+                                                  isFav,
+                                                  () => authProvider.toggleFavouriteVideo(videoId),
+                                                  isInProg,
+                                                  () => authProvider.toggleProgramVideo(videoId),
+                                                  1.0,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              contentPadding: const EdgeInsets.all(20),
+              insetPadding: const EdgeInsets.all(16),
+            );
+          },
+        );
+      },
+    ).then((_) {
+      setState(() {
+        _isSearchModalOpen = false;
+        _modalSearchQuery = '';
+      });
     });
   }
 
@@ -287,7 +462,28 @@ class _MyProgramPageState extends State<MyProgramPage> {
           builder: (context, authProvider, child) {
             return SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: TextField(
+                      onTap: () {
+                        if (!_isSearchModalOpen) {
+                          _isSearchModalOpen = true;
+                          _showSearchResultsModal(context);
+                        }
+                      },
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        hintText: 'Search all videos...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                    ),
+                  ),
                   Builder(
                     builder: (context) {
                       final programIds = authProvider.currentUser?.programVideos ?? [];
