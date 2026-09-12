@@ -485,7 +485,8 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
             selectedItems.contains(label),
             (_) => onToggle(label),
           );
-        }).toList(),
+        }),
+        ...?null,
       ],
     );
   }
@@ -546,7 +547,7 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
                 }
               });
             },
-            activeColor: Colors.orange,
+            activeThumbColor: Colors.orange,
             inactiveThumbColor: Colors.grey,
           ),
         ],
@@ -583,7 +584,7 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.orange.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? Colors.orange.withValues(alpha: 0.1) : Colors.transparent,
           border: Border.all(
             color: isSelected ? Colors.orange : Colors.grey.shade300,
             width: isSelected ? 2 : 1,
@@ -1559,7 +1560,20 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
 
                       const SizedBox(height: 32),
 
-                      // �💾 PRZYCISK ZAPISU
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'My Body Support Settings',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF860E66),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -1583,6 +1597,8 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
                           ),
                         ),
                       ),
+
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
