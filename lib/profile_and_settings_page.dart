@@ -1560,20 +1560,6 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
 
                       const SizedBox(height: 32),
 
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'My Body Support Settings',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF860E66),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
