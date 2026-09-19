@@ -364,7 +364,7 @@ class _MyProgramPageState extends State<MyProgramPage> {
                               Expanded(
                                 child: _buildActionButton(
                                   icon: Icons.check_box,
-                                  label: 'Add to Program',
+                                  label: isInProgram ? 'Remove from my program' : 'Add to Program',
                                   isActive: isInProgram,
                                   onPressed: onProgramToggle,
                                 ),

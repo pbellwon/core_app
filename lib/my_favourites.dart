@@ -354,7 +354,7 @@ class _MyFavouritesPageState extends State<MyFavouritesPage> {
                               Expanded(
                                 child: _buildActionButton(
                                   icon: Icons.star,
-                                  label: 'Add to Favourites',
+                                  label: isFav ? 'Remove from Favourites' : 'Add to Favourites',
                                   isActive: isFav,
                                   onPressed: onFavToggle,
                                 ),
