@@ -46,14 +46,6 @@ class MenuProvider with ChangeNotifier {
     _allMenuItems = [
       // PAGE LINKS - pokazują się w hamburger menu
 
-      // Get Started Page - ZAWSZE widoczna
-      MenuItem(
-        title: 'Home',
-        icon: Icons.home,
-        route: '/get_started',
-        pageFilter: null,
-        type: MenuItemType.pageLink,
-      ),
       MenuItem(
         title: 'Explore my options',
         icon: Icons.explore,

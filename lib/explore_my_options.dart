@@ -18,7 +18,6 @@ class ExploreMyOptionsPage extends StatefulWidget {
 class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
   late final List<_VideoData> _videos;
   final Set<String> _selectedMovementConsiderationButtons = <String>{};
-  bool _isMovementConsiderationExpanded = false;
   bool _isFiltersExpanded = false;
   String _modalSearchQuery = '';
   bool _isSearchModalOpen = false;
@@ -391,93 +390,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // Movement Considerations Filter Button
-                      OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _isMovementConsiderationExpanded = !_isMovementConsiderationExpanded;
-                          });
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF860E66),
-                          side: const BorderSide(color: Color(0xFF860E66), width: 2),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Movement Considerations',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            if (_selectedMovementConsiderationButtons.isNotEmpty) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF860E66),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${_selectedMovementConsiderationButtons.length}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                            const SizedBox(width: 8),
-                            if (_selectedMovementConsiderationButtons.isNotEmpty)
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _selectedMovementConsiderationButtons.clear();
-                                  });
-                                },
-                                child: const Icon(Icons.close, size: 20),
-                              )
-                            else
-                              Icon(
-                                _isMovementConsiderationExpanded ? Icons.expand_less : Icons.expand_more,
-                              ),
-                          ],
-                        ),
-                      ),
-                      // Expanded Movement Considerations Content
-                      if (_isMovementConsiderationExpanded) ...[
-                        const SizedBox(height: 12),
-                        SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildFilterCheckboxGroup(
-                                'MOVEMENT CONSIDERATIONS',
-                                _movementConsiderationLabels,
-                                _selectedMovementConsiderationButtons,
-                                (label) {
-                                  setState(() {
-                                    if (_selectedMovementConsiderationButtons.contains(label)) {
-                                      _selectedMovementConsiderationButtons.remove(label);
-                                    } else {
-                                      _selectedMovementConsiderationButtons.add(label);
-                                    }
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
                       // Filters Button
-                      const SizedBox(height: 12),
                       OutlinedButton(
                         onPressed: () {
                           setState(() {
@@ -502,7 +415,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            if (_selectedPracticeTypes.isNotEmpty || _selectedDurations.isNotEmpty || _selectedPositions.isNotEmpty || _selectedProps.isNotEmpty) ...[
+                            if (_selectedMovementConsiderationButtons.isNotEmpty || _selectedPracticeTypes.isNotEmpty || _selectedDurations.isNotEmpty || _selectedPositions.isNotEmpty || _selectedProps.isNotEmpty) ...[
                               const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -511,7 +424,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
-                                  '${_selectedPracticeTypes.length + _selectedDurations.length + _selectedPositions.length + _selectedProps.length}',
+                                  '${_selectedMovementConsiderationButtons.length + _selectedPracticeTypes.length + _selectedDurations.length + _selectedPositions.length + _selectedProps.length}',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
@@ -521,10 +434,11 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                               ),
                             ],
                             const SizedBox(width: 8),
-                            if (_selectedPracticeTypes.isNotEmpty || _selectedDurations.isNotEmpty || _selectedPositions.isNotEmpty || _selectedProps.isNotEmpty)
+                            if (_selectedMovementConsiderationButtons.isNotEmpty || _selectedPracticeTypes.isNotEmpty || _selectedDurations.isNotEmpty || _selectedPositions.isNotEmpty || _selectedProps.isNotEmpty)
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
+                                    _selectedMovementConsiderationButtons.clear();
                                     _selectedPracticeTypes.clear();
                                     _selectedDurations.clear();
                                     _selectedPositions.clear();
@@ -547,6 +461,20 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              _buildFilterCheckboxGroup(
+                                'MOVEMENT CONSIDERATIONS',
+                                _movementConsiderationLabels,
+                                _selectedMovementConsiderationButtons,
+                                (label) {
+                                  setState(() {
+                                    if (_selectedMovementConsiderationButtons.contains(label)) {
+                                      _selectedMovementConsiderationButtons.remove(label);
+                                    } else {
+                                      _selectedMovementConsiderationButtons.add(label);
+                                    }
+                                  });
+                                },
+                              ),
                               _buildFilterCheckboxGroup(
                                 'PRACTICE TYPE',
                                 _practiceTypeLabels,
