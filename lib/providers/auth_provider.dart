@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -154,6 +155,9 @@ class AppAuthProvider with ChangeNotifier {
       notifyListeners();
       
       debugPrint('✅ Force logout completed - user needs to re-login');
+      
+      // Give a moment for Firebase to fully sign out
+      await Future.delayed(Duration(milliseconds: 300));
     } catch (e) {
       debugPrint('❌ Error during force logout: $e');
       rethrow;
