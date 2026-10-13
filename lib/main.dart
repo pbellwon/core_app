@@ -42,29 +42,20 @@ Future<void> _checkAppVersionOnStartup() async {
       // Version changed! Force logout
       debugPrint('🔄 App updated from $storedVersion to $currentVersion - forcing logout');
       
-      // Sign out from Firebase
-      await FirebaseAuth.instance.signOut();
-      
-      // On web, clear all storage to remove persisted Firebase session
+      // Firebase is not initialized yet, so remove the persisted session directly.
       if (kIsWeb) {
-        debugPrint('🧹 Web detected - clearing all storage...');
-        // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
         html.window.localStorage.clear();
         html.window.sessionStorage.clear();
-        
-        // Clear IndexedDB (where Firebase stores persistent auth)
         try {
-          // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
-          final dbs = await html.window.indexedDB!.databases();
-          for (final db in dbs) {
-            debugPrint('🗑️ Deleting IndexedDB: ${db.name}');
-            html.window.indexedDB!.deleteDatabase(db.name!);
-          }
+          await html.window.indexedDB!.deleteDatabase('firebaseLocalStorageDb');
         } catch (e) {
           debugPrint('⚠️ Could not delete IndexedDB: $e');
         }
-        
-        debugPrint('✅ All storage cleared');
+      } else {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        await FirebaseAuth.instance.signOut();
       }
       
       debugPrint('✅ User logged out due to app update');
