@@ -46,8 +46,6 @@ new_build=$((build_number + 1))
 new_version="$version_part+$new_build"
 
 sed -i '' "s/version: .*/version: $new_version/" pubspec.yaml
-# Update APP_VERSION in auth_provider.dart
-sed -i '' "s/const String APP_VERSION = .*/const String APP_VERSION = '$new_version';/" lib/providers/auth_provider.dart
 print_success "Version updated: $current_version → $new_version"
 
 # Clean & Pub Get

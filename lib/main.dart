@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:html' as html;
+import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
@@ -29,40 +30,45 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 final KartraRouteObserver kartraRouteObserver = KartraRouteObserver();
 
-/// 🔄 Check app version and force logout if changed
+// Read from the server (not the compiled bundle) so a stale cached bundle still detects a new deploy.
+Future<String?> _fetchDeployedVersion() async {
+  try {
+    final url = Uri.parse(
+      '${Uri.base.origin}/version.json?t=${DateTime.now().millisecondsSinceEpoch}',
+    );
+    final res = await http.get(url).timeout(const Duration(seconds: 3));
+    if (res.statusCode != 200) return null;
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    return '${data['version']}+${data['build_number']}';
+  } catch (e) {
+    debugPrint('⚠️ Could not fetch deployed version: $e');
+    return null;
+  }
+}
+
+/// Clears the persisted Firebase session when a new version has been deployed.
 Future<void> _checkAppVersionOnStartup() async {
   try {
+    final deployed = await _fetchDeployedVersion();
+    if (deployed == null) return;
+
     final prefs = await SharedPreferences.getInstance();
-    const currentVersion = APP_VERSION;
-    final storedVersion = prefs.getString('app_version');
-    
-    debugPrint('📱 App startup version check: current=$currentVersion, stored=$storedVersion');
-    
-    if (storedVersion != null && storedVersion != currentVersion) {
-      // Version changed! Force logout
-      debugPrint('🔄 App updated from $storedVersion to $currentVersion - forcing logout');
-      
-      // Firebase is not initialized yet, so remove the persisted session directly.
-      if (kIsWeb) {
-        html.window.localStorage.clear();
-        html.window.sessionStorage.clear();
-        try {
-          await html.window.indexedDB!.deleteDatabase('firebaseLocalStorageDb');
-        } catch (e) {
-          debugPrint('⚠️ Could not delete IndexedDB: $e');
-        }
-      } else {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        );
-        await FirebaseAuth.instance.signOut();
+    final stored = prefs.getString('app_version');
+    debugPrint('📱 Version check: deployed=$deployed, stored=$stored');
+
+    if (stored != null && stored != deployed) {
+      debugPrint('🔄 New deploy detected - clearing session');
+      html.window.localStorage.clear();
+      html.window.sessionStorage.clear();
+      try {
+        await html.window.indexedDB!
+            .deleteDatabase('firebaseLocalStorageDb')
+            .timeout(const Duration(seconds: 2));
+      } catch (e) {
+        debugPrint('⚠️ Could not delete IndexedDB: $e');
       }
-      
-      debugPrint('✅ User logged out due to app update');
     }
-    
-    // Always update stored version
-    await prefs.setString('app_version', currentVersion);
+    await prefs.setString('app_version', deployed);
   } catch (e) {
     debugPrint('⚠️ Error checking version on startup: $e');
   }
