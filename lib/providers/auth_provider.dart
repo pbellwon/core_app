@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
+
+// Version from deployment
+const String APP_VERSION = '1.0.0+1';
 
 class AppAuthProvider with ChangeNotifier {
   /// 💾 ZAPISZ WSZYSTKIE ODPOWIEDZI QUIZU DO FIRESTORE
@@ -53,6 +57,18 @@ class AppAuthProvider with ChangeNotifier {
         notifyListeners();
         return;
       }
+      
+      // 🔄 CHECK APP VERSION ON LOGIN - Force re-login if app was updated
+      try {
+        await _checkAndHandleVersionUpdate();
+        if (_firebaseUser == null) {
+          // User was logged out due to version update
+          return;
+        }
+      } catch (e) {
+        debugPrint('⚠️ Error checking app version: $e');
+      }
+      
       _isLoading = true;
       notifyListeners();
       try {
@@ -84,6 +100,64 @@ class AppAuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     });
+  }
+
+  /// 🔄 VERSION CHECK - Force re-login when app is updated
+  Future<void> _checkAndHandleVersionUpdate() async {
+    try {
+      const currentVersion = APP_VERSION;
+      
+      debugPrint('📱 Current app version: $currentVersion');
+      
+      // Get stored version from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final storedVersion = prefs.getString('app_version');
+      
+      debugPrint('💾 Stored app version: $storedVersion');
+      
+      if (storedVersion == null) {
+        // First time - just store the version
+        await prefs.setString('app_version', currentVersion);
+        debugPrint('✅ First app version stored: $currentVersion');
+        return;
+      }
+      
+      if (storedVersion != currentVersion) {
+        // Version changed! Force re-login
+        debugPrint('🔄 App version updated from $storedVersion to $currentVersion');
+        debugPrint('🔐 Forcing user to re-login...');
+        
+        await _performForceLogout();
+        
+        // Update stored version
+        await prefs.setString('app_version', currentVersion);
+        debugPrint('✅ App version updated to: $currentVersion');
+      }
+    } catch (e) {
+      debugPrint('❌ Error in version check: $e');
+    }
+  }
+
+  /// 🔐 FORCE LOGOUT (when app is updated)
+  Future<void> _performForceLogout() async {
+    try {
+      debugPrint('🔐 Performing force logout...');
+      
+      // Sign out from Firebase
+      await FirebaseAuth.instance.signOut();
+      
+      // Clear local state
+      _currentUser = null;
+      _firebaseUser = null;
+      _isLoading = false;
+      
+      notifyListeners();
+      
+      debugPrint('✅ Force logout completed - user needs to re-login');
+    } catch (e) {
+      debugPrint('❌ Error during force logout: $e');
+      rethrow;
+    }
   }
 
   Future<void> _createUserInFirestore(User user) async {
