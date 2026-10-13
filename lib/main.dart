@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:html' as html;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'login_page.dart';
 import 'get_started.dart';
@@ -27,12 +29,38 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 final KartraRouteObserver kartraRouteObserver = KartraRouteObserver();
 
+/// 🔄 Check app version and force logout if changed
+Future<void> _checkAppVersionOnStartup() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    const currentVersion = APP_VERSION;
+    final storedVersion = prefs.getString('app_version');
+    
+    debugPrint('📱 App startup version check: current=$currentVersion, stored=$storedVersion');
+    
+    if (storedVersion != null && storedVersion != currentVersion) {
+      // Version changed! Force logout
+      debugPrint('🔄 App updated from $storedVersion to $currentVersion - forcing logout');
+      await FirebaseAuth.instance.signOut();
+      debugPrint('✅ User logged out due to app update');
+    }
+    
+    // Always update stored version
+    await prefs.setString('app_version', currentVersion);
+  } catch (e) {
+    debugPrint('⚠️ Error checking version on startup: $e');
+  }
+}
+
 void main() async {
   // (usunięto rejestrację iframe)
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // 🔄 Check version and force logout if needed (must be before running app)
+  await _checkAppVersionOnStartup();
 
   FlutterError.onError = (details) {
     debugPrint('FLUTTER ERROR: ${details.exception}');
