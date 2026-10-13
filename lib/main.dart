@@ -41,7 +41,18 @@ Future<void> _checkAppVersionOnStartup() async {
     if (storedVersion != null && storedVersion != currentVersion) {
       // Version changed! Force logout
       debugPrint('🔄 App updated from $storedVersion to $currentVersion - forcing logout');
+      
+      // Sign out from Firebase
       await FirebaseAuth.instance.signOut();
+      
+      // On web, also clear localStorage to remove persisted Firebase session
+      if (kIsWeb) {
+        debugPrint('🧹 Web detected - clearing localStorage...');
+        // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
+        html.window.localStorage.clear();
+        debugPrint('✅ localStorage cleared');
+      }
+      
       debugPrint('✅ User logged out due to app update');
     }
     
@@ -55,12 +66,13 @@ Future<void> _checkAppVersionOnStartup() async {
 void main() async {
   // (usunięto rejestrację iframe)
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // 🔄 Check version BEFORE Firebase init to clear old session
+  await _checkAppVersionOnStartup();
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // 🔄 Check version and force logout if needed (must be before running app)
-  await _checkAppVersionOnStartup();
 
   FlutterError.onError = (details) {
     debugPrint('FLUTTER ERROR: ${details.exception}');
