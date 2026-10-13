@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 // Version from deployment
-const String APP_VERSION = '1.0.0+5';
+const String APP_VERSION = '1.0.0+6';
 
 class AppAuthProvider with ChangeNotifier {
   /// 💾 ZAPISZ WSZYSTKIE ODPOWIEDZI QUIZU DO FIRESTORE
