@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../providers/auth_provider.dart';
@@ -51,6 +53,7 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
           _isFavorite = authProvider.isFavourite(url);
 
           return SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Card(
@@ -92,79 +95,92 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                             );
                           }
                           return Center(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: GestureDetector(
-                                onTap: () => _openVideoPlayer(context, url),
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Image.network(
-                                      'https://img.youtube.com/vi/$videoId/maxresdefault.jpg',
-                                      width: 400,
-                                      height: 280,
-                                      fit: BoxFit.cover,
-                                      loadingBuilder: (context, child, progress) {
-                                        if (progress == null) return child;
-                                        return Container(
+                            child: SizedBox(
+                              width: 400,
+                              height: 280,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    debugPrint('🎬 PLAY NOW tapped - starting video player');
+                                    _openVideoPlayer(context, url);
+                                  },
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        // Background image
+                                        Image.network(
+                                          'https://img.youtube.com/vi/$videoId/maxresdefault.jpg',
                                           width: 400,
                                           height: 280,
-                                          color: Colors.grey[200],
-                                          child: const Center(
-                                            child: SizedBox(
-                                              width: 32,
-                                              height: 32,
-                                              child:
-                                                  CircularProgressIndicator(strokeWidth: 2),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          Container(
-                                        width: 400,
-                                        height: 280,
-                                        color: Colors.grey[300],
-                                        child: const Icon(Icons.broken_image,
-                                            color: Colors.red, size: 48),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 400,
-                                      height: 280,
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.3),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          width: 80,
-                                          height: 80,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.9),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            Icons.play_arrow,
-                                            color: Color(0xFF860E66),
-                                            size: 48,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (context, child, progress) {
+                                            if (progress == null) return child;
+                                            return Container(
+                                              width: 400,
+                                              height: 280,
+                                              color: Colors.grey[200],
+                                              child: const Center(
+                                                child: SizedBox(
+                                                  width: 32,
+                                                  height: 32,
+                                                  child:
+                                                      CircularProgressIndicator(strokeWidth: 2),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          errorBuilder: (context, error, stackTrace) =>
+                                              Container(
+                                            width: 400,
+                                            height: 280,
+                                            color: Colors.grey[300],
+                                            child: const Icon(Icons.broken_image,
+                                                color: Colors.red, size: 48),
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
-                                        const Text(
-                                          'PLAY NOW',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
+                                        // Dark overlay
+                                        Positioned.fill(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withOpacity(0.3),
+                                            ),
                                           ),
+                                        ),
+                                        // Play button and text
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 80,
+                                              height: 80,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withOpacity(0.9),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.play_arrow,
+                                                color: Color(0xFF860E66),
+                                                size: 48,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            const Text(
+                                              'PLAY NOW',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -338,10 +354,44 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
   }
 
   void _openVideoPlayer(BuildContext context, String url) {
-    showDialog(
-      context: context,
-      builder: (context) => VideoPlayerDialog(videoUrl: url),
-    );
+    debugPrint('📱 _openVideoPlayer called');
+    debugPrint('kIsWeb: $kIsWeb');
+    debugPrint('Screen width: ${MediaQuery.of(context).size.width}');
+    debugPrint('Screen height: ${MediaQuery.of(context).size.height}');
+    
+    // Determine if this is mobile based on screen size (works for both native and web)
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobileScreen = screenWidth < 768; // iPad threshold
+    
+    debugPrint('🔍 isMobileScreen: $isMobileScreen (width: $screenWidth)');
+    
+    try {
+      if (isMobileScreen) {
+        // Open fullscreen on mobile (native or web)
+        debugPrint('🎬 Opening fullscreen video player on mobile');
+        
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FullscreenVideoPlayer(videoUrl: url),
+            fullscreenDialog: true,
+          ),
+        ).then((_) {
+          debugPrint('✅ Fullscreen video player closed');
+        }).catchError((e) {
+          debugPrint('❌ Navigation error: $e');
+        });
+      } else {
+        // Show dialog on web/desktop
+        debugPrint('🖥️ Opening video dialog on desktop');
+        showDialog(
+          context: context,
+          builder: (context) => VideoPlayerDialog(videoUrl: url),
+        );
+      }
+    } catch (e) {
+      debugPrint('🔴 CRITICAL ERROR in _openVideoPlayer: $e');
+    }
   }
 
   String _extractYoutubeId(String url) {
@@ -470,6 +520,143 @@ class _VideoPlayerDialogState extends State<VideoPlayerDialog> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Fullscreen video player for mobile devices
+class FullscreenVideoPlayer extends StatefulWidget {
+  final String videoUrl;
+  const FullscreenVideoPlayer({super.key, required this.videoUrl});
+
+  @override
+  State<FullscreenVideoPlayer> createState() => _FullscreenVideoPlayerState();
+}
+
+class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
+  bool _webViewFailed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupOrientation();
+    _initializeWebView();
+  }
+
+  Future<void> _setupOrientation() async {
+    // Lock orientation to portrait
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    // Hide system UI for immersive fullscreen experience
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  Future<void> _initializeWebView() async {
+    try {
+      final videoId = _extractYoutubeId(widget.videoUrl);
+      if (videoId.isEmpty) {
+        setState(() => _webViewFailed = true);
+        return;
+      }
+    } catch (e) {
+      setState(() => _webViewFailed = true);
+      debugPrint('WebView initialization failed: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    // Restore normal orientation and system UI
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: SystemUiOverlay.values);
+    super.dispose();
+  }
+
+  String _extractYoutubeId(String url) {
+    final regex = RegExp(
+      r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)',
+      caseSensitive: false,
+    );
+    final match = regex.firstMatch(url);
+    return match?.group(1) ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_webViewFailed) {
+      return Scaffold(
+        body: Container(
+          color: Colors.black,
+          child: Stack(
+            children: [
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.video_library,
+                        color: Colors.white, size: 64),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Unable to load video',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF9800),
+                      ),
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 20,
+                left: 20,
+                child: SafeArea(
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 32),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final videoId = _extractYoutubeId(widget.videoUrl);
+    final embedUrl = 'https://www.youtube.com/embed/$videoId?autoplay=1&mute=1&fs=1';
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // Video player
+          InAppWebView(
+            initialSettings: InAppWebViewSettings(
+              mediaPlaybackRequiresUserGesture: false,
+              allowsInlineMediaPlayback: true,
+            ),
+            initialUrlRequest: URLRequest(url: WebUri(embedUrl)),
+            onWebViewCreated: (controller) {},
+            onLoadError: (controller, url, code, message) {
+              debugPrint('WebView load error: $message');
+              setState(() => _webViewFailed = true);
+            },
+          ),
+        ],
       ),
     );
   }
