@@ -641,6 +641,17 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
 
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.7),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white, size: 28),
+          onPressed: () {
+            debugPrint('🎬 Closing fullscreen video player');
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
       body: Stack(
         children: [
           // Video player

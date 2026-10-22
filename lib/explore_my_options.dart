@@ -672,42 +672,44 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                         builder: (context) {
                           final videoId = _extractYoutubeId(video.url);
                           if (videoId.isEmpty) {
-                            return Container(
-                              height: 180,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(Icons.error, color: Colors.red, size: 28),
-                            );
-                          }
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
-                              height: 180,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, progress) {
-                                if (progress == null) return child;
-                                return Container(
-                                  height: 180,
-                                  color: Colors.grey[200],
-                                  child: const Center(
-                                    child: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    ),
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                height: 180,
+                            return AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Container(
                                 decoration: BoxDecoration(
                                   color: Colors.grey[300],
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Icon(Icons.broken_image, color: Colors.red, size: 28),
+                                child: const Icon(Icons.error, color: Colors.red, size: 28),
+                              ),
+                            );
+                          }
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Image.network(
+                                'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, progress) {
+                                  if (progress == null) return child;
+                                  return Container(
+                                    color: Colors.grey[200],
+                                    child: const Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) => Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(Icons.broken_image, color: Colors.red, size: 28),
+                                ),
                               ),
                             ),
                           );
