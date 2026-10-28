@@ -186,6 +186,7 @@ class OnboardingPageState extends State<OnboardingPage> {
     'Lower-back injury/pain',
     'Upper back/neck injury/pain',
     'POTS / Blood pressure related dizziness',
+    'None of the above',
   ];
 
   // 💪 EMOTIONAL ENERGY PREFERENCES (strona 6)
@@ -290,35 +291,6 @@ class OnboardingPageState extends State<OnboardingPage> {
   }
 
   /// 🔧 WIDGET DO BUDOWANIA GRUPY PRZYCISKÓW
-  Widget _buildButtonGroup(List<String> labels, Set<String> selectedSet, bool multiSelect) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 12,
-      children: [
-        for (final label in labels)
-          SizedBox(
-            width: (MediaQuery.of(context).size.width - 80) / 2,
-            child: _buildToggleButton(
-              label,
-              selectedSet.contains(label),
-              () {
-                setState(() {
-                  if (selectedSet.contains(label)) {
-                    selectedSet.remove(label);
-                  } else {
-                    if (!multiSelect) {
-                      selectedSet.clear();
-                    }
-                    selectedSet.add(label);
-                  }
-                });
-              },
-            ),
-          ),
-      ],
-    );
-  }
-
   /// 🔘 Build emotional energy toggle button (simple)
   Widget _buildEmotionalEnergyToggleButton(String label) {
     final isSelected = _selectedEmotionalEnergyPreferences.contains(label);
@@ -678,10 +650,40 @@ class OnboardingPageState extends State<OnboardingPage> {
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 16),
-            _buildButtonGroup(
-              _movementConsiderationLabels,
-              _selectedMovementConsiderations,
-              true,
+            Wrap(
+              spacing: 8,
+              runSpacing: 12,
+              children: [
+                for (final label in _movementConsiderationLabels)
+                  SizedBox(
+                    width: (MediaQuery.of(context).size.width - 80) / 2,
+                    child: _buildToggleButton(
+                      label,
+                      _selectedMovementConsiderations.contains(label),
+                      () {
+                        setState(() {
+                          if (label == 'None of the above') {
+                            // If "None of the above" is clicked, deselect all others
+                            if (_selectedMovementConsiderations.contains(label)) {
+                              _selectedMovementConsiderations.remove(label);
+                            } else {
+                              _selectedMovementConsiderations.clear();
+                              _selectedMovementConsiderations.add(label);
+                            }
+                          } else {
+                            // If any other option is clicked, remove "None of the above"
+                            _selectedMovementConsiderations.remove('None of the above');
+                            if (_selectedMovementConsiderations.contains(label)) {
+                              _selectedMovementConsiderations.remove(label);
+                            } else {
+                              _selectedMovementConsiderations.add(label);
+                            }
+                          }
+                        });
+                      },
+                    ),
+                  ),
+              ],
             ),
           ],
         ),

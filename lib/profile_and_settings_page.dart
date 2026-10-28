@@ -426,6 +426,7 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
     'Lower-back injury/pain',
     'Upper back/neck injury/pain',
     'POTS / Blood pressure related dizziness',
+    'None of the above',
   ];
 
   static const List<String> _emotionalEnergyLabels = <String>[
@@ -513,10 +514,22 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
       _selectedInjuryButtons,
       (label) {
         setState(() {
-          if (_selectedInjuryButtons.contains(label)) {
-            _selectedInjuryButtons.remove(label);
+          if (label == 'None of the above') {
+            // If "None of the above" is clicked, deselect all others
+            if (_selectedInjuryButtons.contains(label)) {
+              _selectedInjuryButtons.remove(label);
+            } else {
+              _selectedInjuryButtons.clear();
+              _selectedInjuryButtons.add(label);
+            }
           } else {
-            _selectedInjuryButtons.add(label);
+            // If any other option is clicked, remove "None of the above"
+            _selectedInjuryButtons.remove('None of the above');
+            if (_selectedInjuryButtons.contains(label)) {
+              _selectedInjuryButtons.remove(label);
+            } else {
+              _selectedInjuryButtons.add(label);
+            }
           }
         });
       },

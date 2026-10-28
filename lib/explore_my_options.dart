@@ -35,6 +35,7 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     'Lower-back injury/pain',
     'Upper back/neck injury/pain',
     'POTS / Blood pressure related dizziness',
+    'None of the above',
   ];
 
   static const List<String> _practiceTypeLabels = <String>[
@@ -106,9 +107,14 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     return _videos.where((video) {
       // Movement Considerations filter
       if (_selectedMovementConsiderationButtons.isNotEmpty) {
-        final matchesMovement = video.tags
-            .any((tag) => _selectedMovementConsiderationButtons.contains(tag));
-        if (!matchesMovement) return false;
+        // If "None of the above" is selected, show all videos
+        if (_selectedMovementConsiderationButtons.contains('None of the above')) {
+          // Continue to next filter
+        } else {
+          final matchesMovement = video.tags
+              .any((tag) => _selectedMovementConsiderationButtons.contains(tag));
+          if (!matchesMovement) return false;
+        }
       }
 
       // Practice Type filter
@@ -467,10 +473,22 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                                 _selectedMovementConsiderationButtons,
                                 (label) {
                                   setState(() {
-                                    if (_selectedMovementConsiderationButtons.contains(label)) {
-                                      _selectedMovementConsiderationButtons.remove(label);
+                                    if (label == 'None of the above') {
+                                      // If "None of the above" is clicked, deselect all others
+                                      if (_selectedMovementConsiderationButtons.contains(label)) {
+                                        _selectedMovementConsiderationButtons.remove(label);
+                                      } else {
+                                        _selectedMovementConsiderationButtons.clear();
+                                        _selectedMovementConsiderationButtons.add(label);
+                                      }
                                     } else {
-                                      _selectedMovementConsiderationButtons.add(label);
+                                      // If any other option is clicked, remove "None of the above"
+                                      _selectedMovementConsiderationButtons.remove('None of the above');
+                                      if (_selectedMovementConsiderationButtons.contains(label)) {
+                                        _selectedMovementConsiderationButtons.remove(label);
+                                      } else {
+                                        _selectedMovementConsiderationButtons.add(label);
+                                      }
                                     }
                                   });
                                 },
