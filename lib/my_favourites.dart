@@ -238,15 +238,45 @@ class _MyFavouritesPageState extends State<MyFavouritesPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 📌 TITLE
-                  Text(
-                    video.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  // 📌 TITLE WITH FAVORITE BUTTON
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          video.title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: onFavToggle,
+                        child: Column(
+                          children: [
+                            Icon(
+                              isFav ? Icons.star : Icons.star_border,
+                              color: isFav ? const Color(0xFFFF9800) : Colors.grey[400],
+                              size: 24,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              isFav ? 'Remove from\nFavourites' : 'Add to\nFavourites',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: isFav ? const Color(0xFFFF9800) : Colors.grey[400],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
                   // 📺 THUMBNAIL AND INFO COLUMN
@@ -350,28 +380,6 @@ class _MyFavouritesPageState extends State<MyFavouritesPage> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          // ACTION BUTTONS ROW
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildActionButton(
-                                  icon: Icons.star,
-                                  label: isFav ? 'Remove from Favourites' : 'Add to Favourites',
-                                  isActive: isFav,
-                                  onPressed: onFavToggle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _buildActionButton(
-                                  icon: Icons.check_box,
-                                  label: 'Add to Program',
-                                  isActive: isInProgram,
-                                  onPressed: onProgramToggle,
-                                ),
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                     ],
@@ -386,37 +394,6 @@ class _MyFavouritesPageState extends State<MyFavouritesPage> {
   }
 
   /// Helper widget to build info rows
-  /// Helper widget to build action buttons (icon + text, clickable)
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    required bool isActive,
-    required VoidCallback onPressed,
-  }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? const Color(0xFFFF9800) : Colors.grey[600],
-            size: 20,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: isActive ? const Color(0xFFFF9800) : Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildInfoRow(String label, String value, {int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -61,13 +61,6 @@ class MenuProvider with ChangeNotifier {
         type: MenuItemType.pageLink,
       ),
       MenuItem(
-        title: 'My program',
-        icon: Icons.check_box,
-        route: '/my_program',
-        pageFilter: null,
-        type: MenuItemType.pageLink,
-      ),
-      MenuItem(
         title: 'Request a resource',
         icon: Icons.add_box,
         route: '/request_resource',
