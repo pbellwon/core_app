@@ -35,7 +35,6 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     'Lower-back injury/pain',
     'Upper back/neck injury/pain',
     'POTS / Blood pressure related dizziness',
-    'None of the above',
   ];
 
   static const List<String> _practiceTypeLabels = <String>[
@@ -93,10 +92,13 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
     final user = authProvider.currentUser;
 
-    if (user?.movementConsiderations != null) {
+    if (user?.movementConsiderations != null && user!.movementConsiderations!.isNotEmpty) {
+      // Filter out 'None of the above' to ensure it doesn't get applied as a filter
       _selectedMovementConsiderationButtons
         ..clear()
-        ..addAll(user!.movementConsiderations ?? []);
+        ..addAll((user.movementConsiderations ?? [])
+            .where((item) => item != 'None of the above')
+            .toList());
     } else {
       _selectedMovementConsiderationButtons.clear();
     }
@@ -107,14 +109,9 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
     return _videos.where((video) {
       // Movement Considerations filter
       if (_selectedMovementConsiderationButtons.isNotEmpty) {
-        // If "None of the above" is selected, show all videos
-        if (_selectedMovementConsiderationButtons.contains('None of the above')) {
-          // Continue to next filter
-        } else {
-          final matchesMovement = video.tags
-              .any((tag) => _selectedMovementConsiderationButtons.contains(tag));
-          if (!matchesMovement) return false;
-        }
+        final matchesMovement = video.tags
+            .any((tag) => _selectedMovementConsiderationButtons.contains(tag));
+        if (!matchesMovement) return false;
       }
 
       // Practice Type filter
@@ -473,22 +470,10 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                                 _selectedMovementConsiderationButtons,
                                 (label) {
                                   setState(() {
-                                    if (label == 'None of the above') {
-                                      // If "None of the above" is clicked, deselect all others
-                                      if (_selectedMovementConsiderationButtons.contains(label)) {
-                                        _selectedMovementConsiderationButtons.remove(label);
-                                      } else {
-                                        _selectedMovementConsiderationButtons.clear();
-                                        _selectedMovementConsiderationButtons.add(label);
-                                      }
+                                    if (_selectedMovementConsiderationButtons.contains(label)) {
+                                      _selectedMovementConsiderationButtons.remove(label);
                                     } else {
-                                      // If any other option is clicked, remove "None of the above"
-                                      _selectedMovementConsiderationButtons.remove('None of the above');
-                                      if (_selectedMovementConsiderationButtons.contains(label)) {
-                                        _selectedMovementConsiderationButtons.remove(label);
-                                      } else {
-                                        _selectedMovementConsiderationButtons.add(label);
-                                      }
+                                      _selectedMovementConsiderationButtons.add(label);
                                     }
                                   });
                                 },

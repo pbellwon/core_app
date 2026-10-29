@@ -426,7 +426,6 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
     'Lower-back injury/pain',
     'Upper back/neck injury/pain',
     'POTS / Blood pressure related dizziness',
-    'None of the above',
   ];
 
   static const List<String> _emotionalEnergyLabels = <String>[
@@ -514,22 +513,10 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
       _selectedInjuryButtons,
       (label) {
         setState(() {
-          if (label == 'None of the above') {
-            // If "None of the above" is clicked, deselect all others
-            if (_selectedInjuryButtons.contains(label)) {
-              _selectedInjuryButtons.remove(label);
-            } else {
-              _selectedInjuryButtons.clear();
-              _selectedInjuryButtons.add(label);
-            }
+          if (_selectedInjuryButtons.contains(label)) {
+            _selectedInjuryButtons.remove(label);
           } else {
-            // If any other option is clicked, remove "None of the above"
-            _selectedInjuryButtons.remove('None of the above');
-            if (_selectedInjuryButtons.contains(label)) {
-              _selectedInjuryButtons.remove(label);
-            } else {
-              _selectedInjuryButtons.add(label);
-            }
+            _selectedInjuryButtons.add(label);
           }
         });
       },
@@ -741,7 +728,9 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
 
     _selectedInjuryButtons
       ..clear()
-      ..addAll(user?.movementConsiderations ?? const <String>[]);
+      ..addAll((user?.movementConsiderations ?? const <String>[])
+          .where((item) => item != 'None of the above')
+          .toList());
 
     _selectedEmotionalEnergyButtons
       ..clear()
@@ -986,7 +975,11 @@ class _ProfileAndSettingsPageState extends State<ProfileAndSettingsPage> {
       }
 
       // ✏️ Aktualizacja profilu (wraz z nowymi polami)
-      final movementConsiderations = _selectedInjuryButtons.toList()..sort();
+      // Filter out 'None of the above' to ensure it doesn't get saved
+      final movementConsiderations = _selectedInjuryButtons
+          .where((item) => item != 'None of the above')
+          .toList()
+        ..sort();
       final emotionalEnergyPreferences = _selectedEmotionalEnergyButtons.toList()..sort();
       final notificationPreferences = _selectedNotifications.toList()..sort();
       await authProvider.updateUserProfile(

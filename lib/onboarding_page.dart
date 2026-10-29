@@ -1002,7 +1002,10 @@ class OnboardingPageState extends State<OnboardingPage> {
             ? countryTimezoneMap[_selectedCountry]
             : null,
         country: _selectedCountry,
-        movementConsiderations: _selectedMovementConsiderations.toList()..sort(),
+        movementConsiderations: _selectedMovementConsiderations
+            .where((item) => item != 'None of the above')
+            .toList()
+          ..sort(),
         emotionalEnergyPreferences: _selectedEmotionalEnergyPreferences.toList()..sort(),
         notificationsEnabled: _notificationsEnabled,
         notificationPreferences: _selectedNotifications.toList()..sort(),
