@@ -1021,11 +1021,11 @@ class OnboardingPageState extends State<OnboardingPage> {
         setState(() => _isLoading = false);
       }
 
-      // Czekaj krótko i zamknij dialog
+      // Czekaj krótko i przejdź na welcome page
       if (!mounted) return;
       await Future.delayed(const Duration(milliseconds: 100));
       if (!mounted) return;
-      Navigator.of(context).pop();
+      Navigator.of(context).pushReplacementNamed('/welcome');
       
     } catch (e) {
       debugPrint('❌ Error in _completeOnboarding: $e');
@@ -1056,7 +1056,7 @@ class OnboardingPageState extends State<OnboardingPage> {
       await authProvider.markOnboardingComplete();
 
       if (!mounted) return;
-      Navigator.of(context).pop();
+      Navigator.of(context).pushReplacementNamed('/welcome');
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

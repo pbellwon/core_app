@@ -97,7 +97,7 @@ class _WelcomePageState extends State<WelcomePage> {
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushNamed('/explore_my_options');
+                Navigator.of(context).pushReplacementNamed('/explore_my_options');
               },
               child: const Text("Let's Explore"),
             ),

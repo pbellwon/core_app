@@ -139,9 +139,9 @@ class LoginPageState extends State<LoginPage> {
           email: email,
           password: password,
         );
-        // Po zalogowaniu przenosimy na welcome page
+        // Po zalogowaniu przenosimy na explore_my_options
         if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed('/welcome');
+        Navigator.of(context).pushReplacementNamed('/explore_my_options');
       } else {
         // ===== REGISTER =====
         UserCredential userCredential =
