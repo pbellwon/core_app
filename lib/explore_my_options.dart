@@ -773,30 +773,6 @@ class _ExploreMyOptionsPageState extends State<ExploreMyOptionsPage> {
                             video.duration,
                             maxLines: 1,
                           ),
-                          const SizedBox(height: 10),
-                          // EXPLORE NOW BUTTON
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () => _openVideoDetail(video),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFF9800),
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                'Explore Now',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
                         ],
                       ),
                     ],
