@@ -73,7 +73,7 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                             child: Text(
                               title,
                               style: const TextStyle(
-                                fontSize: 28,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -100,177 +100,154 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                         builder: (context) {
                           final videoId = _extractYoutubeId(url);
                           if (videoId.isEmpty) {
-                            return Center(
-                              child: Container(
-                                width: 400,
-                                height: 280,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Center(
-                                  child: Icon(Icons.error, color: Colors.red, size: 48),
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Center(
+                                    child: Icon(Icons.error, color: Colors.red, size: 28),
+                                  ),
                                 ),
                               ),
                             );
                           }
-                          return Center(
-                            child: SizedBox(
-                              width: 400,
-                              height: 280,
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    debugPrint('🎬 PLAY NOW tapped - starting video player');
-                                    _openVideoPlayer(context, url);
-                                  },
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Stack(
-                                      alignment: Alignment.center,
+                          return GestureDetector(
+                            onTap: () {
+                              debugPrint('🎬 PLAY NOW tapped - starting video player');
+                              _openVideoPlayer(context, url);
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    // Background image - fills entire space
+                                    Positioned.fill(
+                                      child: Image.network(
+                                        'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (context, child, progress) {
+                                          if (progress == null) return child;
+                                          return Container(
+                                            color: Colors.grey[200],
+                                            child: const Center(
+                                              child: SizedBox(
+                                                width: 24,
+                                                height: 24,
+                                                child: CircularProgressIndicator(strokeWidth: 2),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (context, error, stackTrace) => Container(
+                                          color: Colors.grey[300],
+                                          child: const Icon(Icons.broken_image, color: Colors.red, size: 28),
+                                        ),
+                                      ),
+                                    ),
+                                    // Dark overlay
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.3),
+                                        ),
+                                      ),
+                                    ),
+                                    // Play button and text
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        // Background image
-                                        Image.network(
-                                          'https://img.youtube.com/vi/$videoId/maxresdefault.jpg',
-                                          width: 400,
-                                          height: 280,
-                                          fit: BoxFit.cover,
-                                          loadingBuilder: (context, child, progress) {
-                                            if (progress == null) return child;
-                                            return Container(
-                                              width: 400,
-                                              height: 280,
-                                              color: Colors.grey[200],
-                                              child: const Center(
-                                                child: SizedBox(
-                                                  width: 32,
-                                                  height: 32,
-                                                  child:
-                                                      CircularProgressIndicator(strokeWidth: 2),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          errorBuilder: (context, error, stackTrace) =>
-                                              Container(
-                                            width: 400,
-                                            height: 280,
-                                            color: Colors.grey[300],
-                                            child: const Icon(Icons.broken_image,
-                                                color: Colors.red, size: 48),
+                                        Container(
+                                          width: 60,
+                                          height: 60,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.9),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.play_arrow,
+                                            color: Color(0xFF860E66),
+                                            size: 36,
                                           ),
                                         ),
-                                        // Dark overlay
-                                        Positioned.fill(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.3),
-                                            ),
+                                        const SizedBox(height: 12),
+                                        const Text(
+                                          'PLAY NOW',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                        ),
-                                        // Play button and text
-                                        Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                              width: 80,
-                                              height: 80,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(0.9),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.play_arrow,
-                                                color: Color(0xFF860E66),
-                                                size: 48,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 12),
-                                            const Text(
-                                              'PLAY NOW',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
                                         ),
                                       ],
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ),
                             ),
                           );
                         },
                       ),
-                      const SizedBox(height: 24),
-
+                      const SizedBox(height: 16),
                       // 📋 SUMMARY SECTION
                       if (summary.isNotEmpty) ...[
                         Text(
-                          'Summary',
+                          'SUMMARY:',
                           style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF860E66),
                           ),
                         ),
-                        const SizedBox(height: 8),
                         Text(
                           summary,
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 13,
                             color: Colors.black87,
-                            height: 1.5,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 8),
                       ],
 
                       // 📝 DESCRIPTION SECTION
                       if (description.isNotEmpty) ...[
                         Text(
-                          'Description',
+                          'DESCRIPTION:',
                           style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF860E66),
                           ),
                         ),
-                        const SizedBox(height: 8),
                         Text(
                           description,
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 13,
                             color: Colors.black87,
-                            height: 1.6,
                           ),
+                          maxLines: 5,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 8),
                       ],
 
                       // ℹ️ DETAILS SECTION
-                      Text(
-                        'Details',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF860E66),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildDetailRow('Practice Type:', practiceType),
-                      const SizedBox(height: 12),
-                      _buildDetailRow('Duration:', duration),
-                      const SizedBox(height: 12),
-                      _buildDetailRow('Position:', position),
-                      const SizedBox(height: 12),
-                      _buildDetailRow('Props:', props),
-                      const SizedBox(height: 24),
+                      _buildDetailRow('PRACTICE TYPE:', practiceType),
+                      const SizedBox(height: 8),
+                      _buildDetailRow('DURATION:', duration),
+                      const SizedBox(height: 8),
+                      _buildDetailRow('POSITION:', position),
+                      const SizedBox(height: 8),
+                      _buildDetailRow('PROPS:', props),
                     ],
                   ),
                 ),
@@ -282,30 +259,27 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
     );
   }
 
-  /// Helper widget to build detail rows
-  Widget _buildDetailRow(String label, String value) {
-    return Row(
+  /// Helper widget to build detail rows (same as explore_my_options)
+  Widget _buildDetailRow(String label, String value, {int maxLines = 1}) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF860E66),
-            ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF860E66),
           ),
         ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 13,
+            color: Colors.black87,
           ),
+          maxLines: maxLines,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
