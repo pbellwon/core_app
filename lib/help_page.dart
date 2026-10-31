@@ -92,6 +92,10 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
           overflow: hidden !important;
           z-index: 9999 !important;
         }
+        .kartra_helpdesk_overlay {
+          top: 56px !important;
+          height: calc(100% - 56px) !important;
+        }
       ''';
       html.document.head!.append(style);
     }
@@ -132,17 +136,21 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
 
   void _autoOpenKartra({required int attempt}) {
     if (_cancelled) return;
-    if (attempt > 60) return; // max 30 sekund (60 x 500ms)
+    if (attempt > 120) return; // max 60 sekund (120 x 500ms)
     Future.delayed(const Duration(milliseconds: 500), () {
       if (_cancelled || !mounted) return;
 
       final btn = html.document.getElementById('display_kartra_helpdesk');
-      if (btn == null) {
+      // Przycisk istnieje od razu, ale Kartra podpina jego obsługę kliknięcia dopiero
+      // po załadowaniu swoich skryptów (overlay powstaje w tym samym bloku).
+      // Klik przed tym momentem przepada, więc czekamy na overlay.
+      final kartraReady = html.document.querySelector('.kartra_helpdesk_overlay') != null;
+      if (btn == null || !kartraReady) {
         _autoOpenKartra(attempt: attempt + 1);
         return;
       }
 
-      // Przycisk istnieje – kliknij DOKŁADNIE RAZ i zakończ
+      // Kartra gotowa – kliknij DOKŁADNIE RAZ i zakończ
       _cancelled = true;
       btn.dispatchEvent(html.Event('click', canBubble: true, cancelable: true));
     });
