@@ -55,22 +55,23 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
   }
 
   void _injectKartraIfNeeded() {
-    if (html.document.getElementById('kartra_live_chat') != null) return;
-
     // CSS do <head>
     if (html.document.head!.querySelector('#kartra-css') == null) {
       final link = html.LinkElement()
         ..id = 'kartra-css'
         ..rel = 'stylesheet'
         ..type = 'text/css'
-        ..href = 'https://app.kartra.com/css/new/css/kartra_helpdesk_sidebar_out.css';
+        ..href =
+            'https://app.kartra.com/css/new/css/kartra_helpdesk_sidebar_out.css';
       html.document.head!.append(link);
     }
 
     // Nadpisanie CSS – wyśrodkowanie formularza, przycisk poza ekranem
-    if (html.document.head!.querySelector('#kartra-override-css') == null) {
-      final style = html.StyleElement()..id = 'kartra-override-css';
-      style.text = '''
+    final style =
+        (html.document.getElementById('kartra-override-css')
+            as html.StyleElement?) ??
+        (html.StyleElement()..id = 'kartra-override-css');
+    style.text = '''
         #display_kartra_helpdesk {
           position: fixed !important;
           left: -9999px !important;
@@ -79,14 +80,15 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
         }
         .kartra_helpdesk_sidebar_wrapper {
           position: fixed !important;
-          top: 50% !important;
+          top: 56px !important;
           left: 50% !important;
-          transform: translate(-50%, -50%) !important;
+          transform: translate(-50%, 0) !important;
           right: auto !important;
           bottom: auto !important;
           max-width: 520px !important;
           width: 90vw !important;
-          max-height: 80vh !important;
+          max-height: calc(100vh - 56px - 16px) !important;
+          margin-top: 8px !important;
           box-shadow: 0 8px 32px rgba(0,0,0,0.18) !important;
           border-radius: 16px !important;
           overflow: hidden !important;
@@ -96,9 +98,13 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
           top: 56px !important;
           height: calc(100% - 56px) !important;
         }
+        .kartra_helpdesk_sidebar {
+          top: 56px !important;
+        }
       ''';
-      html.document.head!.append(style);
-    }
+    if (style.parent == null) html.document.head!.append(style);
+
+    if (html.document.getElementById('kartra_live_chat') != null) return;
 
     // Kontener + skrypt + przycisk
     final container = html.DivElement()
@@ -127,7 +133,8 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
   void _showKartra() {
     _cancelled = false;
     html.document.getElementById('kartra_live_chat')?.style.display = '';
-    html.document.querySelectorAll('.kartra_helpdesk_sidebar_wrapper')
+    html.document
+        .querySelectorAll('.kartra_helpdesk_sidebar_wrapper')
         .forEach((el) => (el as html.HtmlElement).style.display = '');
 
     // Przy kolejnych wejściach skrypt jest już załadowany – kliknij od razu
@@ -144,7 +151,8 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
       // Przycisk istnieje od razu, ale Kartra podpina jego obsługę kliknięcia dopiero
       // po załadowaniu swoich skryptów (overlay powstaje w tym samym bloku).
       // Klik przed tym momentem przepada, więc czekamy na overlay.
-      final kartraReady = html.document.querySelector('.kartra_helpdesk_overlay') != null;
+      final kartraReady =
+          html.document.querySelector('.kartra_helpdesk_overlay') != null;
       if (btn == null || !kartraReady) {
         _autoOpenKartra(attempt: attempt + 1);
         return;
@@ -165,7 +173,8 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
       '.kartra_helpdesk_overlay',
       '.js_kartra_helpdesk_wrapper',
     ]) {
-      html.document.querySelectorAll(selector)
+      html.document
+          .querySelectorAll(selector)
           .forEach((el) => (el as html.HtmlElement).style.display = 'none');
     }
     // Usuń blur z body jeśli Kartra go dodała
@@ -182,7 +191,11 @@ class _HelpPageState extends State<HelpPage> with RouteAware {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.headset_mic_outlined, size: 64, color: Color(0xFF860E66)),
+              Icon(
+                Icons.headset_mic_outlined,
+                size: 64,
+                color: Color(0xFF860E66),
+              ),
               SizedBox(height: 24),
               Text(
                 'Need help?',
